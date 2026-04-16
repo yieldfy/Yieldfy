@@ -61,7 +61,7 @@ const HeroSection = () => {
         </nav>
 
         {/* Hero content */}
-        <div className="flex flex-1 flex-col items-center justify-end pb-[200px]">
+        <div className="flex flex-1 flex-col items-center justify-center">
           {/* Featured glass pill (dark variant for hero) */}
           <div className="glass-pill glass-pill-dark mb-10">
             <div className="glass-pill-inner">
