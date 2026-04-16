@@ -20,17 +20,17 @@ const HeroSection = () => {
         playsInline
       />
 
-      {/* Gradient overlay for legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0F1923]/85 via-[#0F1923]/40 to-[#0F1923]/60" />
+      {/* Lighter gradient overlay so blobs glow through */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0F1923]/60 via-[#0F1923]/25 to-[#0F1923]/40" />
 
-      {/* Animated blobs (hero gets strongest opacity) */}
-      <div className="blob absolute -left-[200px] top-[10%] h-[700px] w-[700px] opacity-[0.28]" />
-      <div className="blob absolute -right-[150px] bottom-[5%] h-[800px] w-[800px] opacity-[0.22]" style={{ animationDirection: "reverse" }} />
+      {/* Animated blobs (warm light through video) */}
+      <div className="blob absolute -left-[200px] top-[10%] h-[700px] w-[700px] opacity-[0.35]" />
+      <div className="blob absolute -right-[150px] bottom-[5%] h-[800px] w-[800px] opacity-[0.35]" style={{ animationDirection: "reverse" }} />
 
       {/* Content layer */}
       <div className="relative z-10 flex h-full flex-col">
-        {/* Navigation */}
-        <nav className="glass-nav flex items-center justify-between px-10 py-5">
+        {/* Navigation (transparent over hero) */}
+        <nav className="flex items-center justify-between px-10 py-5">
           <a href="/" className="font-barlow text-xl font-light tracking-tight text-white">
             yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
           </a>
@@ -53,8 +53,8 @@ const HeroSection = () => {
 
         {/* Hero content */}
         <div className="flex flex-1 flex-col items-center justify-end pb-[200px]">
-          {/* Featured glass pill */}
-          <div className="glass-pill mb-10">
+          {/* Featured glass pill (dark variant for hero) */}
+          <div className="glass-pill glass-pill-dark mb-10">
             <div className="glass-pill-inner">
               <span className="font-barlow tracking-wide">★ Featured in Fortune</span>
             </div>
@@ -86,7 +86,7 @@ const HeroSection = () => {
           {/* CTA buttons */}
           <div className="mt-8 flex gap-4">
             <button className="btn-primary">View our work</button>
-            <button className="btn-secondary">Book a call</button>
+            <button className="btn-secondary-dark">Book a call</button>
           </div>
         </div>
       </div>
