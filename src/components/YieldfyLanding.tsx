@@ -7,8 +7,8 @@ const TEXT_50 = "text-[#0F1923]/50";
 const TEXT_40 = "text-[#0F1923]/40";
 const TEXT_30 = "text-[#0F1923]/30";
 
-const BG_CREAM = "bg-[#FAF3E0]";
-const BG_SAND = "bg-[#F5EDD6]";
+const BG_CREAM = "bg-white";
+const BG_SAND = "bg-[#F8F8F8]";
 const BG_WHITE = "bg-white";
 
 function useReveal<T extends HTMLElement>() {
@@ -542,7 +542,7 @@ function CTASection() {
 
 function FooterSection() {
   return (
-    <footer className="relative py-20 px-8 overflow-hidden bg-[#F0E8D4]">
+    <footer className="relative py-20 px-8 overflow-hidden bg-[#F4F4F4]">
       <div className="relative max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
@@ -620,7 +620,7 @@ function ScrolledNav() {
 
 export default function YieldfyLanding() {
   return (
-    <main className="bg-[#FAF3E0] text-[#0F1923] font-barlow">
+    <main className="bg-white text-[#0F1923] font-barlow">
       <ScrolledNav />
       <HowItWorks />
       <Metrics />

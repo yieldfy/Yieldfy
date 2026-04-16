@@ -16,9 +16,9 @@
     --navy: 210 40% 10%;
     --navy-deep: 210 42% 7%;
 
-    --background: 42 72% 93%;          /* #FAF3E0 cream */
+    --background: 0 0% 100%;           /* white */
     --foreground: 210 40% 10%;         /* #0F1923 navy text */
-    --card: 42 72% 93%;
+    --card: 0 0% 100%;
     --card-foreground: 210 40% 10%;
     --popover: 42 72% 93%;
     --popover-foreground: 210 40% 10%;
@@ -66,7 +66,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: 'Barlow', sans-serif;
-    background-color: #FAF3E0;
+    background-color: #ffffff;
     color: #0F1923;
   }
 }
@@ -141,7 +141,7 @@
   }
 
   .glass-nav {
-    background: rgba(250, 243, 224, 0.7);
+    background: rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(40px) saturate(1.4);
     -webkit-backdrop-filter: blur(40px) saturate(1.4);
     border-bottom: 1px solid rgba(15, 25, 35, 0.06);
