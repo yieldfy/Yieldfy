@@ -4,12 +4,12 @@ const VIDEO_SRC =
 const NAV_LINKS = ["Work", "Services", "About", "Blog", "Contact"];
 
 const CornerAccent = ({ className }: { className: string }) => (
-  <span className={`absolute h-[7px] w-[7px] bg-hero-text ${className}`} />
+  <span className={`absolute h-[7px] w-[7px] corner-accent ${className}`} />
 );
 
 const HeroSection = () => {
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden bg-[#0F1923]">
       {/* Background video */}
       <video
         className="absolute inset-0 h-full w-full object-cover"
@@ -20,18 +20,19 @@ const HeroSection = () => {
         playsInline
       />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/40" />
+      {/* Gradient overlay for legibility */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0F1923]/85 via-[#0F1923]/40 to-[#0F1923]/60" />
+
+      {/* Animated blobs (hero gets strongest opacity) */}
+      <div className="blob absolute -left-[200px] top-[10%] h-[700px] w-[700px] opacity-[0.28]" />
+      <div className="blob absolute -right-[150px] bottom-[5%] h-[800px] w-[800px] opacity-[0.22]" style={{ animationDirection: "reverse" }} />
 
       {/* Content layer */}
       <div className="relative z-10 flex h-full flex-col">
         {/* Navigation */}
-        <nav className="flex items-center justify-between px-10 py-6">
-          <a
-            href="/"
-            className="font-barlow text-lg font-semibold tracking-wide text-hero-text"
-          >
-            STUDIO
+        <nav className="glass-nav flex items-center justify-between px-10 py-5">
+          <a href="/" className="font-barlow text-xl font-light tracking-tight text-white">
+            yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
           </a>
 
           <ul className="hidden items-center gap-1 md:flex">
@@ -39,7 +40,7 @@ const HeroSection = () => {
               <li key={link}>
                 <a
                   href={`#${link.toLowerCase()}`}
-                  className="rounded-sm px-4 py-2 font-barlow text-sm font-medium text-hero-text transition-colors hover:bg-hero-nav-hover"
+                  className="rounded-md px-4 py-2 font-barlow text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   {link}
                 </a>
@@ -47,23 +48,19 @@ const HeroSection = () => {
             ))}
           </ul>
 
-          <button className="rounded-hero bg-hero-cta px-5 py-2 font-barlow text-sm font-medium text-hero-cta-foreground transition-colors hover:bg-hero-cta-hover">
-            Get in touch
-          </button>
+          <button className="btn-primary !py-2 !px-5">Get in touch</button>
         </nav>
 
         {/* Hero content */}
-        <div className="flex flex-1 flex-col items-center justify-end pb-[250px]">
-          {/* Featured badge */}
-          <div className="mb-10 rounded-full bg-hero-glass-outer p-[2px] backdrop-blur-sm">
-            <div className="flex items-center gap-2 rounded-full bg-hero-glass-inner px-5 py-1.5 backdrop-blur-md">
-              <span className="font-barlow text-xs font-medium tracking-wide text-hero-text">
-                ★ Featured in Fortune
-              </span>
+        <div className="flex flex-1 flex-col items-center justify-end pb-[200px]">
+          {/* Featured glass pill */}
+          <div className="glass-pill mb-10">
+            <div className="glass-pill-inner">
+              <span className="font-barlow tracking-wide">★ Featured in Fortune</span>
             </div>
           </div>
 
-          {/* Headline container with corner accents */}
+          {/* Headline with corner accents */}
           <div className="relative px-8 py-6">
             <CornerAccent className="left-0 top-0" />
             <CornerAccent className="right-0 top-0" />
@@ -71,29 +68,25 @@ const HeroSection = () => {
             <CornerAccent className="bottom-0 right-0" />
 
             <h1 className="text-center">
-              <span className="block font-barlow text-[64px] font-light leading-[1.1] text-hero-text">
+              <span className="block font-barlow text-[72px] font-light leading-[1.1] text-white">
                 Your XRPL treasuries, now
               </span>
-              <span className="block font-instrument text-[64px] italic leading-[1.1] text-hero-text">
+              <span className="block font-instrument text-[72px] italic leading-[1.1] gradient-text metric-glow">
                 earning Solana yield
               </span>
             </h1>
           </div>
 
           {/* Sub-headline */}
-          <p className="mt-6 max-w-lg text-center font-barlow text-base text-hero-text-muted">
-            We craft scroll-stopping short-form content that drives millions of
-            organic views, turning brands into cultural moments.
+          <p className="mt-6 max-w-lg text-center font-barlow text-base text-white/75">
+            An autonomous routing agent that bridges tokenized treasuries to the best Solana
+            yield venues — institutional, non-custodial, fully auditable.
           </p>
 
           {/* CTA buttons */}
           <div className="mt-8 flex gap-4">
-            <button className="rounded-hero bg-hero-cta px-7 py-3 font-barlow text-sm font-medium text-hero-cta-foreground transition-colors hover:bg-hero-cta-hover">
-              View our work
-            </button>
-            <button className="rounded-hero bg-hero-cta px-7 py-3 font-barlow text-sm font-medium text-hero-cta-foreground transition-colors hover:bg-hero-cta-hover">
-              Book a call
-            </button>
+            <button className="btn-primary">View our work</button>
+            <button className="btn-secondary">Book a call</button>
           </div>
         </div>
       </div>
