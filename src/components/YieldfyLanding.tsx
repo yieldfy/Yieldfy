@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import yieldfyLogo from "@/assets/yieldfy-logo.png";
 
 const TEXT = "text-[#0F1923]";
 const TEXT_70 = "text-[#0F1923]/70";
@@ -546,8 +547,11 @@ function FooterSection() {
       <div className="relative max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
-            <div className={`text-3xl font-light tracking-tight mb-4 ${TEXT}`}>
-              yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+            <div className={`flex items-center gap-2 mb-4 ${TEXT}`}>
+              <img src={yieldfyLogo} alt="Yieldfy logo" className="h-8 w-auto" />
+              <span className="text-3xl font-light tracking-tight">
+                yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+              </span>
             </div>
             <p className={`${TEXT_60} max-w-sm text-sm leading-relaxed`}>
               An autonomous routing agent bridging XRPL tokenized treasuries to the best Solana yield venues.
@@ -598,8 +602,9 @@ function ScrolledNav() {
         scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
       }`}
     >
-      <a href="/" className={`font-barlow text-xl font-light tracking-tight ${TEXT}`}>
-        yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+      <a href="/" className={`flex items-center gap-2 font-barlow text-xl font-light tracking-tight ${TEXT}`}>
+        <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto" />
+        <span>yieldfy<span style={{ color: "#2EC4B6" }}>.</span></span>
       </a>
       <ul className="hidden items-center gap-1 md:flex">
         {NAV_LINKS.map((link) => (
