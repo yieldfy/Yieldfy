@@ -549,7 +549,7 @@ function FooterSection() {
             <div className={`flex items-center gap-2 mb-4 ${TEXT}`}>
               <img src={yieldfyLogo} alt="Yieldfy logo" className="h-8 w-auto" />
               <span className="text-3xl font-light tracking-tight">
-                yieldfy<span className="gradient-text">.</span>
+                yieldfy<span className="text-[#0F1923]">.</span>
               </span>
             </div>
             <p className={`${TEXT_60} max-w-sm text-sm leading-relaxed`}>
@@ -617,7 +617,7 @@ function ScrolledNav() {
     >
       <a href="/" className={`flex items-center gap-2 font-barlow text-xl font-light tracking-tight ${TEXT}`}>
         <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto" />
-        <span>yieldfy<span className="gradient-text">.</span></span>
+        <span>yieldfy<span className="text-[#0F1923]">.</span></span>
       </a>
       <ul className="hidden items-center gap-1 md:flex">
         {NAV_LINKS.map((link) => (
