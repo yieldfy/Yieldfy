@@ -515,7 +515,9 @@ function CTASection() {
   return (
     <section className={`relative py-40 px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
       <Blobs variant="medium" />
-      <div className="relative max-w-4xl mx-auto text-center reveal">
+      <FloatingCoin type="xrp" size={110} rotate={-16} className="absolute left-[6%] top-[20%] z-[1] hidden md:block" />
+      <FloatingCoin type="sol" size={110} rotate={14} delay slow className="absolute right-[6%] bottom-[20%] z-[1] hidden md:block" />
+      <div className="relative max-w-4xl mx-auto text-center reveal z-[2]">
         <div className="glass-refraction glass-refraction-shimmer">
           <div className="glass-refraction-inner">
             <CornerFrame className="py-20 px-8">
