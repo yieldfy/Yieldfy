@@ -20,6 +20,9 @@ const HeroSection = () => {
         playsInline
       />
 
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/40" />
+
       {/* Content layer */}
       <div className="relative z-10 flex h-full flex-col">
         {/* Navigation */}
