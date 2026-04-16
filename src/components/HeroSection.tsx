@@ -65,7 +65,7 @@ const HeroSection = () => {
           {/* Featured glass pill (dark variant for hero) */}
           <div className="glass-pill glass-pill-dark mb-10">
             <div className="glass-pill-inner">
-              <span className="font-barlow tracking-wide">★ Featured in Fortune</span>
+              <span className="font-barlow tracking-wide">XRP × Solana</span>
             </div>
           </div>
 
