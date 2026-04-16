@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
+import FloatingCoin from "./FloatingCoin";
 
 const TEXT = "text-[#0F1923]";
 const TEXT_70 = "text-[#0F1923]/70";
@@ -184,7 +185,9 @@ function Architecture() {
   return (
     <section id="architecture" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
-      <div className="relative max-w-6xl mx-auto">
+      <FloatingCoin type="xrp" size={90} rotate={-14} className="absolute left-[4%] top-[20%] z-[1] hidden md:block opacity-90" />
+      <FloatingCoin type="sol" size={90} rotate={12} delay slow className="absolute right-[4%] bottom-[18%] z-[1] hidden md:block opacity-90" />
+      <div className="relative max-w-6xl mx-auto z-[2]">
         <SectionLabel number="02" label="Architecture" />
         <div className="grid md:grid-cols-5 gap-12 items-start">
           <div className="md:col-span-2">
@@ -512,7 +515,9 @@ function CTASection() {
   return (
     <section className={`relative py-40 px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
       <Blobs variant="medium" />
-      <div className="relative max-w-4xl mx-auto text-center reveal">
+      <FloatingCoin type="xrp" size={110} rotate={-16} className="absolute left-[6%] top-[20%] z-[1] hidden md:block" />
+      <FloatingCoin type="sol" size={110} rotate={14} delay slow className="absolute right-[6%] bottom-[20%] z-[1] hidden md:block" />
+      <div className="relative max-w-4xl mx-auto text-center reveal z-[2]">
         <div className="glass-refraction glass-refraction-shimmer">
           <div className="glass-refraction-inner">
             <CornerFrame className="py-20 px-8">
