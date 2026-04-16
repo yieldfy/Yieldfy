@@ -80,29 +80,29 @@ function HowItWorks() {
     { n: "04", title: "Settle back to XRPL", copy: "Principal and accrued yield unwind back to XRPL on demand, with a full on-chain audit trail across both ledgers." },
   ];
   return (
-    <section id="how-it-works" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="how-it-works" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="01" label="How It Works" />
-        <h2 className={`text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
           From tokenized treasuries to{" "}
           <span className="font-instrument italic font-normal gradient-text">Solana-native yield</span>, in four steps.
         </h2>
-        <p className={`${TEXT_60} text-lg max-w-2xl mb-20 reveal`}>
+        <p className={`${TEXT_60} text-base md:text-lg max-w-2xl mb-12 md:mb-20 reveal`}>
           Yieldfy removes the engineering overhead institutions face when accessing Solana DeFi from an XRPL treasury position.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {steps.map((s, i) => (
             <div
               key={s.n}
-              className="glass-card glass-card-hover p-10 group reveal"
+              className="glass-card glass-card-hover p-6 md:p-10 group reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <div className="flex items-start justify-between mb-8">
+              <div className="flex items-start justify-between mb-6 md:mb-8">
                 <span className="font-mono text-xs gradient-text">{s.n}</span>
                 <GradientDot />
               </div>
-              <h3 className={`text-2xl font-light mb-4 ${TEXT}`}>{s.title}</h3>
-              <p className={`${TEXT_70} leading-relaxed`}>{s.copy}</p>
+              <h3 className={`text-xl md:text-2xl font-light mb-4 ${TEXT}`}>{s.title}</h3>
+              <p className={`${TEXT_70} leading-relaxed text-sm md:text-base`}>{s.copy}</p>
             </div>
           ))}
         </div>
@@ -120,18 +120,18 @@ function Metrics() {
     { k: "24/7", v: "Autonomous agent rebalancing" },
   ];
   return (
-    <section className={`relative py-20 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section className={`relative py-16 px-5 md:py-20 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {stats.map((s, i) => (
             <div
               key={s.k}
-              className="glass-card glass-card-hover p-8 text-center reveal"
+              className="glass-card glass-card-hover p-5 md:p-8 text-center reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <div className="text-4xl md:text-5xl font-instrument italic font-normal mb-3 gradient-text metric-glow">{s.k}</div>
-              <div className={`text-xs tracking-wider uppercase ${TEXT_60}`}>{s.v}</div>
+              <div className="text-3xl md:text-4xl lg:text-5xl font-instrument italic font-normal mb-3 gradient-text metric-glow">{s.k}</div>
+              <div className={`text-[10px] md:text-xs tracking-wider uppercase ${TEXT_60}`}>{s.v}</div>
             </div>
           ))}
         </div>
@@ -182,17 +182,17 @@ function ArchDiagram() {
 function Architecture() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section id="architecture" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="architecture" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="02" label="Architecture" />
-        <div className="grid md:grid-cols-5 gap-12 items-start">
+        <div className="grid md:grid-cols-5 gap-8 md:gap-12 items-start">
           <div className="md:col-span-2">
-            <h2 className={`text-[44px] leading-[1.1] font-light mb-6 ${TEXT} reveal`}>
+            <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-6 ${TEXT} reveal`}>
               Two ledgers.{" "}
               <span className="font-instrument italic font-normal gradient-text">One routing layer.</span>
             </h2>
-            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal text-base md:text-lg`}>
               Yieldfy maintains custody parity across XRPL and Solana through cryptographic proofs. Your treasuries never leave the regulated rails institutions require — they gain yield from them.
             </p>
             <ul className={`space-y-3 ${TEXT} text-sm reveal`}>
@@ -204,9 +204,9 @@ function Architecture() {
               ))}
             </ul>
           </div>
-          <div className="md:col-span-3 reveal">
+          <div className="md:col-span-3 reveal mt-8 md:mt-0">
             <div className="glass-refraction">
-              <div className="glass-refraction-inner p-10">
+              <div className="glass-refraction-inner p-4 md:p-10">
                 <ArchDiagram />
               </div>
             </div>
@@ -251,22 +251,23 @@ function Venues() {
     return 0;
   });
   return (
-    <section id="venues" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="venues" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="03" label="Routing Universe" />
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <h2 className={`text-[44px] leading-[1.1] font-light max-w-2xl ${TEXT} reveal`}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-12 gap-6">
+          <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light max-w-2xl ${TEXT} reveal`}>
             Every major Solana yield venue,{" "}
             <span className="font-instrument italic font-normal gradient-text">evaluated live.</span>
           </h2>
-          <div className="flex gap-2 text-xs tracking-wider uppercase reveal">
+          <div className="flex flex-col sm:flex-row gap-2 text-xs tracking-wider uppercase reveal">
             {(["apy", "tvl"] as const).map((key) => (
               <button
                 key={key}
                 onClick={() => setSortBy(key)}
                 className={
-                  sortBy === key ? "btn-primary !py-2 !px-3 !text-xs" : "btn-secondary !py-2 !px-3 !text-xs"
+                  (sortBy === key ? "btn-primary" : "btn-secondary") +
+                  " !py-2 !px-3 !text-xs w-full sm:w-auto min-h-[44px]"
                 }
               >
                 Sort {key.toUpperCase()}
@@ -274,7 +275,9 @@ function Venues() {
             ))}
           </div>
         </div>
-        <div className="glass-card p-2 reveal">
+
+        {/* Desktop table */}
+        <div className="hidden md:block glass-card p-2 reveal">
           <div className={`grid grid-cols-5 gap-4 px-6 py-4 text-xs tracking-wider uppercase ${TEXT_50} border-b border-[#0F1923]/[0.06]`}>
             <div>Venue</div><div>Strategy</div><div>TVL</div><div>Net APY</div><div className="text-right">Risk Tier</div>
           </div>
@@ -293,6 +296,32 @@ function Venues() {
             </div>
           ))}
         </div>
+
+        {/* Mobile cards */}
+        <div className="md:hidden grid grid-cols-1 gap-3 reveal">
+          {sorted.map((v) => (
+            <div key={v.name} className="glass-card p-5">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className={`font-medium text-lg ${TEXT}`}>{v.name}</div>
+                  <div className={`${TEXT_60} text-xs`}>{v.type}</div>
+                </div>
+                <RiskBadge risk={v.risk} />
+              </div>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className={`text-[10px] tracking-wider uppercase ${TEXT_50}`}>TVL</div>
+                  <div className={`font-mono text-sm ${TEXT}`}>{v.tvl}</div>
+                </div>
+                <div className="text-right">
+                  <div className={`text-[10px] tracking-wider uppercase ${TEXT_50}`}>Net APY</div>
+                  <div className="font-instrument italic text-2xl gradient-text">{v.apy}%</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <p className={`${TEXT_40} text-xs mt-4`}>Sample data for illustration. Live venue coverage expands with every Solana DeFi integration.</p>
       </div>
     </section>
@@ -309,20 +338,20 @@ function AgentLogic() {
     { name: "Rebalancing cost", weight: "5%", desc: "Gas and opportunity cost of moving capital." },
   ];
   return (
-    <section id="agent" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="agent" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="04" label="Agent Logic" />
-        <div className="grid md:grid-cols-2 gap-16">
+        <div className="grid md:grid-cols-2 gap-10 md:gap-16">
           <div>
-            <h2 className={`text-[44px] leading-[1.1] font-light mb-8 ${TEXT} reveal`}>
+            <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-8 ${TEXT} reveal`}>
               An allocator that{" "}
               <span className="font-instrument italic font-normal gradient-text">thinks in basis points.</span>
             </h2>
-            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal text-base md:text-lg`}>
               The Yieldfy agent is a deterministic policy engine — not a black box. Every routing decision is explainable, auditable, and constrained by institutional risk parameters you define.
             </p>
-            <div className="space-y-6 mt-12">
+            <div className="space-y-6 mt-10 md:mt-12">
               {[
                 { title: "Configurable risk budget", desc: "Cap exposure per protocol, chain, or strategy." },
                 { title: "Hysteresis thresholds", desc: "Prevents churn from transient APY spikes." },
@@ -338,14 +367,14 @@ function AgentLogic() {
               ))}
             </div>
           </div>
-          <div className="glass-card p-10 reveal">
+          <div className="glass-card p-6 md:p-10 reveal mt-4 md:mt-0">
             <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-6`}>Scoring weights</div>
             <div className="space-y-5">
               {signals.map((s) => (
                 <div key={s.name}>
                   <div className="flex justify-between items-baseline mb-2">
-                    <span className={`text-sm ${TEXT}`}>{s.name}</span>
-                    <span className="font-mono text-sm gradient-text">{s.weight}</span>
+                    <span className={`text-xs md:text-sm ${TEXT}`}>{s.name}</span>
+                    <span className="font-mono text-xs md:text-sm gradient-text">{s.weight}</span>
                   </div>
                   <div className="h-[3px] bg-[#0F1923]/10 rounded-full mb-2 overflow-hidden">
                     <div className="h-full gradient-bg rounded-full" style={{ width: s.weight }} />
@@ -370,19 +399,19 @@ function Security() {
     { title: "Institutional access control", body: "Multi-sig, HSM-backed signers, and role-based permissions out of the box." },
   ];
   return (
-    <section id="security" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="security" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="05" label="Security" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Built for capital that{" "}
           <span className="font-instrument italic font-normal gradient-text">cannot afford to be wrong.</span>
         </h2>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           {items.map((x, i) => (
             <div
               key={x.title}
-              className="glass-card glass-card-hover p-10 reveal"
+              className="glass-card glass-card-hover p-6 md:p-10 reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               <GradientDot className="mb-6" />
@@ -404,25 +433,25 @@ function Pricing() {
     { name: "Protocol", tag: "For DAOs & issuers", fee: "Custom", feeNote: "revenue-share or flat fee", features: ["White-label routing", "API-first integration", "Co-branded reporting", "Governance hooks"] },
   ];
   return (
-    <section id="pricing" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="pricing" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="06" label="Pricing" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Aligned with your yield —{" "}
           <span className="font-instrument italic font-normal gradient-text">not your TVL.</span>
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {tiers.map((t, i) => {
             const card = (
-              <div className={`p-10 relative h-full glass-card ${t.featured ? "pricing-featured" : "glass-card-hover"}`}>
+              <div className={`p-6 md:p-10 relative h-full glass-card ${t.featured ? "pricing-featured" : "glass-card-hover"}`}>
                 {t.featured && (
-                  <div className="absolute top-4 right-4 gradient-bg text-[#0F1923] text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full font-semibold">Most chosen</div>
+                  <div className="absolute top-3 right-3 md:top-4 md:right-4 gradient-bg text-[#0F1923] text-[9px] md:text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full font-semibold">Most chosen</div>
                 )}
                 <div className={`text-xs tracking-wider uppercase mb-2 ${TEXT_50}`}>{t.tag}</div>
                 <h3 className={`text-3xl font-light mb-6 ${TEXT}`}>{t.name}</h3>
                 <div className="mb-2">
-                  <span className={`font-instrument italic text-5xl ${t.featured ? "gradient-text metric-glow" : TEXT}`}>{t.fee}</span>
+                  <span className={`font-instrument italic text-4xl md:text-5xl ${t.featured ? "gradient-text metric-glow" : TEXT}`}>{t.fee}</span>
                 </div>
                 <div className={`text-xs mb-8 ${TEXT_60}`}>{t.feeNote}</div>
                 <ul className="space-y-3 mb-10">
@@ -433,7 +462,7 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed`}>
+                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed min-h-[44px]`}>
                   Coming soon
                 </button>
               </div>
@@ -467,26 +496,26 @@ function FAQ() {
     { q: "How fast can I exit?", a: "Soft exits (unwinding to stable reserves on Solana) settle within one block. Full XRPL repatriation completes in under nine seconds on average." },
   ];
   return (
-    <section id="faq" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="faq" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-4xl mx-auto">
         <SectionLabel number="07" label="Questions" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 ${TEXT} reveal`}>
           Frequently{" "}
           <span className="font-instrument italic font-normal gradient-text">asked.</span>
         </h2>
-        <div className="glass-card p-2 reveal">
+        <div className="glass-card p-1 md:p-2 reveal">
           {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div key={i} className={`${i !== items.length - 1 ? "border-b border-[#0F1923]/[0.06]" : ""} ${isOpen ? "faq-open" : ""}`}>
                 <button
                   onClick={() => setOpen(isOpen ? -1 : i)}
-                  className="w-full flex justify-between items-center py-6 px-4 text-left transition-colors"
+                  className="w-full flex justify-between items-center gap-4 py-4 px-3 md:py-6 md:px-4 text-left transition-colors min-h-[44px]"
                 >
-                  <span className={`text-lg font-light ${TEXT}`}>{item.q}</span>
+                  <span className={`text-base md:text-lg font-light ${TEXT}`}>{item.q}</span>
                   <span
-                    className="font-mono text-xl transition-all duration-300"
+                    className="font-mono text-xl transition-all duration-300 shrink-0"
                     style={{
                       color: isOpen ? "#2EC4B6" : "rgba(15,25,35,0.25)",
                       transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
@@ -496,7 +525,7 @@ function FAQ() {
                   </span>
                 </button>
                 {isOpen && (
-                  <div className={`pb-6 px-4 ${TEXT_70} leading-relaxed max-w-2xl`}>{item.a}</div>
+                  <div className={`pb-6 px-3 md:px-4 text-sm md:text-base ${TEXT_70} leading-relaxed max-w-2xl`}>{item.a}</div>
                 )}
               </div>
             );
@@ -510,27 +539,27 @@ function FAQ() {
 function CTASection() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section className={`relative py-40 px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
+    <section className={`relative py-20 px-5 md:py-40 md:px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
       <Blobs variant="medium" />
       <div className="relative max-w-4xl mx-auto text-center reveal">
         <div className="glass-refraction glass-refraction-shimmer">
           <div className="glass-refraction-inner">
-            <CornerFrame className="py-20 px-8">
-              <div className="glass-pill mb-10">
-                <div className="glass-pill-inner">Now accepting institutional pilots</div>
+            <CornerFrame className="py-12 px-5 md:py-20 md:px-8">
+              <div className="glass-pill mb-8 md:mb-10">
+                <div className="glass-pill-inner !text-[10px] md:!text-xs">Now accepting institutional pilots</div>
               </div>
-              <h2 className={`text-[64px] leading-[1.05] font-light mb-6 ${TEXT}`}>
+              <h2 className={`text-[32px] md:text-[48px] lg:text-[64px] leading-[1.05] font-light mb-6 ${TEXT}`}>
                 Your treasuries are{" "}
                 <span className="font-instrument italic font-normal gradient-text">working harder</span>
                 <br />
                 by tomorrow morning.
               </h2>
-              <p className={`${TEXT_70} text-lg max-w-xl mx-auto mb-10`}>
+              <p className={`${TEXT_70} text-base md:text-lg max-w-xl mx-auto mb-10`}>
                 Onboard in a single call. Full integration in under two weeks.
               </p>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <button disabled className="btn-primary opacity-60 cursor-not-allowed">Coming soon</button>
-                <button disabled className="btn-secondary opacity-60 cursor-not-allowed">Coming soon</button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <button disabled className="btn-primary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
+                <button disabled className="btn-secondary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
               </div>
             </CornerFrame>
           </div>
@@ -542,10 +571,10 @@ function CTASection() {
 
 function FooterSection() {
   return (
-    <footer className="relative py-20 px-8 overflow-hidden bg-[#F4F4F4]">
+    <footer className="relative py-12 px-5 md:py-20 md:px-8 overflow-hidden bg-[#F4F4F4]">
       <div className="relative max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-16">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-12 mb-12 md:mb-16">
+          <div className="col-span-1 sm:col-span-2 md:col-span-2">
             <div className={`flex items-center gap-2 mb-4 ${TEXT}`}>
               <img src={yieldfyLogo} alt="Yieldfy logo" className="h-8 w-auto" />
               <span className="text-3xl font-light tracking-tight">
@@ -611,12 +640,13 @@ function ScrolledNav() {
   ];
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-4 transition-all duration-300 glass-nav ${
+      className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 py-3 md:px-10 md:py-4 transition-all duration-300 glass-nav ${
         scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
       }`}
+      style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
     >
-      <a href="/" className={`flex items-center gap-2 font-barlow text-xl font-light tracking-tight ${TEXT}`}>
-        <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto" />
+      <a href="/" className={`flex items-center gap-2 font-barlow text-lg md:text-xl font-light tracking-tight ${TEXT}`}>
+        <img src={yieldfyLogo} alt="Yieldfy logo" className="h-6 md:h-7 w-auto" />
         <span>yieldfy<span className="text-[#0F1923]">.</span></span>
       </a>
       <ul className="hidden items-center gap-1 md:flex">
@@ -631,7 +661,7 @@ function ScrolledNav() {
           </li>
         ))}
       </ul>
-      <button disabled className="btn-primary !py-2 !px-5 opacity-60 cursor-not-allowed">Coming soon</button>
+      <button disabled className="btn-primary !py-2 !px-4 md:!px-5 !text-xs md:!text-sm opacity-60 cursor-not-allowed min-h-[44px]">Coming soon</button>
     </nav>
   );
 }
