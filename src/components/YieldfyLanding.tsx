@@ -80,8 +80,7 @@ function HowItWorks() {
     { n: "04", title: "Settle back to XRPL", copy: "Principal and accrued yield unwind back to XRPL on demand, with a full on-chain audit trail across both ledgers." },
   ];
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
-      <Blobs variant="medium" />
+    <section id="how-it-works" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="01" label="How It Works" />
         <h2 className={`text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
@@ -183,7 +182,7 @@ function ArchDiagram() {
 function Architecture() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="architecture" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="02" label="Architecture" />
@@ -252,7 +251,7 @@ function Venues() {
     return 0;
   });
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="venues" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="03" label="Routing Universe" />
@@ -310,7 +309,7 @@ function AgentLogic() {
     { name: "Rebalancing cost", weight: "5%", desc: "Gas and opportunity cost of moving capital." },
   ];
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="agent" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="04" label="Agent Logic" />
@@ -371,7 +370,7 @@ function Security() {
     { title: "Institutional access control", body: "Multi-sig, HSM-backed signers, and role-based permissions out of the box." },
   ];
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="security" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="05" label="Security" />
@@ -405,7 +404,7 @@ function Pricing() {
     { name: "Protocol", tag: "For DAOs & issuers", fee: "Custom", feeNote: "revenue-share or flat fee", features: ["White-label routing", "API-first integration", "Co-branded reporting", "Governance hooks"] },
   ];
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="pricing" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="06" label="Pricing" />
@@ -434,8 +433,8 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button className={t.featured ? "btn-primary w-full" : "btn-secondary w-full"}>
-                  {t.featured ? "Talk to our desk" : "Get started"}
+                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed`}>
+                  Coming soon
                 </button>
               </div>
             );
@@ -468,7 +467,7 @@ function FAQ() {
     { q: "How fast can I exit?", a: "Soft exits (unwinding to stable reserves on Solana) settle within one block. Full XRPL repatriation completes in under nine seconds on average." },
   ];
   return (
-    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="faq" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-4xl mx-auto">
         <SectionLabel number="07" label="Questions" />
@@ -530,8 +529,8 @@ function CTASection() {
                 Onboard in a single call. Full integration in under two weeks.
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
-                <button className="btn-primary">Book a demo</button>
-                <button className="btn-secondary">Read the docs</button>
+                <button disabled className="btn-primary opacity-60 cursor-not-allowed">Coming soon</button>
+                <button disabled className="btn-secondary opacity-60 cursor-not-allowed">Coming soon</button>
               </div>
             </CornerFrame>
           </div>
@@ -560,27 +559,35 @@ function FooterSection() {
           <div>
             <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Product</div>
             <ul className={`space-y-2 text-sm ${TEXT_70}`}>
-              {["How it works", "Venues", "Pricing", "Documentation"].map((item) => (
-                <li key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</li>
+              {[
+                { label: "How it works", href: "#how-it-works" },
+                { label: "Venues", href: "#venues" },
+                { label: "Pricing", href: "#pricing" },
+                { label: "FAQ", href: "#faq" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <a href={item.href} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item.label}</a>
+                </li>
               ))}
             </ul>
           </div>
           <div>
-            <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Company</div>
+            <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Platform</div>
             <ul className={`space-y-2 text-sm ${TEXT_70}`}>
-              {["About", "Security", "Audits", "Contact"].map((item) => (
-                <li key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</li>
+              {[
+                { label: "Architecture", href: "#architecture" },
+                { label: "Agent logic", href: "#agent" },
+                { label: "Security", href: "#security" },
+              ].map((item) => (
+                <li key={item.label}>
+                  <a href={item.href} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item.label}</a>
+                </li>
               ))}
             </ul>
           </div>
         </div>
-        <div className={`pt-8 border-t border-[#0F1923]/[0.08] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs ${TEXT_50}`}>
-          <div>© 2026 Yieldfy. All rights reserved.</div>
-          <div className="flex gap-6">
-            {["Privacy", "Terms", "Disclosures"].map((item) => (
-              <span key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</span>
-            ))}
-          </div>
+        <div className={`pt-8 border-t border-[#0F1923]/[0.08] text-xs ${TEXT_50}`}>
+          © 2026 Yieldfy. All rights reserved.
         </div>
       </div>
     </footer>
@@ -595,7 +602,13 @@ function ScrolledNav() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
-  const NAV_LINKS = ["Work", "Services", "About", "Blog", "Contact"];
+  const NAV_LINKS = [
+    { label: "How it works", href: "#how-it-works" },
+    { label: "Architecture", href: "#architecture" },
+    { label: "Venues", href: "#venues" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "FAQ", href: "#faq" },
+  ];
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-4 transition-all duration-300 glass-nav ${
@@ -608,17 +621,17 @@ function ScrolledNav() {
       </a>
       <ul className="hidden items-center gap-1 md:flex">
         {NAV_LINKS.map((link) => (
-          <li key={link}>
+          <li key={link.label}>
             <a
-              href={`#${link.toLowerCase()}`}
+              href={link.href}
               className={`rounded-md px-4 py-2 font-barlow text-sm font-medium ${TEXT_70} transition-colors hover:bg-[#0F1923]/[0.04] hover:text-[#0F1923]`}
             >
-              {link}
+              {link.label}
             </a>
           </li>
         ))}
       </ul>
-      <button className="btn-primary !py-2 !px-5">Get in touch</button>
+      <button disabled className="btn-primary !py-2 !px-5 opacity-60 cursor-not-allowed">Coming soon</button>
     </nav>
   );
 }
