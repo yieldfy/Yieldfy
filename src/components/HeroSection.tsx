@@ -3,7 +3,13 @@ import yieldfyLogo from "@/assets/yieldfy-logo.png";
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260306_074215_04640ca7-042c-45d6-bb56-58b1e8a42489.mp4";
 
-const NAV_LINKS = ["Work", "Services", "About", "Blog", "Contact"];
+const NAV_LINKS = [
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Architecture", href: "#architecture" },
+  { label: "Venues", href: "#venues" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "#faq" },
+];
 
 const CornerAccent = ({ className }: { className: string }) => (
   <span className={`absolute h-[7px] w-[7px] corner-accent ${className}`} />
@@ -40,18 +46,18 @@ const HeroSection = () => {
 
           <ul className="hidden items-center gap-1 md:flex">
             {NAV_LINKS.map((link) => (
-              <li key={link}>
+              <li key={link.label}>
                 <a
-                  href={`#${link.toLowerCase()}`}
+                  href={link.href}
                   className="rounded-md px-4 py-2 font-barlow text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  {link}
+                  {link.label}
                 </a>
               </li>
             ))}
           </ul>
 
-          <button className="btn-primary !py-2 !px-5">Get in touch</button>
+          <button disabled className="btn-primary !py-2 !px-5 opacity-60 cursor-not-allowed">Coming soon</button>
         </nav>
 
         {/* Hero content */}
@@ -88,8 +94,8 @@ const HeroSection = () => {
 
           {/* CTA buttons */}
           <div className="mt-8 flex gap-4">
-            <button className="btn-primary">View our work</button>
-            <button className="btn-secondary-dark">Book a call</button>
+            <button disabled className="btn-primary opacity-60 cursor-not-allowed">Coming soon</button>
+            <button disabled className="btn-secondary-dark opacity-60 cursor-not-allowed">Coming soon</button>
           </div>
         </div>
       </div>
