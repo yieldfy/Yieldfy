@@ -80,29 +80,29 @@ function HowItWorks() {
     { n: "04", title: "Settle back to XRPL", copy: "Principal and accrued yield unwind back to XRPL on demand, with a full on-chain audit trail across both ledgers." },
   ];
   return (
-    <section id="how-it-works" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="how-it-works" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="01" label="How It Works" />
-        <h2 className={`text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
           From tokenized treasuries to{" "}
           <span className="font-instrument italic font-normal gradient-text">Solana-native yield</span>, in four steps.
         </h2>
-        <p className={`${TEXT_60} text-lg max-w-2xl mb-20 reveal`}>
+        <p className={`${TEXT_60} text-base md:text-lg max-w-2xl mb-12 md:mb-20 reveal`}>
           Yieldfy removes the engineering overhead institutions face when accessing Solana DeFi from an XRPL treasury position.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {steps.map((s, i) => (
             <div
               key={s.n}
-              className="glass-card glass-card-hover p-10 group reveal"
+              className="glass-card glass-card-hover p-6 md:p-10 group reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <div className="flex items-start justify-between mb-8">
+              <div className="flex items-start justify-between mb-6 md:mb-8">
                 <span className="font-mono text-xs gradient-text">{s.n}</span>
                 <GradientDot />
               </div>
-              <h3 className={`text-2xl font-light mb-4 ${TEXT}`}>{s.title}</h3>
-              <p className={`${TEXT_70} leading-relaxed`}>{s.copy}</p>
+              <h3 className={`text-xl md:text-2xl font-light mb-4 ${TEXT}`}>{s.title}</h3>
+              <p className={`${TEXT_70} leading-relaxed text-sm md:text-base`}>{s.copy}</p>
             </div>
           ))}
         </div>
@@ -120,18 +120,18 @@ function Metrics() {
     { k: "24/7", v: "Autonomous agent rebalancing" },
   ];
   return (
-    <section className={`relative py-20 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section className={`relative py-16 px-5 md:py-20 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {stats.map((s, i) => (
             <div
               key={s.k}
-              className="glass-card glass-card-hover p-8 text-center reveal"
+              className="glass-card glass-card-hover p-5 md:p-8 text-center reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
-              <div className="text-4xl md:text-5xl font-instrument italic font-normal mb-3 gradient-text metric-glow">{s.k}</div>
-              <div className={`text-xs tracking-wider uppercase ${TEXT_60}`}>{s.v}</div>
+              <div className="text-3xl md:text-4xl lg:text-5xl font-instrument italic font-normal mb-3 gradient-text metric-glow">{s.k}</div>
+              <div className={`text-[10px] md:text-xs tracking-wider uppercase ${TEXT_60}`}>{s.v}</div>
             </div>
           ))}
         </div>
@@ -182,17 +182,17 @@ function ArchDiagram() {
 function Architecture() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section id="architecture" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="architecture" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="02" label="Architecture" />
-        <div className="grid md:grid-cols-5 gap-12 items-start">
+        <div className="grid md:grid-cols-5 gap-8 md:gap-12 items-start">
           <div className="md:col-span-2">
-            <h2 className={`text-[44px] leading-[1.1] font-light mb-6 ${TEXT} reveal`}>
+            <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-6 ${TEXT} reveal`}>
               Two ledgers.{" "}
               <span className="font-instrument italic font-normal gradient-text">One routing layer.</span>
             </h2>
-            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal text-base md:text-lg`}>
               Yieldfy maintains custody parity across XRPL and Solana through cryptographic proofs. Your treasuries never leave the regulated rails institutions require — they gain yield from them.
             </p>
             <ul className={`space-y-3 ${TEXT} text-sm reveal`}>
@@ -204,9 +204,9 @@ function Architecture() {
               ))}
             </ul>
           </div>
-          <div className="md:col-span-3 reveal">
+          <div className="md:col-span-3 reveal mt-8 md:mt-0">
             <div className="glass-refraction">
-              <div className="glass-refraction-inner p-10">
+              <div className="glass-refraction-inner p-4 md:p-10">
                 <ArchDiagram />
               </div>
             </div>
