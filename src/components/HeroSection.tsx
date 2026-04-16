@@ -70,17 +70,17 @@ const HeroSection = () => {
           </div>
 
           {/* Headline with corner accents */}
-          <div className="relative px-8 py-6">
+          <div className="relative px-4 py-6 sm:px-8">
             <CornerAccent className="left-0 top-0" />
             <CornerAccent className="right-0 top-0" />
             <CornerAccent className="bottom-0 left-0" />
             <CornerAccent className="bottom-0 right-0" />
 
             <h1 className="text-center">
-              <span className="block font-barlow text-[72px] font-light leading-[1.1] text-white">
+              <span className="block font-barlow text-[40px] sm:text-[56px] md:text-[72px] font-light leading-[1.1] text-white">
                 Your XRPL treasuries, now
               </span>
-              <span className="block font-instrument text-[72px] italic leading-[1.1] gradient-text metric-glow">
+              <span className="block font-instrument text-[40px] sm:text-[56px] md:text-[72px] italic leading-[1.1] gradient-text metric-glow">
                 earning Solana yield
               </span>
             </h1>
