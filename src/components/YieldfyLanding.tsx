@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
+import FloatingCoin from "./FloatingCoin";
 
 const TEXT = "text-[#0F1923]";
 const TEXT_70 = "text-[#0F1923]/70";
@@ -184,7 +185,9 @@ function Architecture() {
   return (
     <section id="architecture" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
-      <div className="relative max-w-6xl mx-auto">
+      <FloatingCoin type="xrp" size={90} rotate={-14} className="absolute left-[4%] top-[20%] z-[1] hidden md:block opacity-90" />
+      <FloatingCoin type="sol" size={90} rotate={12} delay slow className="absolute right-[4%] bottom-[18%] z-[1] hidden md:block opacity-90" />
+      <div className="relative max-w-6xl mx-auto z-[2]">
         <SectionLabel number="02" label="Architecture" />
         <div className="grid md:grid-cols-5 gap-12 items-start">
           <div className="md:col-span-2">
