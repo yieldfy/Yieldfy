@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        barlow: ["Barlow", "sans-serif"],
+        instrument: ["Instrument Serif", "serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -57,8 +61,17 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "hero-text": "hsl(var(--hero-text))",
+        "hero-text-muted": "hsl(var(--hero-text-muted))",
+        "hero-cta": "hsl(var(--hero-cta))",
+        "hero-cta-hover": "hsl(var(--hero-cta-hover))",
+        "hero-cta-foreground": "hsl(var(--hero-cta-foreground))",
+        "hero-glass-outer": "rgba(255, 255, 255, 0.1)",
+        "hero-glass-inner": "rgba(255, 255, 255, 0.9)",
+        "hero-nav-hover": "rgba(255, 255, 255, 0.1)",
       },
       borderRadius: {
+        hero: "2px",
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
