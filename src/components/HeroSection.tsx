@@ -1,3 +1,5 @@
+import yieldfyLogo from "@/assets/yieldfy-logo.png";
+
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260306_074215_04640ca7-042c-45d6-bb56-58b1e8a42489.mp4";
 
@@ -31,8 +33,9 @@ const HeroSection = () => {
       <div className="relative z-10 flex h-full flex-col">
         {/* Navigation (transparent over hero) */}
         <nav className="flex items-center justify-between px-10 py-5">
-          <a href="/" className="font-barlow text-xl font-light tracking-tight text-white">
-            yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+          <a href="/" className="flex items-center gap-2 font-barlow text-xl font-light tracking-tight text-white">
+            <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto invert" />
+            <span>yieldfy<span style={{ color: "#2EC4B6" }}>.</span></span>
           </a>
 
           <ul className="hidden items-center gap-1 md:flex">
