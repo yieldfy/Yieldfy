@@ -69,10 +69,10 @@ const HeroSection = () => {
 
             <h1 className="text-center">
               <span className="block font-barlow text-[64px] font-light leading-[1.1] text-hero-text">
-                Agency that makes your
+                Your XRPL treasuries, now
               </span>
               <span className="block font-instrument text-[64px] italic leading-[1.1] text-hero-text">
-                videos &amp; reels viral
+                earning Solana yield
               </span>
             </h1>
           </div>
