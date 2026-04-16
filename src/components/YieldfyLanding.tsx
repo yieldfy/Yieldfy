@@ -496,26 +496,26 @@ function FAQ() {
     { q: "How fast can I exit?", a: "Soft exits (unwinding to stable reserves on Solana) settle within one block. Full XRPL repatriation completes in under nine seconds on average." },
   ];
   return (
-    <section id="faq" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="faq" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-4xl mx-auto">
         <SectionLabel number="07" label="Questions" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 ${TEXT} reveal`}>
           Frequently{" "}
           <span className="font-instrument italic font-normal gradient-text">asked.</span>
         </h2>
-        <div className="glass-card p-2 reveal">
+        <div className="glass-card p-1 md:p-2 reveal">
           {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div key={i} className={`${i !== items.length - 1 ? "border-b border-[#0F1923]/[0.06]" : ""} ${isOpen ? "faq-open" : ""}`}>
                 <button
                   onClick={() => setOpen(isOpen ? -1 : i)}
-                  className="w-full flex justify-between items-center py-6 px-4 text-left transition-colors"
+                  className="w-full flex justify-between items-center gap-4 py-4 px-3 md:py-6 md:px-4 text-left transition-colors min-h-[44px]"
                 >
-                  <span className={`text-lg font-light ${TEXT}`}>{item.q}</span>
+                  <span className={`text-base md:text-lg font-light ${TEXT}`}>{item.q}</span>
                   <span
-                    className="font-mono text-xl transition-all duration-300"
+                    className="font-mono text-xl transition-all duration-300 shrink-0"
                     style={{
                       color: isOpen ? "#2EC4B6" : "rgba(15,25,35,0.25)",
                       transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
@@ -525,7 +525,7 @@ function FAQ() {
                   </span>
                 </button>
                 {isOpen && (
-                  <div className={`pb-6 px-4 ${TEXT_70} leading-relaxed max-w-2xl`}>{item.a}</div>
+                  <div className={`pb-6 px-3 md:px-4 text-sm md:text-base ${TEXT_70} leading-relaxed max-w-2xl`}>{item.a}</div>
                 )}
               </div>
             );
@@ -539,27 +539,27 @@ function FAQ() {
 function CTASection() {
   const ref = useReveal<HTMLDivElement>();
   return (
-    <section className={`relative py-40 px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
+    <section className={`relative py-20 px-5 md:py-40 md:px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
       <Blobs variant="medium" />
       <div className="relative max-w-4xl mx-auto text-center reveal">
         <div className="glass-refraction glass-refraction-shimmer">
           <div className="glass-refraction-inner">
-            <CornerFrame className="py-20 px-8">
-              <div className="glass-pill mb-10">
-                <div className="glass-pill-inner">Now accepting institutional pilots</div>
+            <CornerFrame className="py-12 px-5 md:py-20 md:px-8">
+              <div className="glass-pill mb-8 md:mb-10">
+                <div className="glass-pill-inner !text-[10px] md:!text-xs">Now accepting institutional pilots</div>
               </div>
-              <h2 className={`text-[64px] leading-[1.05] font-light mb-6 ${TEXT}`}>
+              <h2 className={`text-[32px] md:text-[48px] lg:text-[64px] leading-[1.05] font-light mb-6 ${TEXT}`}>
                 Your treasuries are{" "}
                 <span className="font-instrument italic font-normal gradient-text">working harder</span>
                 <br />
                 by tomorrow morning.
               </h2>
-              <p className={`${TEXT_70} text-lg max-w-xl mx-auto mb-10`}>
+              <p className={`${TEXT_70} text-base md:text-lg max-w-xl mx-auto mb-10`}>
                 Onboard in a single call. Full integration in under two weeks.
               </p>
-              <div className="flex flex-wrap gap-3 justify-center">
-                <button disabled className="btn-primary opacity-60 cursor-not-allowed">Coming soon</button>
-                <button disabled className="btn-secondary opacity-60 cursor-not-allowed">Coming soon</button>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                <button disabled className="btn-primary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
+                <button disabled className="btn-secondary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
               </div>
             </CornerFrame>
           </div>
@@ -571,10 +571,10 @@ function CTASection() {
 
 function FooterSection() {
   return (
-    <footer className="relative py-20 px-8 overflow-hidden bg-[#F4F4F4]">
+    <footer className="relative py-12 px-5 md:py-20 md:px-8 overflow-hidden bg-[#F4F4F4]">
       <div className="relative max-w-6xl mx-auto">
-        <div className="grid md:grid-cols-4 gap-12 mb-16">
-          <div className="md:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10 md:gap-12 mb-12 md:mb-16">
+          <div className="col-span-1 sm:col-span-2 md:col-span-2">
             <div className={`flex items-center gap-2 mb-4 ${TEXT}`}>
               <img src={yieldfyLogo} alt="Yieldfy logo" className="h-8 w-auto" />
               <span className="text-3xl font-light tracking-tight">
@@ -640,12 +640,13 @@ function ScrolledNav() {
   ];
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-4 transition-all duration-300 glass-nav ${
+      className={`fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-5 py-3 md:px-10 md:py-4 transition-all duration-300 glass-nav ${
         scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
       }`}
+      style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
     >
-      <a href="/" className={`flex items-center gap-2 font-barlow text-xl font-light tracking-tight ${TEXT}`}>
-        <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto" />
+      <a href="/" className={`flex items-center gap-2 font-barlow text-lg md:text-xl font-light tracking-tight ${TEXT}`}>
+        <img src={yieldfyLogo} alt="Yieldfy logo" className="h-6 md:h-7 w-auto" />
         <span>yieldfy<span className="text-[#0F1923]">.</span></span>
       </a>
       <ul className="hidden items-center gap-1 md:flex">
@@ -660,7 +661,7 @@ function ScrolledNav() {
           </li>
         ))}
       </ul>
-      <button disabled className="btn-primary !py-2 !px-5 opacity-60 cursor-not-allowed">Coming soon</button>
+      <button disabled className="btn-primary !py-2 !px-4 md:!px-5 !text-xs md:!text-sm opacity-60 cursor-not-allowed min-h-[44px]">Coming soon</button>
     </nav>
   );
 }
