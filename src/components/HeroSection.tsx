@@ -41,7 +41,7 @@ const HeroSection = () => {
         <nav className="flex items-center justify-between px-10 py-5">
           <a href="/" className="flex items-center gap-2 font-barlow text-xl font-light tracking-tight text-white">
             <img src={yieldfyLogo} alt="Yieldfy logo" className="h-7 w-auto invert" />
-            <span>yieldfy<span style={{ color: "#2EC4B6" }}>.</span></span>
+            <span>yieldfy<span className="gradient-text">.</span></span>
           </a>
 
           <ul className="hidden items-center gap-1 md:flex">
