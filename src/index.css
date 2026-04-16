@@ -183,7 +183,7 @@
 
   /* ================== GRADIENT TEXT & BUTTONS ================== */
   .gradient-text {
-    background: linear-gradient(135deg, #2EC4B6, #E84855, #FF6B35);
+    background: linear-gradient(135deg, #3B82F6, #2EC4B6, #E84855, #FF6B35);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -191,7 +191,7 @@
   }
 
   .gradient-bg {
-    background: linear-gradient(135deg, #2EC4B6, #E84855);
+    background: linear-gradient(135deg, #3B82F6, #2EC4B6, #E84855);
   }
 
   .metric-glow {
@@ -199,7 +199,7 @@
   }
 
   .btn-primary {
-    background: linear-gradient(135deg, #2EC4B6, #E84855);
+    background: linear-gradient(135deg, #3B82F6, #2EC4B6, #E84855);
     color: #0F1923;
     box-shadow:
       0 8px 32px rgba(46, 196, 182, 0.2),
@@ -272,7 +272,7 @@
 
   /* ================== CORNER ACCENTS ================== */
   .corner-accent {
-    background: linear-gradient(135deg, #2EC4B6, #E84855);
+    background: linear-gradient(135deg, #3B82F6, #2EC4B6, #E84855);
   }
 
   /* ================== ANIMATED BLOBS ================== */
@@ -280,7 +280,7 @@
     position: absolute;
     border-radius: 50%;
     filter: blur(120px);
-    background: conic-gradient(from 0deg, #2EC4B6, #E84855, #E5989B, #FF6B35, #2EC4B6);
+    background: conic-gradient(from 0deg, #3B82F6, #2EC4B6, #E84855, #E5989B, #FF6B35, #3B82F6);
     pointer-events: none;
     animation: blob-spin 28s linear infinite;
     will-change: transform;
