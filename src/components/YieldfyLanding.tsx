@@ -338,20 +338,20 @@ function AgentLogic() {
     { name: "Rebalancing cost", weight: "5%", desc: "Gas and opportunity cost of moving capital." },
   ];
   return (
-    <section id="agent" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="agent" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="04" label="Agent Logic" />
-        <div className="grid md:grid-cols-2 gap-16">
+        <div className="grid md:grid-cols-2 gap-10 md:gap-16">
           <div>
-            <h2 className={`text-[44px] leading-[1.1] font-light mb-8 ${TEXT} reveal`}>
+            <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-8 ${TEXT} reveal`}>
               An allocator that{" "}
               <span className="font-instrument italic font-normal gradient-text">thinks in basis points.</span>
             </h2>
-            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal text-base md:text-lg`}>
               The Yieldfy agent is a deterministic policy engine — not a black box. Every routing decision is explainable, auditable, and constrained by institutional risk parameters you define.
             </p>
-            <div className="space-y-6 mt-12">
+            <div className="space-y-6 mt-10 md:mt-12">
               {[
                 { title: "Configurable risk budget", desc: "Cap exposure per protocol, chain, or strategy." },
                 { title: "Hysteresis thresholds", desc: "Prevents churn from transient APY spikes." },
@@ -367,14 +367,14 @@ function AgentLogic() {
               ))}
             </div>
           </div>
-          <div className="glass-card p-10 reveal">
+          <div className="glass-card p-6 md:p-10 reveal mt-4 md:mt-0">
             <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-6`}>Scoring weights</div>
             <div className="space-y-5">
               {signals.map((s) => (
                 <div key={s.name}>
                   <div className="flex justify-between items-baseline mb-2">
-                    <span className={`text-sm ${TEXT}`}>{s.name}</span>
-                    <span className="font-mono text-sm gradient-text">{s.weight}</span>
+                    <span className={`text-xs md:text-sm ${TEXT}`}>{s.name}</span>
+                    <span className="font-mono text-xs md:text-sm gradient-text">{s.weight}</span>
                   </div>
                   <div className="h-[3px] bg-[#0F1923]/10 rounded-full mb-2 overflow-hidden">
                     <div className="h-full gradient-bg rounded-full" style={{ width: s.weight }} />
@@ -399,19 +399,19 @@ function Security() {
     { title: "Institutional access control", body: "Multi-sig, HSM-backed signers, and role-based permissions out of the box." },
   ];
   return (
-    <section id="security" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="security" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="05" label="Security" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Built for capital that{" "}
           <span className="font-instrument italic font-normal gradient-text">cannot afford to be wrong.</span>
         </h2>
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6">
           {items.map((x, i) => (
             <div
               key={x.title}
-              className="glass-card glass-card-hover p-10 reveal"
+              className="glass-card glass-card-hover p-6 md:p-10 reveal"
               style={{ transitionDelay: `${i * 100}ms` }}
             >
               <GradientDot className="mb-6" />
@@ -433,25 +433,25 @@ function Pricing() {
     { name: "Protocol", tag: "For DAOs & issuers", fee: "Custom", feeNote: "revenue-share or flat fee", features: ["White-label routing", "API-first integration", "Co-branded reporting", "Governance hooks"] },
   ];
   return (
-    <section id="pricing" className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+    <section id="pricing" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="06" label="Pricing" />
-        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Aligned with your yield —{" "}
           <span className="font-instrument italic font-normal gradient-text">not your TVL.</span>
         </h2>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {tiers.map((t, i) => {
             const card = (
-              <div className={`p-10 relative h-full glass-card ${t.featured ? "pricing-featured" : "glass-card-hover"}`}>
+              <div className={`p-6 md:p-10 relative h-full glass-card ${t.featured ? "pricing-featured" : "glass-card-hover"}`}>
                 {t.featured && (
-                  <div className="absolute top-4 right-4 gradient-bg text-[#0F1923] text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full font-semibold">Most chosen</div>
+                  <div className="absolute top-3 right-3 md:top-4 md:right-4 gradient-bg text-[#0F1923] text-[9px] md:text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full font-semibold">Most chosen</div>
                 )}
                 <div className={`text-xs tracking-wider uppercase mb-2 ${TEXT_50}`}>{t.tag}</div>
                 <h3 className={`text-3xl font-light mb-6 ${TEXT}`}>{t.name}</h3>
                 <div className="mb-2">
-                  <span className={`font-instrument italic text-5xl ${t.featured ? "gradient-text metric-glow" : TEXT}`}>{t.fee}</span>
+                  <span className={`font-instrument italic text-4xl md:text-5xl ${t.featured ? "gradient-text metric-glow" : TEXT}`}>{t.fee}</span>
                 </div>
                 <div className={`text-xs mb-8 ${TEXT_60}`}>{t.feeNote}</div>
                 <ul className="space-y-3 mb-10">
@@ -462,7 +462,7 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed`}>
+                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed min-h-[44px]`}>
                   Coming soon
                 </button>
               </div>
