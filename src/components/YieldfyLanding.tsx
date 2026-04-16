@@ -1,4 +1,37 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const TEXT = "text-[#0F1923]";
+const TEXT_70 = "text-[#0F1923]/70";
+const TEXT_60 = "text-[#0F1923]/60";
+const TEXT_50 = "text-[#0F1923]/50";
+const TEXT_40 = "text-[#0F1923]/40";
+const TEXT_30 = "text-[#0F1923]/30";
+
+const BG_CREAM = "bg-[#FAF3E0]";
+const BG_SAND = "bg-[#F5EDD6]";
+const BG_WHITE = "bg-white";
+
+function useReveal<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-visible");
+            obs.unobserve(e.target);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+    el.querySelectorAll(".reveal").forEach((n) => obs.observe(n));
+    return () => obs.disconnect();
+  }, []);
+  return ref;
+}
 
 function CornerFrame({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -14,17 +47,17 @@ function CornerFrame({ children, className = "" }: { children: React.ReactNode; 
 
 function SectionLabel({ number, label }: { number: string; label: string }) {
   return (
-    <div className="flex items-center gap-3 text-xs tracking-[0.2em] uppercase text-white/50 mb-6">
+    <div className={`flex items-center gap-3 text-xs tracking-[0.2em] uppercase ${TEXT_50} mb-6 reveal`}>
       <span className="font-mono gradient-text">{number}</span>
-      <span className="w-8 h-px bg-white/20" />
+      <span className="w-8 h-px bg-[#0F1923]/20" />
       <span>{label}</span>
     </div>
   );
 }
 
 function Blobs({ variant = "subtle" }: { variant?: "subtle" | "medium" }) {
-  const op1 = variant === "medium" ? 0.1 : 0.07;
-  const op2 = variant === "medium" ? 0.08 : 0.06;
+  const op1 = variant === "medium" ? 0.25 : 0.18;
+  const op2 = variant === "medium" ? 0.22 : 0.15;
   return (
     <>
       <div className="blob absolute -left-[200px] top-[10%] h-[600px] w-[600px]" style={{ opacity: op1 }} />
@@ -38,6 +71,7 @@ function GradientDot({ className = "" }: { className?: string }) {
 }
 
 function HowItWorks() {
+  const ref = useReveal<HTMLDivElement>();
   const steps = [
     { n: "01", title: "Deposit on XRPL", copy: "Hold OUSG, TBILL, or other tokenized treasuries in your XRPL account. Yieldfy reads the position through a non-custodial routing contract." },
     { n: "02", title: "Bridge atomically", copy: "RWA tokens are wrapped into a Solana-native representation through an audited bridge, preserving institutional custody and compliance metadata." },
@@ -45,26 +79,30 @@ function HowItWorks() {
     { n: "04", title: "Settle back to XRPL", copy: "Principal and accrued yield unwind back to XRPL on demand, with a full on-chain audit trail across both ledgers." },
   ];
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0F1923]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs variant="medium" />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="01" label="How It Works" />
-        <h2 className="text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl text-white">
+        <h2 className={`text-[52px] leading-[1.05] font-light tracking-tight mb-4 max-w-3xl ${TEXT} reveal`}>
           From tokenized treasuries to{" "}
           <span className="font-instrument italic font-normal gradient-text">Solana-native yield</span>, in four steps.
         </h2>
-        <p className="text-white/60 text-lg max-w-2xl mb-20">
+        <p className={`${TEXT_60} text-lg max-w-2xl mb-20 reveal`}>
           Yieldfy removes the engineering overhead institutions face when accessing Solana DeFi from an XRPL treasury position.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {steps.map((s) => (
-            <div key={s.n} className="glass-card glass-card-hover p-10 group">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="glass-card glass-card-hover p-10 group reveal"
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
               <div className="flex items-start justify-between mb-8">
                 <span className="font-mono text-xs gradient-text">{s.n}</span>
                 <GradientDot />
               </div>
-              <h3 className="text-2xl font-light mb-4 text-white">{s.title}</h3>
-              <p className="text-white/70 leading-relaxed">{s.copy}</p>
+              <h3 className={`text-2xl font-light mb-4 ${TEXT}`}>{s.title}</h3>
+              <p className={`${TEXT_70} leading-relaxed`}>{s.copy}</p>
             </div>
           ))}
         </div>
@@ -74,6 +112,7 @@ function HowItWorks() {
 }
 
 function Metrics() {
+  const ref = useReveal<HTMLDivElement>();
   const stats = [
     { k: "$2.4B", v: "Tokenized treasuries on XRPL" },
     { k: "14.2%", v: "Best-in-class Solana yield (30d avg)" },
@@ -81,14 +120,18 @@ function Metrics() {
     { k: "24/7", v: "Autonomous agent rebalancing" },
   ];
   return (
-    <section className="relative py-20 px-8 overflow-hidden bg-[#0a1219]">
+    <section className={`relative py-20 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {stats.map((s) => (
-            <div key={s.k} className="glass-card glass-card-hover p-8 text-center">
+          {stats.map((s, i) => (
+            <div
+              key={s.k}
+              className="glass-card glass-card-hover p-8 text-center reveal"
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
               <div className="text-4xl md:text-5xl font-instrument italic font-normal mb-3 gradient-text metric-glow">{s.k}</div>
-              <div className="text-xs tracking-wider uppercase text-white/60">{s.v}</div>
+              <div className={`text-xs tracking-wider uppercase ${TEXT_60}`}>{s.v}</div>
             </div>
           ))}
         </div>
@@ -107,9 +150,9 @@ function ArchDiagram() {
         </linearGradient>
       </defs>
       <g>
-        <rect x="20" y="40" width="140" height="80" fill="none" stroke="white" strokeOpacity="0.4" strokeWidth="1" rx="4" />
-        <text x="90" y="72" textAnchor="middle" fill="white" fontSize="11" fontFamily="Barlow" letterSpacing="1.5">XRPL</text>
-        <text x="90" y="92" textAnchor="middle" fill="white" fillOpacity="0.6" fontSize="9" fontFamily="Barlow">OUSG · TBILL</text>
+        <rect x="20" y="40" width="140" height="80" fill="none" stroke="#0F1923" strokeOpacity="0.2" strokeWidth="1" rx="4" />
+        <text x="90" y="72" textAnchor="middle" fill="#0F1923" fontSize="11" fontFamily="Barlow" letterSpacing="1.5">XRPL</text>
+        <text x="90" y="92" textAnchor="middle" fill="#0F1923" fillOpacity="0.6" fontSize="9" fontFamily="Barlow">OUSG · TBILL</text>
       </g>
       <g>
         <rect x="200" y="120" width="100" height="80" fill="url(#gAcc)" rx="4" />
@@ -119,13 +162,13 @@ function ArchDiagram() {
       <g>
         {["Kamino", "Jito", "MarginFi", "Drift"].map((name, i) => (
           <g key={name}>
-            <rect x={340} y={20 + i * 70} width="140" height="50" fill="none" stroke="white" strokeOpacity="0.4" strokeWidth="1" rx="4" />
-            <text x={410} y={42 + i * 70} textAnchor="middle" fill="white" fontSize="10" fontFamily="Barlow" letterSpacing="1">{name.toUpperCase()}</text>
-            <text x={410} y={58 + i * 70} textAnchor="middle" fill="white" fillOpacity="0.5" fontSize="8" fontFamily="Barlow">Solana</text>
+            <rect x={340} y={20 + i * 70} width="140" height="50" fill="none" stroke="#0F1923" strokeOpacity="0.15" strokeWidth="1" rx="4" />
+            <text x={410} y={42 + i * 70} textAnchor="middle" fill="#0F1923" fontSize="10" fontFamily="Barlow" letterSpacing="1">{name.toUpperCase()}</text>
+            <text x={410} y={58 + i * 70} textAnchor="middle" fill="#0F1923" fillOpacity="0.5" fontSize="8" fontFamily="Barlow">Solana</text>
           </g>
         ))}
       </g>
-      <g stroke="url(#gAcc)" strokeOpacity="0.6" strokeWidth="1" fill="none">
+      <g stroke="url(#gAcc)" strokeOpacity="0.7" strokeWidth="1" fill="none">
         <line x1="160" y1="80" x2="200" y2="150" />
         <line x1="160" y1="80" x2="200" y2="170" />
         {[0, 1, 2, 3].map((i) => (
@@ -137,21 +180,22 @@ function ArchDiagram() {
 }
 
 function Architecture() {
+  const ref = useReveal<HTMLDivElement>();
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0F1923]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="02" label="Architecture" />
         <div className="grid md:grid-cols-5 gap-12 items-start">
           <div className="md:col-span-2">
-            <h2 className="text-[44px] leading-[1.1] font-light mb-6 text-white">
+            <h2 className={`text-[44px] leading-[1.1] font-light mb-6 ${TEXT} reveal`}>
               Two ledgers.{" "}
               <span className="font-instrument italic font-normal gradient-text">One routing layer.</span>
             </h2>
-            <p className="text-white/70 leading-relaxed mb-8">
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
               Yieldfy maintains custody parity across XRPL and Solana through cryptographic proofs. Your treasuries never leave the regulated rails institutions require — they gain yield from them.
             </p>
-            <ul className="space-y-3 text-white/80 text-sm">
+            <ul className={`space-y-3 ${TEXT} text-sm reveal`}>
               {["Non-custodial routing contracts on both chains", "Proof-of-reserve attestation every epoch", "Signed messages preserve compliance metadata"].map((item) => (
                 <li key={item} className="flex gap-3">
                   <GradientDot className="mt-[7px]" />
@@ -160,7 +204,7 @@ function Architecture() {
               ))}
             </ul>
           </div>
-          <div className="md:col-span-3">
+          <div className="md:col-span-3 reveal">
             <div className="glass-refraction">
               <div className="glass-refraction-inner p-10">
                 <ArchDiagram />
@@ -175,9 +219,9 @@ function Architecture() {
 
 function RiskBadge({ risk }: { risk: string }) {
   const styles: Record<string, { bg: string; color: string }> = {
-    Low: { bg: "rgba(46,196,182,0.1)", color: "#2EC4B6" },
-    Medium: { bg: "rgba(255,107,53,0.1)", color: "#FF6B35" },
-    High: { bg: "rgba(232,72,85,0.1)", color: "#E84855" },
+    Low: { bg: "rgba(46,196,182,0.12)", color: "#1a8d82" },
+    Medium: { bg: "rgba(255,107,53,0.12)", color: "#cc4d1f" },
+    High: { bg: "rgba(232,72,85,0.12)", color: "#c0303d" },
   };
   const s = styles[risk];
   return (
@@ -191,6 +235,7 @@ function RiskBadge({ risk }: { risk: string }) {
 }
 
 function Venues() {
+  const ref = useReveal<HTMLDivElement>();
   const [sortBy, setSortBy] = useState("apy");
   const venues = [
     { name: "Kamino", type: "Lending", tvl: "$1.2B", apy: 14.2, risk: "Low" },
@@ -206,16 +251,16 @@ function Venues() {
     return 0;
   });
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0a1219]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="03" label="Routing Universe" />
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <h2 className="text-[44px] leading-[1.1] font-light max-w-2xl text-white">
+          <h2 className={`text-[44px] leading-[1.1] font-light max-w-2xl ${TEXT} reveal`}>
             Every major Solana yield venue,{" "}
             <span className="font-instrument italic font-normal gradient-text">evaluated live.</span>
           </h2>
-          <div className="flex gap-2 text-xs tracking-wider uppercase">
+          <div className="flex gap-2 text-xs tracking-wider uppercase reveal">
             {(["apy", "tvl"] as const).map((key) => (
               <button
                 key={key}
@@ -229,18 +274,18 @@ function Venues() {
             ))}
           </div>
         </div>
-        <div className="glass-card p-2">
-          <div className="grid grid-cols-5 gap-4 px-6 py-4 text-xs tracking-wider uppercase text-white/50 border-b border-white/[0.04]">
+        <div className="glass-card p-2 reveal">
+          <div className={`grid grid-cols-5 gap-4 px-6 py-4 text-xs tracking-wider uppercase ${TEXT_50} border-b border-[#0F1923]/[0.06]`}>
             <div>Venue</div><div>Strategy</div><div>TVL</div><div>Net APY</div><div className="text-right">Risk Tier</div>
           </div>
           {sorted.map((v, i) => (
             <div
               key={v.name}
-              className={`grid grid-cols-5 gap-4 px-6 py-5 items-center transition-all hover:bg-white/[0.03] ${i !== sorted.length - 1 ? "border-b border-white/[0.04]" : ""}`}
+              className={`grid grid-cols-5 gap-4 px-6 py-5 items-center transition-all hover:bg-[#0F1923]/[0.02] ${i !== sorted.length - 1 ? "border-b border-[#0F1923]/[0.06]" : ""}`}
             >
-              <div className="font-medium text-white">{v.name}</div>
-              <div className="text-white/70 text-sm">{v.type}</div>
-              <div className="font-mono text-sm text-white/90">{v.tvl}</div>
+              <div className={`font-medium ${TEXT}`}>{v.name}</div>
+              <div className={`${TEXT_70} text-sm`}>{v.type}</div>
+              <div className={`font-mono text-sm ${TEXT}`}>{v.tvl}</div>
               <div className="font-instrument italic text-2xl gradient-text">{v.apy}%</div>
               <div className="text-right">
                 <RiskBadge risk={v.risk} />
@@ -248,13 +293,14 @@ function Venues() {
             </div>
           ))}
         </div>
-        <p className="text-white/40 text-xs mt-4">Sample data for illustration. Live venue coverage expands with every Solana DeFi integration.</p>
+        <p className={`${TEXT_40} text-xs mt-4`}>Sample data for illustration. Live venue coverage expands with every Solana DeFi integration.</p>
       </div>
     </section>
   );
 }
 
 function AgentLogic() {
+  const ref = useReveal<HTMLDivElement>();
   const signals = [
     { name: "Net APY projection", weight: "35%", desc: "Forward-looking yield after fees, MEV, and gas amortization." },
     { name: "Liquidity depth", weight: "25%", desc: "Exit slippage modeled at full position size." },
@@ -263,17 +309,17 @@ function AgentLogic() {
     { name: "Rebalancing cost", weight: "5%", desc: "Gas and opportunity cost of moving capital." },
   ];
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0F1923]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="04" label="Agent Logic" />
         <div className="grid md:grid-cols-2 gap-16">
           <div>
-            <h2 className="text-[44px] leading-[1.1] font-light mb-8 text-white">
+            <h2 className={`text-[44px] leading-[1.1] font-light mb-8 ${TEXT} reveal`}>
               An allocator that{" "}
               <span className="font-instrument italic font-normal gradient-text">thinks in basis points.</span>
             </h2>
-            <p className="text-white/70 leading-relaxed mb-8">
+            <p className={`${TEXT_70} leading-relaxed mb-8 reveal`}>
               The Yieldfy agent is a deterministic policy engine — not a black box. Every routing decision is explainable, auditable, and constrained by institutional risk parameters you define.
             </p>
             <div className="space-y-6 mt-12">
@@ -282,29 +328,29 @@ function AgentLogic() {
                 { title: "Hysteresis thresholds", desc: "Prevents churn from transient APY spikes." },
                 { title: "Emergency circuit breakers", desc: "Auto-exit on protocol anomaly or peg deviation." },
               ].map((item) => (
-                <div key={item.title} className="flex gap-4">
+                <div key={item.title} className="flex gap-4 reveal">
                   <span className="font-mono text-xs gradient-text mt-1">→</span>
                   <div>
-                    <div className="text-sm font-medium mb-1 text-white">{item.title}</div>
-                    <div className="text-white/60 text-sm">{item.desc}</div>
+                    <div className={`text-sm font-medium mb-1 ${TEXT}`}>{item.title}</div>
+                    <div className={`${TEXT_60} text-sm`}>{item.desc}</div>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="glass-card p-10">
-            <div className="text-xs tracking-wider uppercase text-white/50 mb-6">Scoring weights</div>
+          <div className="glass-card p-10 reveal">
+            <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-6`}>Scoring weights</div>
             <div className="space-y-5">
               {signals.map((s) => (
                 <div key={s.name}>
                   <div className="flex justify-between items-baseline mb-2">
-                    <span className="text-sm text-white">{s.name}</span>
+                    <span className={`text-sm ${TEXT}`}>{s.name}</span>
                     <span className="font-mono text-sm gradient-text">{s.weight}</span>
                   </div>
-                  <div className="h-[3px] bg-white/10 rounded-full mb-2 overflow-hidden">
+                  <div className="h-[3px] bg-[#0F1923]/10 rounded-full mb-2 overflow-hidden">
                     <div className="h-full gradient-bg rounded-full" style={{ width: s.weight }} />
                   </div>
-                  <p className="text-white/50 text-xs">{s.desc}</p>
+                  <p className={`${TEXT_50} text-xs`}>{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -316,6 +362,7 @@ function AgentLogic() {
 }
 
 function Security() {
+  const ref = useReveal<HTMLDivElement>();
   const items = [
     { title: "Non-custodial by design", body: "Yieldfy never takes custody. Routing contracts execute against your signed intents; your keys, your treasuries." },
     { title: "Dual-chain audits", body: "Solana programs and XRPL hooks audited by two independent firms. Reports published in full." },
@@ -323,20 +370,24 @@ function Security() {
     { title: "Institutional access control", body: "Multi-sig, HSM-backed signers, and role-based permissions out of the box." },
   ];
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0a1219]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="05" label="Security" />
-        <h2 className="text-[44px] leading-[1.1] font-light mb-16 max-w-3xl text-white">
+        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
           Built for capital that{" "}
           <span className="font-instrument italic font-normal gradient-text">cannot afford to be wrong.</span>
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
-          {items.map((x) => (
-            <div key={x.title} className="glass-card glass-card-hover p-10">
+          {items.map((x, i) => (
+            <div
+              key={x.title}
+              className="glass-card glass-card-hover p-10 reveal"
+              style={{ transitionDelay: `${i * 100}ms` }}
+            >
               <GradientDot className="mb-6" />
-              <h3 className="text-xl font-light mb-3 text-white">{x.title}</h3>
-              <p className="text-white/70 leading-relaxed text-sm">{x.body}</p>
+              <h3 className={`text-xl font-light mb-3 ${TEXT}`}>{x.title}</h3>
+              <p className={`${TEXT_70} leading-relaxed text-sm`}>{x.body}</p>
             </div>
           ))}
         </div>
@@ -346,38 +397,39 @@ function Security() {
 }
 
 function Pricing() {
+  const ref = useReveal<HTMLDivElement>();
   const tiers = [
     { name: "Desk", tag: "For small treasuries", fee: "25 bps", feeNote: "performance fee on yield generated", features: ["Up to $10M routed", "Standard venue coverage", "Monthly reporting", "Email support"] },
     { name: "Institutional", tag: "For funds & family offices", fee: "15 bps", feeNote: "performance fee + custom terms", features: ["Unlimited routing", "Full venue coverage", "Custom risk policies", "Dedicated desk", "SLA-backed settlement"], featured: true },
     { name: "Protocol", tag: "For DAOs & issuers", fee: "Custom", feeNote: "revenue-share or flat fee", features: ["White-label routing", "API-first integration", "Co-branded reporting", "Governance hooks"] },
   ];
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0F1923]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="06" label="Pricing" />
-        <h2 className="text-[44px] leading-[1.1] font-light mb-16 max-w-3xl text-white">
+        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 max-w-3xl ${TEXT} reveal`}>
           Aligned with your yield —{" "}
           <span className="font-instrument italic font-normal gradient-text">not your TVL.</span>
         </h2>
         <div className="grid md:grid-cols-3 gap-6">
-          {tiers.map((t) => {
+          {tiers.map((t, i) => {
             const card = (
               <div className={`p-10 relative h-full glass-card ${t.featured ? "pricing-featured" : "glass-card-hover"}`}>
                 {t.featured && (
                   <div className="absolute top-4 right-4 gradient-bg text-[#0F1923] text-[10px] tracking-widest uppercase px-3 py-1.5 rounded-full font-semibold">Most chosen</div>
                 )}
-                <div className="text-xs tracking-wider uppercase mb-2 text-white/50">{t.tag}</div>
-                <h3 className="text-3xl font-light mb-6 text-white">{t.name}</h3>
+                <div className={`text-xs tracking-wider uppercase mb-2 ${TEXT_50}`}>{t.tag}</div>
+                <h3 className={`text-3xl font-light mb-6 ${TEXT}`}>{t.name}</h3>
                 <div className="mb-2">
-                  <span className={`font-instrument italic text-5xl ${t.featured ? "gradient-text metric-glow" : "text-white"}`}>{t.fee}</span>
+                  <span className={`font-instrument italic text-5xl ${t.featured ? "gradient-text metric-glow" : TEXT}`}>{t.fee}</span>
                 </div>
-                <div className="text-xs mb-8 text-white/60">{t.feeNote}</div>
+                <div className={`text-xs mb-8 ${TEXT_60}`}>{t.feeNote}</div>
                 <ul className="space-y-3 mb-10">
                   {t.features.map((f) => (
                     <li key={f} className="flex gap-3 text-sm">
                       <GradientDot className="mt-[7px]" />
-                      <span className="text-white/80">{f}</span>
+                      <span className={TEXT}>{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -387,11 +439,15 @@ function Pricing() {
               </div>
             );
             return t.featured ? (
-              <div key={t.name} className="glass-refraction">
-                <div className="glass-refraction-inner h-full">{card}</div>
+              <div key={t.name} className="reveal" style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className="glass-refraction h-full">
+                  <div className="glass-refraction-inner h-full">{card}</div>
+                </div>
               </div>
             ) : (
-              <div key={t.name}>{card}</div>
+              <div key={t.name} className="reveal" style={{ transitionDelay: `${i * 100}ms` }}>
+                {card}
+              </div>
             );
           })}
         </div>
@@ -401,6 +457,7 @@ function Pricing() {
 }
 
 function FAQ() {
+  const ref = useReveal<HTMLDivElement>();
   const [open, setOpen] = useState(0);
   const items = [
     { q: "Which RWA tokens are supported?", a: "Yieldfy currently routes OUSG, TBILL, and other XRPL-issued tokenized treasuries. Support for additional tokenized T-bills, money market funds, and private credit is added as issuers go live." },
@@ -410,28 +467,28 @@ function FAQ() {
     { q: "How fast can I exit?", a: "Soft exits (unwinding to stable reserves on Solana) settle within one block. Full XRPL repatriation completes in under nine seconds on average." },
   ];
   return (
-    <section className="relative py-32 px-8 overflow-hidden bg-[#0a1219]">
+    <section className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-4xl mx-auto">
         <SectionLabel number="07" label="Questions" />
-        <h2 className="text-[44px] leading-[1.1] font-light mb-16 text-white">
+        <h2 className={`text-[44px] leading-[1.1] font-light mb-16 ${TEXT} reveal`}>
           Frequently{" "}
           <span className="font-instrument italic font-normal gradient-text">asked.</span>
         </h2>
-        <div className="glass-card p-2">
+        <div className="glass-card p-2 reveal">
           {items.map((item, i) => {
             const isOpen = open === i;
             return (
-              <div key={i} className={`${i !== items.length - 1 ? "border-b border-white/[0.04]" : ""} ${isOpen ? "faq-open" : ""}`}>
+              <div key={i} className={`${i !== items.length - 1 ? "border-b border-[#0F1923]/[0.06]" : ""} ${isOpen ? "faq-open" : ""}`}>
                 <button
                   onClick={() => setOpen(isOpen ? -1 : i)}
                   className="w-full flex justify-between items-center py-6 px-4 text-left transition-colors"
                 >
-                  <span className="text-lg font-light text-white">{item.q}</span>
+                  <span className={`text-lg font-light ${TEXT}`}>{item.q}</span>
                   <span
                     className="font-mono text-xl transition-all duration-300"
                     style={{
-                      color: isOpen ? "#2EC4B6" : "rgba(255,255,255,0.3)",
+                      color: isOpen ? "#2EC4B6" : "rgba(15,25,35,0.25)",
                       transform: isOpen ? "rotate(45deg)" : "rotate(0deg)",
                     }}
                   >
@@ -439,7 +496,7 @@ function FAQ() {
                   </span>
                 </button>
                 {isOpen && (
-                  <div className="pb-6 px-4 text-white/70 leading-relaxed max-w-2xl">{item.a}</div>
+                  <div className={`pb-6 px-4 ${TEXT_70} leading-relaxed max-w-2xl`}>{item.a}</div>
                 )}
               </div>
             );
@@ -451,23 +508,24 @@ function FAQ() {
 }
 
 function CTASection() {
+  const ref = useReveal<HTMLDivElement>();
   return (
-    <section className="relative py-40 px-8 overflow-hidden bg-[#0F1923]">
+    <section className={`relative py-40 px-8 overflow-hidden ${BG_WHITE}`} ref={ref}>
       <Blobs variant="medium" />
-      <div className="relative max-w-4xl mx-auto text-center">
-        <div className="glass-refraction">
+      <div className="relative max-w-4xl mx-auto text-center reveal">
+        <div className="glass-refraction glass-refraction-shimmer">
           <div className="glass-refraction-inner">
             <CornerFrame className="py-20 px-8">
               <div className="glass-pill mb-10">
                 <div className="glass-pill-inner">Now accepting institutional pilots</div>
               </div>
-              <h2 className="text-[64px] leading-[1.05] font-light mb-6 text-white">
+              <h2 className={`text-[64px] leading-[1.05] font-light mb-6 ${TEXT}`}>
                 Your treasuries are{" "}
                 <span className="font-instrument italic font-normal gradient-text">working harder</span>
                 <br />
                 by tomorrow morning.
               </h2>
-              <p className="text-white/70 text-lg max-w-xl mx-auto mb-10">
+              <p className={`${TEXT_70} text-lg max-w-xl mx-auto mb-10`}>
                 Onboard in a single call. Full integration in under two weeks.
               </p>
               <div className="flex flex-wrap gap-3 justify-center">
@@ -484,39 +542,39 @@ function CTASection() {
 
 function FooterSection() {
   return (
-    <footer className="relative py-20 px-8 overflow-hidden bg-[#0a1219]">
+    <footer className="relative py-20 px-8 overflow-hidden bg-[#F0E8D4]">
       <div className="relative max-w-6xl mx-auto">
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-2">
-            <div className="text-3xl font-light tracking-tight mb-4 text-white">
+            <div className={`text-3xl font-light tracking-tight mb-4 ${TEXT}`}>
               yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
             </div>
-            <p className="text-white/60 max-w-sm text-sm leading-relaxed">
+            <p className={`${TEXT_60} max-w-sm text-sm leading-relaxed`}>
               An autonomous routing agent bridging XRPL tokenized treasuries to the best Solana yield venues.
             </p>
           </div>
           <div>
-            <div className="text-xs tracking-wider uppercase text-white/50 mb-4">Product</div>
-            <ul className="space-y-2 text-sm text-white/80">
+            <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Product</div>
+            <ul className={`space-y-2 text-sm ${TEXT_70}`}>
               {["How it works", "Venues", "Pricing", "Documentation"].map((item) => (
-                <li key={item} className="hover:text-white transition-colors cursor-pointer">{item}</li>
+                <li key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</li>
               ))}
             </ul>
           </div>
           <div>
-            <div className="text-xs tracking-wider uppercase text-white/50 mb-4">Company</div>
-            <ul className="space-y-2 text-sm text-white/80">
+            <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Company</div>
+            <ul className={`space-y-2 text-sm ${TEXT_70}`}>
               {["About", "Security", "Audits", "Contact"].map((item) => (
-                <li key={item} className="hover:text-white transition-colors cursor-pointer">{item}</li>
+                <li key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</li>
               ))}
             </ul>
           </div>
         </div>
-        <div className="pt-8 border-t border-white/[0.06] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs text-white/50">
+        <div className={`pt-8 border-t border-[#0F1923]/[0.08] flex flex-col md:flex-row justify-between items-start md:items-center gap-4 text-xs ${TEXT_50}`}>
           <div>© 2026 Yieldfy. All rights reserved.</div>
           <div className="flex gap-6">
             {["Privacy", "Terms", "Disclosures"].map((item) => (
-              <span key={item} className="hover:text-white transition-colors cursor-pointer">{item}</span>
+              <span key={item} className="hover:text-[#0F1923] transition-colors cursor-pointer">{item}</span>
             ))}
           </div>
         </div>
@@ -525,9 +583,45 @@ function FooterSection() {
   );
 }
 
+function ScrolledNav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > window.innerHeight - 80);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const NAV_LINKS = ["Work", "Services", "About", "Blog", "Contact"];
+  return (
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-10 py-4 transition-all duration-300 glass-nav ${
+        scrolled ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0 pointer-events-none"
+      }`}
+    >
+      <a href="/" className={`font-barlow text-xl font-light tracking-tight ${TEXT}`}>
+        yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+      </a>
+      <ul className="hidden items-center gap-1 md:flex">
+        {NAV_LINKS.map((link) => (
+          <li key={link}>
+            <a
+              href={`#${link.toLowerCase()}`}
+              className={`rounded-md px-4 py-2 font-barlow text-sm font-medium ${TEXT_70} transition-colors hover:bg-[#0F1923]/[0.04] hover:text-[#0F1923]`}
+            >
+              {link}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <button className="btn-primary !py-2 !px-5">Get in touch</button>
+    </nav>
+  );
+}
+
 export default function YieldfyLanding() {
   return (
-    <main className="bg-[#0F1923] text-white font-barlow">
+    <main className="bg-[#FAF3E0] text-[#0F1923] font-barlow">
+      <ScrolledNav />
       <HowItWorks />
       <Metrics />
       <Architecture />
