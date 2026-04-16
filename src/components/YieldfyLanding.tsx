@@ -251,22 +251,23 @@ function Venues() {
     return 0;
   });
   return (
-    <section id="venues" className={`relative py-32 px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
+    <section id="venues" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
         <SectionLabel number="03" label="Routing Universe" />
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
-          <h2 className={`text-[44px] leading-[1.1] font-light max-w-2xl ${TEXT} reveal`}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-12 gap-6">
+          <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light max-w-2xl ${TEXT} reveal`}>
             Every major Solana yield venue,{" "}
             <span className="font-instrument italic font-normal gradient-text">evaluated live.</span>
           </h2>
-          <div className="flex gap-2 text-xs tracking-wider uppercase reveal">
+          <div className="flex flex-col sm:flex-row gap-2 text-xs tracking-wider uppercase reveal">
             {(["apy", "tvl"] as const).map((key) => (
               <button
                 key={key}
                 onClick={() => setSortBy(key)}
                 className={
-                  sortBy === key ? "btn-primary !py-2 !px-3 !text-xs" : "btn-secondary !py-2 !px-3 !text-xs"
+                  (sortBy === key ? "btn-primary" : "btn-secondary") +
+                  " !py-2 !px-3 !text-xs w-full sm:w-auto min-h-[44px]"
                 }
               >
                 Sort {key.toUpperCase()}
@@ -274,7 +275,9 @@ function Venues() {
             ))}
           </div>
         </div>
-        <div className="glass-card p-2 reveal">
+
+        {/* Desktop table */}
+        <div className="hidden md:block glass-card p-2 reveal">
           <div className={`grid grid-cols-5 gap-4 px-6 py-4 text-xs tracking-wider uppercase ${TEXT_50} border-b border-[#0F1923]/[0.06]`}>
             <div>Venue</div><div>Strategy</div><div>TVL</div><div>Net APY</div><div className="text-right">Risk Tier</div>
           </div>
@@ -293,6 +296,32 @@ function Venues() {
             </div>
           ))}
         </div>
+
+        {/* Mobile cards */}
+        <div className="md:hidden grid grid-cols-1 gap-3 reveal">
+          {sorted.map((v) => (
+            <div key={v.name} className="glass-card p-5">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <div className={`font-medium text-lg ${TEXT}`}>{v.name}</div>
+                  <div className={`${TEXT_60} text-xs`}>{v.type}</div>
+                </div>
+                <RiskBadge risk={v.risk} />
+              </div>
+              <div className="flex items-end justify-between">
+                <div>
+                  <div className={`text-[10px] tracking-wider uppercase ${TEXT_50}`}>TVL</div>
+                  <div className={`font-mono text-sm ${TEXT}`}>{v.tvl}</div>
+                </div>
+                <div className="text-right">
+                  <div className={`text-[10px] tracking-wider uppercase ${TEXT_50}`}>Net APY</div>
+                  <div className="font-instrument italic text-2xl gradient-text">{v.apy}%</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
         <p className={`${TEXT_40} text-xs mt-4`}>Sample data for illustration. Live venue coverage expands with every Solana DeFi integration.</p>
       </div>
     </section>
