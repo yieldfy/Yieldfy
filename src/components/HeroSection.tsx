@@ -1,5 +1,4 @@
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
-import FloatingCoin from "./FloatingCoin";
 
 const VIDEO_SRC =
   "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260306_074215_04640ca7-042c-45d6-bb56-58b1e8a42489.mp4";
@@ -35,36 +34,6 @@ const HeroSection = () => {
       {/* Animated blobs (warm light through video) */}
       <div className="blob absolute -left-[200px] top-[10%] h-[700px] w-[700px] opacity-[0.35]" />
       <div className="blob absolute -right-[150px] bottom-[5%] h-[800px] w-[800px] opacity-[0.35]" style={{ animationDirection: "reverse" }} />
-
-      {/* Floating tokens */}
-      <FloatingCoin
-        type="xrp"
-        size={140}
-        rotate={-12}
-        className="absolute left-[6%] top-[28%] z-[5] hidden md:block"
-      />
-      <FloatingCoin
-        type="sol"
-        size={140}
-        rotate={14}
-        delay
-        slow
-        className="absolute right-[6%] top-[34%] z-[5] hidden md:block"
-      />
-      <FloatingCoin
-        type="xrp"
-        size={70}
-        rotate={-8}
-        className="absolute left-[8%] bottom-[18%] z-[5] hidden lg:block opacity-80"
-        slow
-      />
-      <FloatingCoin
-        type="sol"
-        size={70}
-        rotate={10}
-        delay
-        className="absolute right-[10%] bottom-[22%] z-[5] hidden lg:block opacity-80"
-      />
 
       {/* Content layer */}
       <div className="relative z-10 flex h-full flex-col">

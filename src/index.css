@@ -332,17 +332,3 @@
     transform: translateY(0);
   }
 }
-
-@layer utilities {
-  @keyframes coinFloat {
-    0%, 100% { transform: translateY(0) rotate(var(--coin-rot, 0deg)); }
-    50% { transform: translateY(-14px) rotate(calc(var(--coin-rot, 0deg) + 4deg)); }
-  }
-  .coin-float {
-    animation: coinFloat 7s ease-in-out infinite;
-    will-change: transform;
-    filter: drop-shadow(0 12px 30px rgba(15, 25, 35, 0.18));
-  }
-  .coin-float-slow { animation-duration: 10s; }
-  .coin-float-delay { animation-delay: -3s; }
-}
