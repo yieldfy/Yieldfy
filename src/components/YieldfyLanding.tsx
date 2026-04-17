@@ -141,6 +141,13 @@ function Metrics() {
 }
 
 function ArchDiagram() {
+  const venues = ["Kamino", "Jito", "MarginFi", "Drift"];
+  const inboundPaths = [
+    "M160,80 L200,150",
+    "M160,80 L200,170",
+  ];
+  const outboundPaths = [0, 1, 2, 3].map((i) => `M300,160 L340,${45 + i * 70}`);
+
   return (
     <svg viewBox="0 0 500 320" className="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -148,31 +155,116 @@ function ArchDiagram() {
           <stop offset="0%" stopColor="#2EC4B6" />
           <stop offset="100%" stopColor="#E84855" />
         </linearGradient>
+        <radialGradient id="gPulseHalo" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0%" stopColor="#2EC4B6" stopOpacity="0.45" />
+          <stop offset="100%" stopColor="#2EC4B6" stopOpacity="0" />
+        </radialGradient>
       </defs>
+
+      <style>{`
+        @keyframes arch-dash { to { stroke-dashoffset: -24; } }
+        @keyframes arch-core-pulse {
+          0%, 100% { transform: scale(1); opacity: 0.95; }
+          50% { transform: scale(1.04); opacity: 1; }
+        }
+        @keyframes arch-halo {
+          0%, 100% { opacity: 0.25; transform: scale(1); }
+          50% { opacity: 0.6; transform: scale(1.15); }
+        }
+        @keyframes arch-venue-glow {
+          0%, 100% { stroke-opacity: 0.15; }
+          50% { stroke-opacity: 0.55; }
+        }
+        .arch-flow {
+          stroke-dasharray: 6 6;
+          animation: arch-dash 1.6s linear infinite;
+        }
+        .arch-core {
+          transform-origin: 250px 160px;
+          animation: arch-core-pulse 3s ease-in-out infinite;
+        }
+        .arch-halo {
+          transform-origin: 250px 160px;
+          animation: arch-halo 3s ease-in-out infinite;
+        }
+        .arch-venue-0 { animation: arch-venue-glow 3s ease-in-out infinite; animation-delay: 0s; }
+        .arch-venue-1 { animation: arch-venue-glow 3s ease-in-out infinite; animation-delay: 0.4s; }
+        .arch-venue-2 { animation: arch-venue-glow 3s ease-in-out infinite; animation-delay: 0.8s; }
+        .arch-venue-3 { animation: arch-venue-glow 3s ease-in-out infinite; animation-delay: 1.2s; }
+        .arch-packet {
+          fill: #2EC4B6;
+          filter: drop-shadow(0 0 4px rgba(46, 196, 182, 0.8));
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .arch-flow, .arch-core, .arch-halo, .arch-packet animateMotion,
+          [class^="arch-venue-"] { animation: none; }
+        }
+      `}</style>
+
+      {/* XRPL source */}
       <g>
         <rect x="20" y="40" width="140" height="80" fill="none" stroke="#0F1923" strokeOpacity="0.2" strokeWidth="1" rx="4" />
         <text x="90" y="72" textAnchor="middle" fill="#0F1923" fontSize="11" fontFamily="Barlow" letterSpacing="1.5">XRPL</text>
         <text x="90" y="92" textAnchor="middle" fill="#0F1923" fillOpacity="0.6" fontSize="9" fontFamily="Barlow">OUSG · TBILL</text>
       </g>
+
+      {/* Yieldfy core with halo + pulse */}
       <g>
-        <rect x="200" y="120" width="100" height="80" fill="url(#gAcc)" rx="4" />
-        <text x="250" y="152" textAnchor="middle" fill="#0F1923" fontSize="11" fontFamily="Barlow" fontWeight="600" letterSpacing="1.5">YIELDFY</text>
-        <text x="250" y="172" textAnchor="middle" fill="#0F1923" fontSize="9" fontFamily="Barlow">routing agent</text>
+        <circle className="arch-halo" cx="250" cy="160" r="80" fill="url(#gPulseHalo)" />
+        <g className="arch-core">
+          <rect x="200" y="120" width="100" height="80" fill="url(#gAcc)" rx="4" />
+          <text x="250" y="152" textAnchor="middle" fill="#0F1923" fontSize="11" fontFamily="Barlow" fontWeight="600" letterSpacing="1.5">YIELDFY</text>
+          <text x="250" y="172" textAnchor="middle" fill="#0F1923" fontSize="9" fontFamily="Barlow">routing agent</text>
+        </g>
       </g>
+
+      {/* Venues */}
       <g>
-        {["Kamino", "Jito", "MarginFi", "Drift"].map((name, i) => (
+        {venues.map((name, i) => (
           <g key={name}>
-            <rect x={340} y={20 + i * 70} width="140" height="50" fill="none" stroke="#0F1923" strokeOpacity="0.15" strokeWidth="1" rx="4" />
+            <rect
+              className={`arch-venue-${i}`}
+              x={340}
+              y={20 + i * 70}
+              width="140"
+              height="50"
+              fill="none"
+              stroke="url(#gAcc)"
+              strokeOpacity="0.15"
+              strokeWidth="1"
+              rx="4"
+            />
             <text x={410} y={42 + i * 70} textAnchor="middle" fill="#0F1923" fontSize="10" fontFamily="Barlow" letterSpacing="1">{name.toUpperCase()}</text>
             <text x={410} y={58 + i * 70} textAnchor="middle" fill="#0F1923" fillOpacity="0.5" fontSize="8" fontFamily="Barlow">Solana</text>
           </g>
         ))}
       </g>
-      <g stroke="url(#gAcc)" strokeOpacity="0.7" strokeWidth="1" fill="none">
-        <line x1="160" y1="80" x2="200" y2="150" />
-        <line x1="160" y1="80" x2="200" y2="170" />
-        {[0, 1, 2, 3].map((i) => (
-          <line key={i} x1="300" y1="160" x2="340" y2={45 + i * 70} />
+
+      {/* Static base lines */}
+      <g stroke="url(#gAcc)" strokeOpacity="0.25" strokeWidth="1" fill="none">
+        {inboundPaths.map((d, i) => <path key={`ib-${i}`} d={d} />)}
+        {outboundPaths.map((d, i) => <path key={`ob-${i}`} d={d} />)}
+      </g>
+
+      {/* Animated dashed flow overlay */}
+      <g stroke="url(#gAcc)" strokeOpacity="0.85" strokeWidth="1.5" fill="none">
+        {inboundPaths.map((d, i) => <path key={`ibf-${i}`} d={d} className="arch-flow" />)}
+        {outboundPaths.map((d, i) => (
+          <path key={`obf-${i}`} d={d} className="arch-flow" style={{ animationDelay: `${i * 0.2}s` }} />
+        ))}
+      </g>
+
+      {/* Traveling packets along outbound paths */}
+      <g>
+        {outboundPaths.map((d, i) => (
+          <circle key={`pk-${i}`} r="2.5" className="arch-packet">
+            <animateMotion dur="2.4s" repeatCount="indefinite" begin={`${i * 0.4}s`} path={d} />
+          </circle>
+        ))}
+        {inboundPaths.map((d, i) => (
+          <circle key={`pki-${i}`} r="2.5" className="arch-packet">
+            <animateMotion dur="2s" repeatCount="indefinite" begin={`${i * 0.5}s`} path={d} />
+          </circle>
         ))}
       </g>
     </svg>
