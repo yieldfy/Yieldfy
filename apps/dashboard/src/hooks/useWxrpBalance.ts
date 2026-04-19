@@ -7,16 +7,19 @@ import {
   TokenInvalidAccountOwnerError,
 } from "@solana/spl-token";
 import { useQuery } from "@tanstack/react-query";
+import { env } from "@/env";
 
 const WXRP_DECIMALS = 6;
 
-const rawMint = import.meta.env.VITE_WXRP_MINT as string | undefined;
 export const WXRP_MINT: PublicKey | null = (() => {
-  if (!rawMint) return null;
+  if (!env.VITE_WXRP_MINT) return null;
   try {
-    return new PublicKey(rawMint);
+    return new PublicKey(env.VITE_WXRP_MINT);
   } catch {
-    console.warn("[useWxrpBalance] VITE_WXRP_MINT is not a valid pubkey:", rawMint);
+    console.warn(
+      "[useWxrpBalance] VITE_WXRP_MINT is not a valid pubkey:",
+      env.VITE_WXRP_MINT,
+    );
     return null;
   }
 })();

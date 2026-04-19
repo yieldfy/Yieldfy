@@ -194,6 +194,28 @@ All method signatures, account lists, and discriminator derivations already matc
 
 ---
 
+### ✅ Bundle split + zod env validation + readiness probe
+
+**Delivered:**
+- `apps/dashboard/vite.config.ts` — rollup `manualChunks` splits vendor deps by package: `solana-core` (web3.js + spl-token), `solana-wallet` (wallet adapter), `anchor`, `radix`, `charts`, `router`. Main app chunk dropped from 1.02 MB to 235 kB; largest chunk is 314 kB (solana-core). No more 500 kB warning — raised the limit to 600 kB just in case.
+- `apps/dashboard/src/env.ts` — zod schema over `import.meta.env`. Falls back to defaults on parse failure and logs a structured error. `useWxrpBalance`, `useYieldfyClient`, `SolanaWalletProvider`, `DepositView`, `SettingsView` all read from the typed `env` export now — no more ad-hoc `import.meta.env.VITE_*` strings scattered across components.
+- `services/optimizer/src/env.ts` — zod schema over `process.env`. `PORT` / `ATTEST_RATE_MAX` coerced to numbers, `REDIS_URL` validated as `redis(s)://…`, `AXIOM_*` surfaces a warning when `AXIOM_TOKEN` is set without `AXIOM_DATASET`. Imported first in `server.ts` so boot fails fast on bad config.
+- `services/optimizer/src/server.ts` — new `/health/ready` endpoint that probes DeFiLlama (`HEAD /pools`), Solana RPC (`getSlot`), and attestor key in parallel with 3 s per-check timeouts. Returns `{ ready, checks: { defillama, solanaRpc, attestor: { ok, latencyMs? } }, ts }` with 200 when all green, 503 otherwise. `/health` stays cheap for Docker's liveness HEALTHCHECK.
+- Optimizer README endpoint table gained `/health/ready`.
+
+**Build impact (dashboard):**
+```
+before           after
+index.js 1020 kB → 235 kB (app code)
+                   314 kB (solana-core)
+                   276 kB (solana-wallet)
+                   173 kB (anchor)
+                    58 kB (radix)
+                    21 kB (router)
+```
+
+---
+
 ### ✅ Local observability docker-compose
 
 **Delivered:**

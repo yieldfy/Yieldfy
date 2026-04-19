@@ -11,6 +11,7 @@ import {
 import { useWxrpBalance, WXRP_MINT } from "@/hooks/useWxrpBalance";
 import { useYieldfyClient } from "@/hooks/useYieldfyClient";
 import { useRiskProfile } from "@/hooks/useRiskProfile";
+import { env } from "@/env";
 
 type Stage = "idle" | "attesting" | "signing" | "confirming" | "done" | "error";
 
@@ -20,8 +21,7 @@ const RISKS: { key: RiskProfile; label: string; desc: string }[] = [
   { key: "opportunistic", label: "Opportunistic", desc: "Tilts toward APY" },
 ];
 
-const OPTIMIZER_URL =
-  (import.meta.env.VITE_OPTIMIZER_URL as string | undefined) ?? "http://localhost:4000";
+const OPTIMIZER_URL = env.VITE_OPTIMIZER_URL;
 
 const parseAmount = (raw: string): bigint | null => {
   const stripped = raw.replace(/[,\s]/g, "");

@@ -28,7 +28,8 @@ Image runs as a non-root user, ships only production deps, and exposes a `HEALTH
 
 | Path                | Method | Description                                    |
 | ------------------- | ------ | ---------------------------------------------- |
-| `/health`           | GET    | Liveness check.                                |
+| `/health`           | GET    | Liveness — cheap, always 200 if the process answers. |
+| `/health/ready`     | GET    | Readiness — probes DeFiLlama, Solana RPC, and attestor key in parallel (3 s timeout each). Returns 200 when all green, 503 otherwise. |
 | `/attestor/pubkey`  | GET    | Ed25519 public key used to sign attestations. Whitelist this in the Anchor `Config.attestor` field. |
 | `/venues`           | GET    | Current DeFiLlama snapshots for all venues.    |
 | `/choose`           | GET    | `?profile=conservative\|balanced\|opportunistic` — returns the top-scoring venue (unsigned). |

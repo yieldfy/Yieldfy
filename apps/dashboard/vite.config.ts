@@ -16,6 +16,31 @@ export default defineConfig(() => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
-    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime", "@tanstack/react-query", "@tanstack/query-core"],
+    dedupe: [
+      "react",
+      "react-dom",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+      "@tanstack/react-query",
+      "@tanstack/query-core",
+    ],
+  },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          if (!id.includes("node_modules")) return undefined;
+          if (id.includes("@solana/web3.js") || id.includes("@solana/spl-token"))
+            return "solana-core";
+          if (id.includes("@solana/wallet-adapter")) return "solana-wallet";
+          if (id.includes("@coral-xyz/anchor")) return "anchor";
+          if (id.includes("@radix-ui")) return "radix";
+          if (id.includes("recharts")) return "charts";
+          if (id.includes("react-router")) return "router";
+          return undefined;
+        },
+      },
+    },
   },
 }));

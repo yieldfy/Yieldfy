@@ -1,3 +1,6 @@
+// Must run first — validates env and exits on parse failures.
+import { env } from "./env.js";
+
 import Fastify from "fastify";
 import rateLimit from "@fastify/rate-limit";
 import { Connection } from "@solana/web3.js";
@@ -26,13 +29,14 @@ import {
   logEvent,
 } from "./observability.js";
 
-const PORT = Number(process.env.PORT ?? 4000);
-const HOST = process.env.HOST ?? "0.0.0.0";
-const SOLANA_RPC_URL =
-  process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
-const REDIS_URL = process.env.REDIS_URL;
-const ATTEST_RATE_MAX = Number(process.env.ATTEST_RATE_MAX ?? 60);
-const ATTEST_RATE_WINDOW = process.env.ATTEST_RATE_WINDOW ?? "1 minute";
+const {
+  PORT,
+  HOST,
+  SOLANA_RPC_URL,
+  REDIS_URL,
+  ATTEST_RATE_MAX,
+  ATTEST_RATE_WINDOW,
+} = env;
 
 const PROFILES = ["conservative", "balanced", "opportunistic"] as const;
 const isProfile = (s: string): s is RiskProfile =>
@@ -55,6 +59,53 @@ app.addHook("onRequest", async (req, reply) => {
 });
 
 app.get("/health", async () => ({ ok: true, ts: Date.now() }));
+
+type ProbeResult = { ok: boolean; latencyMs?: number; error?: string };
+
+async function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return Promise.race<T>([
+    p,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`timeout after ${ms}ms`)), ms),
+    ),
+  ]);
+}
+
+async function probe(fn: () => Promise<void>, ms = 3_000): Promise<ProbeResult> {
+  const start = Date.now();
+  try {
+    await withTimeout(fn(), ms);
+    return { ok: true, latencyMs: Date.now() - start };
+  } catch (e) {
+    return {
+      ok: false,
+      latencyMs: Date.now() - start,
+      error: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+app.get("/health/ready", async (_req, reply) => {
+  const [defillama, rpc] = await Promise.all([
+    probe(async () => {
+      const r = await fetch("https://yields.llama.fi/pools", { method: "HEAD" });
+      if (!r.ok) throw new Error(`defillama ${r.status}`);
+    }),
+    probe(async () => {
+      await connection.getSlot();
+    }),
+  ]);
+
+  const checks: Record<string, ProbeResult> = {
+    defillama,
+    solanaRpc: rpc,
+    attestor: { ok: !!attestorPubkey },
+  };
+
+  const ready = Object.values(checks).every((c) => c.ok);
+  reply.code(ready ? 200 : 503);
+  return { ready, checks, ts: Date.now() };
+});
 
 app.get("/attestor/pubkey", async () => ({ pubkey: attestorPubkey }));
 

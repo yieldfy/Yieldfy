@@ -1,6 +1,7 @@
 import { useWallet } from "@solana/wallet-adapter-react";
 import type { RiskProfile } from "@yieldfy/sdk";
 import { useRiskProfile } from "@/hooks/useRiskProfile";
+import { env } from "@/env";
 
 const RISK_OPTIONS: {
   key: RiskProfile;
@@ -34,12 +35,8 @@ const SettingsView = () => {
   const { publicKey } = useWallet();
   const [profile, setProfile] = useRiskProfile();
 
-  const rpc =
-    (import.meta.env.VITE_SOLANA_RPC_URL as string | undefined) ??
-    "https://api.devnet.solana.com";
-  const optimizer =
-    (import.meta.env.VITE_OPTIMIZER_URL as string | undefined) ??
-    "http://localhost:4000";
+  const rpc = env.VITE_SOLANA_RPC_URL;
+  const optimizer = env.VITE_OPTIMIZER_URL;
 
   return (
     <div className="max-w-2xl space-y-6">

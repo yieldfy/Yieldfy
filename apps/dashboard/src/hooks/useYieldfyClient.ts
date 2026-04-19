@@ -3,17 +3,16 @@ import { AnchorProvider } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Yieldfy } from "@yieldfy/sdk";
 import { useMemo } from "react";
-
-const rawProgramId = import.meta.env.VITE_YIELDFY_PROGRAM_ID as string | undefined;
+import { env } from "@/env";
 
 export const PROGRAM_ID: PublicKey | null = (() => {
-  if (!rawProgramId) return null;
+  if (!env.VITE_YIELDFY_PROGRAM_ID) return null;
   try {
-    return new PublicKey(rawProgramId);
+    return new PublicKey(env.VITE_YIELDFY_PROGRAM_ID);
   } catch {
     console.warn(
       "[useYieldfyClient] VITE_YIELDFY_PROGRAM_ID is not a valid pubkey:",
-      rawProgramId,
+      env.VITE_YIELDFY_PROGRAM_ID,
     );
     return null;
   }
