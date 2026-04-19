@@ -16,7 +16,7 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ✅ completed |
 | 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ⏳ waiting for yieldfy |
 | 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
-| 7 | W8 | Webhook emitters + Prometheus `/metrics` | ⬜ pending |
+| 7 | W8 | Webhook emitters + Prometheus `/metrics` | ✅ completed |
 | 8 | W9 | Observability end-to-end (Grafana JSON, Axiom, correlation IDs) | ⬜ pending |
 | 9 | W10 | Docs + `@yieldfy/sdk@1.0.0` publish pipeline | ⬜ pending |
 
@@ -94,6 +94,26 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 **Verified:** `npm test` — 9/9 passing (3 score + 6 attest). `curl /attest?profile=balanced` against a running server returns a live signed attestation with a real devnet slot.
 
 **Integration note for yieldfy:** the `attestor` pubkey to bake into `Config.attestor` is whatever `/attestor/pubkey` returns for the server instance we end up deploying. Locally it regenerates every restart unless `YIELDFY_ATTESTOR_KEY` is set.
+
+---
+
+### ✅ Phase 7 — Webhooks + Prometheus metrics (W8)
+
+**Delivered:**
+- `services/optimizer/src/metrics.ts` — Prometheus registry with default Node process metrics, plus `yieldfy_attestations_total{venue, profile}`, `yieldfy_attestation_duration_seconds{profile}`, `yieldfy_feeds_fetch_duration_seconds`, `yieldfy_webhook_dispatch_total{status, event}`.
+- `services/optimizer/src/webhooks.ts` — in-memory subscription store, HMAC-SHA256 body signing (`X-Yieldfy-Signature: sha256=…` header), `dispatchEvent()` fire-and-forget dispatcher with 5s per-target timeout.
+- `services/optimizer/src/webhooks.test.ts` — 6 vitest cases covering create/list/delete, URL validation, signature round-trip + tamper detection, dispatch filtering, HTTP call shape.
+- `services/optimizer/src/server.ts` — new endpoints `/metrics`, `/webhooks` (GET + POST), `/webhooks/:id` (DELETE). `/attest` now increments counters, records latency, and dispatches `attestation.created` webhook async.
+
+**Verified:** `npm test` — 15/15 passing (3 score + 6 attest + 6 webhooks). Live `curl http://localhost:4000/metrics` shows `yieldfy_attestations_total{venue="kamino",profile="balanced"} 1` + full histogram buckets after one `/attest` call. POST-created webhook to `httpbin.org` delivered successfully (`yieldfy_webhook_dispatch_total{status="2xx"} 1`).
+
+**Tenant integration snippet:**
+```
+curl -X POST http://optimizer/webhooks \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://tenant.example/hook","events":["attestation.created"]}'
+# → { id, secret, ... }  — verify inbound X-Yieldfy-Signature with HMAC-SHA256(body, secret)
+```
 
 ---
 

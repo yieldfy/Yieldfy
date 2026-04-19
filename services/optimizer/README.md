@@ -20,7 +20,25 @@ npm test       # vitest run
 | `/attestor/pubkey`  | GET    | Ed25519 public key used to sign attestations. Whitelist this in the Anchor `Config.attestor` field. |
 | `/venues`           | GET    | Current DeFiLlama snapshots for all venues.    |
 | `/choose`           | GET    | `?profile=conservative\|balanced\|opportunistic` — returns the top-scoring venue (unsigned). |
-| `/attest`           | GET    | `?profile=…` — selects the top venue, fetches the current Solana slot, and returns a signed attestation the SDK passes to `deposit_wxrp_to_kamino` via an ed25519 pre-instruction. |
+| `/attest`           | GET    | `?profile=…` — selects the top venue, fetches the current Solana slot, and returns a signed attestation the SDK passes to `deposit_wxrp_to_kamino` via an ed25519 pre-instruction. Fires `attestation.created` webhook. |
+| `/metrics`          | GET    | Prometheus exposition format (`text/plain; version=0.0.4`). Scrape interval ≥ 15 s recommended. |
+| `/webhooks`         | GET    | List subscriptions.                           |
+| `/webhooks`         | POST   | `{ url, events: ["attestation.created"], secret? }` — registers a tenant webhook. Returns the subscription with its secret (generated if omitted). |
+| `/webhooks/:id`     | DELETE | Unregisters a subscription.                   |
+
+### Webhook delivery
+
+- Each POST carries `X-Yieldfy-Event`, `X-Yieldfy-Delivery` (uuid), and `X-Yieldfy-Signature: sha256=<hex>` headers.
+- Signature is `HMAC-SHA256(body, subscription.secret)`; verify with `verifySignature(body, secret, header)` from `webhooks.ts` (constant-time compare).
+- Subscription store is in-memory — swap for Redis / Postgres at production cut.
+
+### Metrics exposed
+
+- `yieldfy_attestations_total{venue, profile}` — counter of signed attestations by winner + profile.
+- `yieldfy_attestation_duration_seconds{profile}` — histogram of end-to-end `/attest` latency.
+- `yieldfy_feeds_fetch_duration_seconds` — histogram of DeFiLlama fetch latency.
+- `yieldfy_webhook_dispatch_total{status, event}` — counter of webhook POST attempts by HTTP status class.
+- Default Node process metrics (CPU, memory, event loop lag).
 
 ## Environment
 
