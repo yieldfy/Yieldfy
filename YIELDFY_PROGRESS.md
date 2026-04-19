@@ -194,6 +194,17 @@ All method signatures, account lists, and discriminator derivations already matc
 
 ---
 
+### ✅ Rate limit + Redis webhook store + retries
+
+**Delivered:**
+- `services/optimizer/src/subscription-store.ts` — `SubscriptionStore` interface with `MemorySubscriptionStore` (default) and `RedisSubscriptionStore` (via `ioredis`). Redis layout: `yieldfy:webhooks:ids` set + one `yieldfy:webhooks:<id>` JSON string per subscription.
+- `services/optimizer/src/webhooks.ts` — `initWebhookStore(REDIS_URL)` selects backend at boot; `createSubscription` / `listSubscriptions` / `deleteSubscription` now async. `dispatchEvent` retries 3× with 1 s / 5 s / 30 s backoff on 5xx + transport errors; 4xx responses don't retry. A final give-up increments `yieldfy_webhook_dispatch_total{status="dead"}`.
+- `services/optimizer/src/server.ts` — registers `@fastify/rate-limit` globally (off by default) and applies per-route `{ max: ATTEST_RATE_MAX, timeWindow: ATTEST_RATE_WINDOW }` to `/attest` (defaults `60 / 1 minute`). SIGINT/SIGTERM handlers close Fastify + Redis gracefully. Startup log now reports subscription-store kind + rate-limit config.
+- `services/optimizer/src/webhooks.test.ts` — 7 passing cases, including new 5xx retry (3 attempts) and 4xx no-retry assertions.
+- Optimizer README documents `REDIS_URL`, `ATTEST_RATE_MAX`, `ATTEST_RATE_WINDOW`, the retry policy, and the updated delivery headers.
+
+---
+
 ### ✅ Vercel deploy + optimizer Dockerfile
 
 **Delivered:**

@@ -1,4 +1,5 @@
 import Fastify from "fastify";
+import rateLimit from "@fastify/rate-limit";
 import { Connection } from "@solana/web3.js";
 import { fetchSnapshots } from "./feeds.js";
 import { chooseVenue, type RiskProfile } from "./score.js";
@@ -13,7 +14,9 @@ import {
   createSubscription,
   deleteSubscription,
   dispatchEvent,
+  initWebhookStore,
   listSubscriptions,
+  shutdownWebhookStore,
   type WebhookEvent,
 } from "./webhooks.js";
 import {
@@ -27,6 +30,9 @@ const PORT = Number(process.env.PORT ?? 4000);
 const HOST = process.env.HOST ?? "0.0.0.0";
 const SOLANA_RPC_URL =
   process.env.SOLANA_RPC_URL ?? "https://api.devnet.solana.com";
+const REDIS_URL = process.env.REDIS_URL;
+const ATTEST_RATE_MAX = Number(process.env.ATTEST_RATE_MAX ?? 60);
+const ATTEST_RATE_WINDOW = process.env.ATTEST_RATE_WINDOW ?? "1 minute";
 
 const PROFILES = ["conservative", "balanced", "opportunistic"] as const;
 const isProfile = (s: string): s is RiskProfile =>
@@ -37,6 +43,12 @@ const app = Fastify({
   genReqId: (req) => getCorrelationId(req.headers as Record<string, unknown>),
 });
 const connection = new Connection(SOLANA_RPC_URL, "confirmed");
+
+await app.register(rateLimit, {
+  global: false,
+  max: ATTEST_RATE_MAX,
+  timeWindow: ATTEST_RATE_WINDOW,
+});
 
 app.addHook("onRequest", async (req, reply) => {
   reply.header(CORRELATION_ID_HEADER, req.id);
@@ -74,56 +86,69 @@ app.get("/choose", async (req) => {
   };
 });
 
-app.get("/attest", async (req, reply) => {
-  const corrId = req.id;
-  const profile = (req.query as { profile?: string }).profile ?? "balanced";
-  if (!isProfile(profile)) {
-    reply.code(400);
-    return { error: `Invalid profile: ${profile}`, corrId };
-  }
+app.get(
+  "/attest",
+  {
+    config: {
+      rateLimit: {
+        max: ATTEST_RATE_MAX,
+        timeWindow: ATTEST_RATE_WINDOW,
+      },
+    },
+  },
+  async (req, reply) => {
+    const corrId = req.id;
+    const profile = (req.query as { profile?: string }).profile ?? "balanced";
+    if (!isProfile(profile)) {
+      reply.code(400);
+      return { error: `Invalid profile: ${profile}`, corrId };
+    }
 
-  const stop = attestationDuration.startTimer({ profile });
-  try {
-    const fetchStop = feedsFetchDuration.startTimer();
-    const [snaps, slot] = await Promise.all([
-      fetchSnapshots().finally(fetchStop),
-      connection.getSlot(),
-    ]);
-    const winner = chooseVenue(snaps, profile);
-    const attestation = signAttestation(winner.s.venue, BigInt(slot));
+    const stop = attestationDuration.startTimer({ profile });
+    try {
+      const fetchStop = feedsFetchDuration.startTimer();
+      const [snaps, slot] = await Promise.all([
+        fetchSnapshots().finally(fetchStop),
+        connection.getSlot(),
+      ]);
+      const winner = chooseVenue(snaps, profile);
+      const attestation = signAttestation(winner.s.venue, BigInt(slot));
 
-    attestationsTotal.inc({ venue: winner.s.venue, profile });
+      attestationsTotal.inc({ venue: winner.s.venue, profile });
 
-    const response = {
-      profile,
-      slot: slot.toString(),
-      corrId,
-      winner: {
+      const response = {
+        profile,
+        slot: slot.toString(),
+        corrId,
+        winner: {
+          venue: winner.s.venue,
+          score: winner.score,
+          snapshot: winner.s,
+        },
+        attestation,
+      };
+
+      logEvent(app.log, {
+        event: "attestation.created",
+        corrId,
+        profile,
         venue: winner.s.venue,
         score: winner.score,
-        snapshot: winner.s,
-      },
-      attestation,
-    };
+        slot: slot.toString(),
+      });
 
-    logEvent(app.log, {
-      event: "attestation.created",
-      corrId,
-      profile,
-      venue: winner.s.venue,
-      score: winner.score,
-      slot: slot.toString(),
-    });
+      void dispatchEvent("attestation.created", response, { corrId });
 
-    dispatchEvent("attestation.created", response, { corrId });
+      return response;
+    } finally {
+      stop();
+    }
+  },
+);
 
-    return response;
-  } finally {
-    stop();
-  }
-});
-
-app.get("/webhooks", async () => ({ subscriptions: listSubscriptions() }));
+app.get("/webhooks", async () => ({
+  subscriptions: await listSubscriptions(),
+}));
 
 app.post("/webhooks", async (req, reply) => {
   const body = req.body as {
@@ -136,7 +161,7 @@ app.post("/webhooks", async (req, reply) => {
     return { error: "Body must include { url, events: WebhookEvent[] }" };
   }
   try {
-    const sub = createSubscription(body.url, body.events, body.secret);
+    const sub = await createSubscription(body.url, body.events, body.secret);
     logEvent(app.log, {
       event: "webhook.subscribed",
       corrId: req.id,
@@ -151,7 +176,7 @@ app.post("/webhooks", async (req, reply) => {
 });
 
 app.delete<{ Params: { id: string } }>("/webhooks/:id", async (req, reply) => {
-  const ok = deleteSubscription(req.params.id);
+  const ok = await deleteSubscription(req.params.id);
   if (!ok) {
     reply.code(404);
     return { error: "subscription not found" };
@@ -164,12 +189,27 @@ app.delete<{ Params: { id: string } }>("/webhooks/:id", async (req, reply) => {
   return { ok: true };
 });
 
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, async () => {
+    app.log.info(`${signal} received — shutting down`);
+    await app.close().catch(() => {});
+    await shutdownWebhookStore().catch(() => {});
+    process.exit(0);
+  });
+}
+
+const storeInit = await initWebhookStore(REDIS_URL);
+
 app
   .listen({ port: PORT, host: HOST })
   .then(() => {
     app.log.info(`attestor pubkey: ${attestorPubkey}`);
     app.log.info(`solana rpc: ${SOLANA_RPC_URL}`);
+    app.log.info(`subscription store: ${storeInit.kind}`);
     app.log.info(`axiom ingest: ${axiomConfigured ? "enabled" : "disabled"}`);
+    app.log.info(
+      `rate limit /attest: ${ATTEST_RATE_MAX} per ${ATTEST_RATE_WINDOW}`,
+    );
   })
   .catch((err) => {
     app.log.error(err);

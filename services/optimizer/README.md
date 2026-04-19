@@ -40,9 +40,10 @@ Image runs as a non-root user, ships only production deps, and exposes a `HEALTH
 
 ### Webhook delivery
 
-- Each POST carries `X-Yieldfy-Event`, `X-Yieldfy-Delivery` (uuid), and `X-Yieldfy-Signature: sha256=<hex>` headers.
+- Each POST carries `X-Yieldfy-Event`, `X-Yieldfy-Delivery` (uuid), `X-Yieldfy-Correlation-Id`, and `X-Yieldfy-Signature: sha256=<hex>` headers.
 - Signature is `HMAC-SHA256(body, subscription.secret)`; verify with `verifySignature(body, secret, header)` from `webhooks.ts` (constant-time compare).
-- Subscription store is in-memory — swap for Redis / Postgres at production cut.
+- Retries: up to 3 attempts per delivery with 1 s → 5 s → 30 s backoff. 4xx responses are treated as permanent failures (no retry); 5xx and transport errors are retried. Final give-ups are counted as `yieldfy_webhook_dispatch_total{status="dead"}`.
+- Subscription store: in-memory by default; set `REDIS_URL` for persistence across restarts.
 
 ### Metrics exposed
 
@@ -60,6 +61,9 @@ Image runs as a non-root user, ships only production deps, and exposes a `HEALTH
 | `HOST`                 | `0.0.0.0`                            | HTTP listen host.                                          |
 | `SOLANA_RPC_URL`       | `https://api.devnet.solana.com`      | RPC used to read the current slot for attestation freshness. |
 | `YIELDFY_ATTESTOR_KEY` | *(ephemeral)*                        | JSON array of 64 bytes (solana-keygen output). When unset, the server generates a fresh keypair on boot and logs its pubkey — convenient for dev, fatal for prod. |
+| `REDIS_URL`            | *(in-memory)*                        | `redis://…` to persist webhook subscriptions across restarts. Without it, subscriptions live in-process. |
+| `ATTEST_RATE_MAX`      | `60`                                 | Max `/attest` requests per `ATTEST_RATE_WINDOW` per client IP. |
+| `ATTEST_RATE_WINDOW`   | `1 minute`                           | `@fastify/rate-limit` window spec (e.g. `30 seconds`, `5 minutes`). |
 
 ### Generating a persistent attestor key
 

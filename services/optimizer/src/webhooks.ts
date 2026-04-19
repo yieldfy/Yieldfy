@@ -1,5 +1,15 @@
-import { createHmac, randomUUID, randomBytes, timingSafeEqual } from "node:crypto";
+import {
+  createHmac,
+  randomUUID,
+  randomBytes,
+  timingSafeEqual,
+} from "node:crypto";
 import { webhookDispatchTotal } from "./metrics.js";
+import {
+  MemorySubscriptionStore,
+  RedisSubscriptionStore,
+  type SubscriptionStore,
+} from "./subscription-store.js";
 
 export type WebhookEvent = "attestation.created";
 
@@ -11,18 +21,37 @@ export type Subscription = {
   createdAt: string;
 };
 
-// In-memory store — swap for Redis / Postgres at production cut.
-const subs = new Map<string, Subscription>();
+// --- store initialisation --------------------------------------------------
 
-export function listSubscriptions(): Subscription[] {
-  return Array.from(subs.values());
+let store: SubscriptionStore = new MemorySubscriptionStore();
+
+/** Wire a persistent store at boot. Safe to call only once. */
+export async function initWebhookStore(redisUrl?: string) {
+  if (!redisUrl) {
+    store = new MemorySubscriptionStore();
+    return { kind: "memory" as const };
+  }
+  const { default: Redis } = await import("ioredis");
+  const client = new Redis(redisUrl, { lazyConnect: false, maxRetriesPerRequest: 3 });
+  store = new RedisSubscriptionStore(client);
+  return { kind: "redis" as const };
 }
 
-export function createSubscription(
+export async function shutdownWebhookStore() {
+  await store.close?.();
+}
+
+// --- public API ------------------------------------------------------------
+
+export async function listSubscriptions(): Promise<Subscription[]> {
+  return store.list();
+}
+
+export async function createSubscription(
   url: string,
   events: WebhookEvent[],
   secret?: string,
-): Subscription {
+): Promise<Subscription> {
   if (!/^https?:\/\//.test(url)) {
     throw new Error("Subscription url must be http(s)");
   }
@@ -33,20 +62,25 @@ export function createSubscription(
     secret: secret ?? randomBytes(32).toString("hex"),
     createdAt: new Date().toISOString(),
   };
-  subs.set(sub.id, sub);
+  await store.save(sub);
   return sub;
 }
 
-export function deleteSubscription(id: string): boolean {
-  return subs.delete(id);
+export async function deleteSubscription(id: string): Promise<boolean> {
+  return store.delete(id);
 }
+
+// --- signing ---------------------------------------------------------------
 
 export function signBody(body: string, secret: string): string {
   return "sha256=" + createHmac("sha256", secret).update(body).digest("hex");
 }
 
-/** Constant-time verify, exposed for tests and inbound verification helpers. */
-export function verifySignature(body: string, secret: string, header: string): boolean {
+export function verifySignature(
+  body: string,
+  secret: string,
+  header: string,
+): boolean {
   const expected = signBody(body, secret);
   const a = Buffer.from(header);
   const b = Buffer.from(expected);
@@ -54,17 +88,28 @@ export function verifySignature(body: string, secret: string, header: string): b
   return timingSafeEqual(a, b);
 }
 
-type DispatchOptions = { timeoutMs?: number; corrId?: string };
+// --- dispatch + retry ------------------------------------------------------
 
-async function post(
+type DispatchOptions = {
+  timeoutMs?: number;
+  corrId?: string;
+  /** Max delivery attempts per subscription. Defaults to 3. */
+  maxAttempts?: number;
+  /** Backoff in ms between attempts. Defaults to [1_000, 5_000, 30_000]. */
+  backoffMs?: number[];
+};
+
+const DEFAULT_BACKOFF_MS = [1_000, 5_000, 30_000];
+
+async function postOnce(
   sub: Subscription,
   body: string,
   event: WebhookEvent,
   corrId: string,
-  opts: DispatchOptions,
+  timeoutMs: number,
 ) {
   const controller = new AbortController();
-  const to = setTimeout(() => controller.abort(), opts.timeoutMs ?? 5_000);
+  const to = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(sub.url, {
       method: "POST",
@@ -78,39 +123,77 @@ async function post(
       body,
       signal: controller.signal,
     });
-    const klass = `${Math.floor(res.status / 100)}xx`;
-    webhookDispatchTotal.inc({ status: klass, event });
-    return res.status;
-  } catch (err) {
-    webhookDispatchTotal.inc({ status: "err", event });
-    throw err;
+    return { status: res.status, ok: res.ok };
   } finally {
     clearTimeout(to);
   }
 }
 
+async function deliverWithRetry(
+  sub: Subscription,
+  body: string,
+  event: WebhookEvent,
+  corrId: string,
+  opts: Required<Pick<DispatchOptions, "timeoutMs" | "maxAttempts" | "backoffMs">>,
+) {
+  for (let attempt = 0; attempt < opts.maxAttempts; attempt++) {
+    try {
+      const { status, ok } = await postOnce(sub, body, event, corrId, opts.timeoutMs);
+      const klass = `${Math.floor(status / 100)}xx`;
+      webhookDispatchTotal.inc({ status: klass, event });
+      if (ok) return;
+      // 4xx = client error, don't retry; 5xx = retryable
+      if (status < 500) return;
+    } catch {
+      webhookDispatchTotal.inc({ status: "err", event });
+    }
+
+    const isLast = attempt === opts.maxAttempts - 1;
+    if (isLast) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[webhooks] dispatch to ${sub.url} failed after ${opts.maxAttempts} attempts (corrId=${corrId})`,
+      );
+      webhookDispatchTotal.inc({ status: "dead", event });
+      return;
+    }
+
+    const delay = opts.backoffMs[Math.min(attempt, opts.backoffMs.length - 1)];
+    await new Promise((r) => setTimeout(r, delay));
+  }
+}
+
 /**
- * Fire-and-forget: returns immediately; dispatches to each matching subscription
- * in parallel without blocking the caller's response.
+ * Fire-and-forget dispatch. Returns immediately with the number of
+ * matching subscriptions; each delivery runs on its own microtask and
+ * retries with exponential backoff on 5xx / transport errors.
  */
-export function dispatchEvent(
+export async function dispatchEvent(
   event: WebhookEvent,
   payload: unknown,
   opts: DispatchOptions = {},
 ) {
   const corrId = opts.corrId ?? randomUUID();
   const body = JSON.stringify({ event, payload, corrId, ts: Date.now() });
-  const targets = listSubscriptions().filter((s) => s.events.includes(event));
+  const targets = (await listSubscriptions()).filter((s) =>
+    s.events.includes(event),
+  );
+
+  const resolved: Required<Pick<DispatchOptions, "timeoutMs" | "maxAttempts" | "backoffMs">> = {
+    timeoutMs: opts.timeoutMs ?? 5_000,
+    maxAttempts: opts.maxAttempts ?? DEFAULT_BACKOFF_MS.length,
+    backoffMs: opts.backoffMs ?? DEFAULT_BACKOFF_MS,
+  };
+
   for (const sub of targets) {
-    post(sub, body, event, corrId, opts).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.warn(`[webhooks] dispatch to ${sub.url} failed:`, err);
-    });
+    void deliverWithRetry(sub, body, event, corrId, resolved);
   }
+
   return { dispatched: targets.length, corrId };
 }
 
-/** Test hook — wipe the in-memory store between specs. */
-export function __resetSubscriptions() {
-  subs.clear();
+// --- test helpers ----------------------------------------------------------
+
+export async function __resetSubscriptions() {
+  store = new MemorySubscriptionStore();
 }
