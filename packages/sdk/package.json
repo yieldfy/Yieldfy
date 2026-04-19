@@ -12,11 +12,16 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean",
     "dev": "tsup src/index.ts --format esm --dts --watch",
-    "test": "echo \"no tests yet — wiring once IDL lands\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -25,13 +30,21 @@
     "@solana/web3.js": "^1.95.0"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "tsup": "^8.3.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.4"
   },
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["solana", "yieldfy", "xrp", "wxrp", "defi"],
+  "keywords": [
+    "solana",
+    "yieldfy",
+    "xrp",
+    "wxrp",
+    "defi"
+  ],
   "license": "UNLICENSED",
   "repository": {
     "type": "git",

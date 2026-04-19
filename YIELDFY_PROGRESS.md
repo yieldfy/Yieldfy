@@ -14,8 +14,8 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | 0 | — | Monorepo migration (`apps/`, `packages/`, `services/`) | ⬜ pending |
 | 3 | W6 | Optimizer service: `score.ts`, `feeds.ts`, Fastify `server.ts` | ✅ completed |
 | 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ✅ completed |
-| 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ⏳ waiting for yieldfy |
-| 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
+| 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ✅ stub complete · swap IDL to finish |
+| 6 | W4 | Positions view reads on-chain PDAs | ✅ wired · populates on first yieldfy deploy |
 | 7 | W8 | Webhook emitters + Prometheus `/metrics` | ✅ completed |
 | 8 | W9 | Observability end-to-end (Grafana JSON, Axiom, correlation IDs) | ✅ completed |
 | 9 | W10 | Docs + `@yieldfy/sdk@1.0.0` publish pipeline | ✅ completed |
@@ -151,6 +151,30 @@ curl -X POST http://optimizer/webhooks \
 1. Bump `packages/sdk/package.json` version and `CHANGELOG.md`.
 2. `git tag sdk-vX.Y.Z && git push origin sdk-vX.Y.Z`.
 3. `release-sdk.yml` runs — provenance-signed publish to `@yieldfy/sdk`.
+
+---
+
+### ✅ Phase 5 (stub) — SDK + deposit flow wired against stub IDL
+
+**Delivered:**
+- `packages/sdk/src/idl/yieldfy.json` — hand-authored Anchor 0.30 IDL matching programs/yieldfy per §05–§07: `initialize`, `deposit_wxrp_to_kamino`, `withdraw`; `Config` + `Position` accounts; `ConfigArgs`, `DepositArgs`, `DepositEvent`; 7 error codes. Discriminators computed via `sha256("account:<Name>" | "global:<snake_case>")` — identical to what `anchor build` will emit.
+- `packages/sdk/src/pdas.ts` — pure helpers: `findConfigPda`, `findPositionPda`, `findVaultPda` + `IX_SYSVAR` / `KAMINO_PROGRAM_ID` constants.
+- `packages/sdk/src/attestation.ts` — `buildAttestationMessage`, `buildAttestationPreIx` (ed25519 precompile instruction), `fetchAttestation` (calls optimizer `/attest`).
+- `packages/sdk/src/client.ts` — `Yieldfy` class with `fetchConfig()`, `readPosition(user)`, `deposit(params, attestation)`, `withdraw(amount)`. Wraps Anchor's `Program` with runtime programId override.
+- `packages/sdk/src/types.ts` — `VenueKey`, `VENUE_CODE`/`VENUE_FROM_CODE`, `Attestation`, `DepositParams`, `ConfigAccount`, `PositionAccount`, `RiskProfile`.
+- `packages/sdk/src/sdk.test.ts` — 7 vitest cases: deterministic PDA derivation, user-scoped position PDA uniqueness, 9-byte message layout with little-endian slot, ed25519 pre-ix program id, `fetchAttestation` happy path + 5xx throw.
+- Dashboard hooks: `src/hooks/useYieldfyClient.ts` (builds `AnchorProvider` from the wallet adapter; exposes `{ kind: "disconnected" | "missing-program-id" | "ready" }`), `src/hooks/useYieldfyPosition.ts` (react-query wrapper around `readPosition`).
+- **Deposit wizard rewrite** (`DepositView.tsx`): 3-step flow (amount + profile → review → processing), real `useWxrpBalance` / `fetchAttestation` / `client.deposit()`, sonner error toasts, Solscan link on success, inline warnings for missing `VITE_WXRP_MINT` / `VITE_YIELDFY_PROGRAM_ID`.
+- **Positions view rewrite** (`PositionsView.tsx`): reads the on-chain Position PDA via `useYieldfyPosition`, renders principal / yXRP supply / venue / owner / bump / last-update once data exists; empty state until then.
+
+**Verified:** `npm run build` (dashboard bundles SDK cleanly, 1.35 MB — code-split pending), `npm test` in SDK 7/7 passing, dashboard 1/1, optimizer 19/19.
+
+**Handoff to yieldfy (one-liner):**
+```
+cp programs/yieldfy/target/idl/yieldfy.json packages/sdk/src/idl/yieldfy.json
+# then bump packages/sdk package.json version + tag sdk-vX.Y.Z
+```
+All method signatures, account lists, and discriminator derivations already match §05–§07; the only expected delta is the `address` field, which the Yieldfy constructor overrides at runtime anyway.
 
 ---
 

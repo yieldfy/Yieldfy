@@ -1,43 +1,36 @@
-// @yieldfy/sdk — scaffold.
+// @yieldfy/sdk — typed client for the Yieldfy Anchor program.
 //
-// The typed Yieldfy client lands once yieldfy publishes the Anchor IDL for the
-// programs/yieldfy program (Phase 5 of the engineering plan). This module
-// exports only the attestation shape and a placeholder client stub so
-// downstream consumers can start wiring integration code without waiting for
-// the on-chain surface.
+// Ships with a stub IDL that matches programs/yieldfy per the engineering
+// plan (§05–§07). Once yieldfy runs `anchor build` and publishes the real
+// IDL, replace src/idl/yieldfy.json with the generated file — the public
+// surface of this package stays stable.
 
-export type VenueKey = "kamino" | "marginfi" | "drift" | "meteora";
+export { Yieldfy, SDK_VERSION } from "./client.js";
 
-export type Attestation = {
-  venue: VenueKey;
-  venueCode: number;
-  /** Decimal string — bigint-safe for JSON transport. */
-  slot: string;
-  /** Hex-encoded 64-byte ed25519 signature. */
-  sigHex: string;
-  /** Base58-encoded signer pubkey. */
-  pubkeyBase58: string;
-};
+export {
+  buildAttestationMessage,
+  buildAttestationPreIx,
+  fetchAttestation,
+} from "./attestation.js";
 
-export type DepositParams = {
-  /** wXRP base units (decimals = 6). */
-  amount: bigint;
-};
+export {
+  CONFIG_SEED,
+  POSITION_SEED,
+  VAULT_SEED,
+  IX_SYSVAR,
+  KAMINO_PROGRAM_ID,
+  findConfigPda,
+  findPositionPda,
+  findVaultPda,
+} from "./pdas.js";
 
-/**
- * Fetch a signed attestation from the Yieldfy optimizer service.
- * Works today; used by the full SDK client once Phase 5 wires deposit/withdraw.
- */
-export async function fetchAttestation(
-  optimizerUrl: string,
-  profile: "conservative" | "balanced" | "opportunistic" = "balanced",
-): Promise<Attestation> {
-  const url = new URL("/attest", optimizerUrl);
-  url.searchParams.set("profile", profile);
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`optimizer /attest failed: ${res.status}`);
-  const body = (await res.json()) as { attestation: Attestation };
-  return body.attestation;
-}
-
-export const SDK_VERSION = "0.0.1";
+export {
+  VENUE_CODE,
+  VENUE_FROM_CODE,
+  type Attestation,
+  type ConfigAccount,
+  type DepositParams,
+  type PositionAccount,
+  type RiskProfile,
+  type VenueKey,
+} from "./types.js";
