@@ -1,3 +1,16 @@
-# Welcome to your Lovable project
+# Yieldfy
 
-TODO: Document your project here
+Yieldfy web app — Vite + React + TypeScript.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Build
+
+```bash
+npm run build
+```
