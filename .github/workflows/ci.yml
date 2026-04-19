@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dashboard:
+    name: dashboard · lint · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: lint
+        run: npm run lint
+        continue-on-error: true # pre-existing shadcn warnings — track in follow-up
+      - name: test
+        run: npm test
+      - name: build
+        run: npm run build
+
+  optimizer:
+    name: optimizer · test · build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/optimizer
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: services/optimizer/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  sdk:
+    name: sdk · build · pack (dry run)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/sdk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: packages/sdk/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm pack --dry-run

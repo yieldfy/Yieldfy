@@ -18,7 +18,7 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
 | 7 | W8 | Webhook emitters + Prometheus `/metrics` | ✅ completed |
 | 8 | W9 | Observability end-to-end (Grafana JSON, Axiom, correlation IDs) | ✅ completed |
-| 9 | W10 | Docs + `@yieldfy/sdk@1.0.0` publish pipeline | ⬜ pending |
+| 9 | W10 | Docs + `@yieldfy/sdk@1.0.0` publish pipeline | ✅ completed |
 
 ---
 
@@ -129,6 +129,28 @@ curl -X POST http://optimizer/webhooks \
 - `ops/README.md` — import instructions, panel list, Axiom setup.
 
 **Verified:** `npm test` 19/19 passing (3 score + 6 attest + 6 webhooks + 4 observability). `curl -H "X-Correlation-Id: ext-test-abc" /health` round-trips the ID on the response header.
+
+---
+
+### ✅ Phase 9 — Docs + SDK publish pipeline (W10)
+
+**Delivered:**
+- `packages/sdk/` — scaffold SDK package `@yieldfy/sdk@0.0.1`. Exports `fetchAttestation()`, shared types (`Attestation`, `VenueKey`, `DepositParams`). tsup-built ESM + `.d.ts`; `npm pack --dry-run` produces a 2.3 kB tarball with 5 files. Full typed client (deposit/withdraw) lands at Phase 5.
+- `.github/workflows/ci.yml` — three jobs run on push + PR: `dashboard` (install, lint [advisory], test, build), `optimizer` (install, test, build), `sdk` (install, build, pack dry-run). Node 20 + npm cache per workspace.
+- `.github/workflows/release-sdk.yml` — triggers on `sdk-v*` tag, verifies tag matches `package.json`, publishes to npm with provenance. Requires `NPM_TOKEN` repo secret.
+- `packages/sdk/CHANGELOG.md` — Keep a Changelog / SemVer format; 0.0.1 scaffold entry + Unreleased section for Phase 5 items.
+- `docs/integration.md` — end-to-end tenant integration: architecture diagram, attestation fetch, deposit flow (⏳ Phase 5), webhooks, positions read (⏳ Phase 5), env vars, error model.
+- `docs/webhooks.md` — event catalogue, delivery headers, Node + Web Crypto signature-verify snippets, timeout policy, subscription CRUD.
+- `docs/observability.md` — correlation ID propagation, Prometheus metric table, Grafana import instructions, Axiom setup + APL example.
+- Root `README.md` — rewritten to describe the full repo layout and link every sub-README.
+- Cleaned up the `eslint-disable no-console` directive I added in `useWxrpBalance.ts` that the ESLint config flagged as unused.
+
+**Verified:** `npm run build` on dashboard, optimizer (`npm test` 19/19), and SDK (`npm run build` → 420 B ESM + 857 B d.ts; `npm pack --dry-run` clean).
+
+**To publish the SDK at Phase 5:**
+1. Bump `packages/sdk/package.json` version and `CHANGELOG.md`.
+2. `git tag sdk-vX.Y.Z && git push origin sdk-vX.Y.Z`.
+3. `release-sdk.yml` runs — provenance-signed publish to `@yieldfy/sdk`.
 
 ---
 

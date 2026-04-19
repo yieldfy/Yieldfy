@@ -1,0 +1,41 @@
+{
+  "name": "@yieldfy/sdk",
+  "version": "0.0.1",
+  "description": "Typed client for the Yieldfy Anchor program. Currently a scaffold — full client lands once the IDL is published.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "test": "echo \"no tests yet — wiring once IDL lands\"",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5",
+    "typescript": "^5.8.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["solana", "yieldfy", "xrp", "wxrp", "defi"],
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yieldfy/yieldfy.git",
+    "directory": "packages/sdk"
+  }
+}

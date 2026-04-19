@@ -16,7 +16,6 @@ export const WXRP_MINT: PublicKey | null = (() => {
   try {
     return new PublicKey(rawMint);
   } catch {
-    // eslint-disable-next-line no-console
     console.warn("[useWxrpBalance] VITE_WXRP_MINT is not a valid pubkey:", rawMint);
     return null;
   }
