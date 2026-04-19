@@ -194,6 +194,19 @@ All method signatures, account lists, and discriminator derivations already matc
 
 ---
 
+### ✅ Local observability docker-compose
+
+**Delivered:**
+- Root `docker-compose.yml` — one command brings up optimizer (built from its Dockerfile) + redis (backing the webhook store via `REDIS_URL`) + prometheus (scraping `optimizer:4000/metrics`) + grafana (anonymous-admin, dashboard auto-provisioned).
+- `ops/grafana/provisioning/datasources/prometheus.yml` — Prometheus data source with `uid: prometheus-default` so the dashboard resolves without manual wiring.
+- `ops/grafana/provisioning/dashboards/dashboards.yml` — file-based provider pointing at `/var/lib/grafana/dashboards`, which the compose mount populates with `yieldfy-optimizer.json`.
+- `ops/grafana/yieldfy-optimizer.json` updated — `DS_PROMETHEUS` variable now defaults to the provisioned `prometheus-default` uid.
+- `ops/README.md` documents the stack, URLs, and teardown.
+
+**Usage:** `docker compose up --build` → Optimizer on :4000, Prometheus on :9090, Grafana on :3030 (Yieldfy folder auto-populates).
+
+---
+
 ### ✅ Rate limit + Redis webhook store + retries
 
 **Delivered:**

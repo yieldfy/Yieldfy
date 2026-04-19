@@ -1,0 +1,69 @@
+services:
+  optimizer:
+    build:
+      context: ./services/optimizer
+    image: yieldfy/optimizer:local
+    container_name: yieldfy-optimizer
+    environment:
+      PORT: "4000"
+      HOST: "0.0.0.0"
+      SOLANA_RPC_URL: ${SOLANA_RPC_URL:-https://api.devnet.solana.com}
+      REDIS_URL: redis://redis:6379
+      # YIELDFY_ATTESTOR_KEY — set in .env for a persistent attestor.
+      ATTEST_RATE_MAX: ${ATTEST_RATE_MAX:-60}
+      ATTEST_RATE_WINDOW: ${ATTEST_RATE_WINDOW:-1 minute}
+    ports:
+      - "4000:4000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: yieldfy-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: yieldfy-prometheus
+    volumes:
+      - ./ops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    ports:
+      - "9090:9090"
+    depends_on:
+      - optimizer
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: yieldfy-grafana
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-yieldfy}
+    volumes:
+      - ./ops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./ops/grafana/yieldfy-optimizer.json:/var/lib/grafana/dashboards/yieldfy-optimizer.json:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3030:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data:
+  grafana-data:

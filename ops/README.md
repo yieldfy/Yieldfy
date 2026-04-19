@@ -7,10 +7,30 @@ Runbooks, terraform, and observability assets. Currently tracks scaffolding only
 ```
 ops/
 ├── grafana/
-│   └── yieldfy-optimizer.json   # Grafana dashboard — import via Dashboards → Import
+│   ├── yieldfy-optimizer.json          # Grafana dashboard
+│   └── provisioning/                   # auto-loaded by the compose stack
+│       ├── datasources/prometheus.yml
+│       └── dashboards/dashboards.yml
 └── prometheus/
-    └── prometheus.yml           # example scrape config targeting the optimizer
+    └── prometheus.yml                  # scrape config targeting the optimizer
 ```
+
+## Local observability stack
+
+One command brings up optimizer + Redis + Prometheus + Grafana, all pre-wired:
+
+```bash
+docker compose up --build
+```
+
+| Service    | URL                    | Notes                                                      |
+| ---------- | ---------------------- | ---------------------------------------------------------- |
+| Optimizer  | http://localhost:4000  | Built from `services/optimizer/Dockerfile`.                 |
+| Redis      | `redis://localhost:6379` | Backs the optimizer's webhook subscription store.         |
+| Prometheus | http://localhost:9090  | Scrapes `optimizer:4000/metrics` every 15 s.                |
+| Grafana    | http://localhost:3030  | Anonymous-admin by default. Dashboard auto-provisioned under *Yieldfy*. |
+
+Stop everything with `docker compose down`; add `-v` to drop Grafana/Prometheus volumes.
 
 ## Grafana dashboard
 
