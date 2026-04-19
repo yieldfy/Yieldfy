@@ -194,6 +194,15 @@ All method signatures, account lists, and discriminator derivations already matc
 
 ---
 
+### ✅ Risk-profile selector in Settings
+
+**Delivered:**
+- `apps/dashboard/src/hooks/useRiskProfile.ts` — localStorage-backed `[profile, setProfile]` with cross-tab `storage` event sync.
+- `SettingsView.tsx` rewritten: shows connected wallet / RPC / optimizer env, plus a three-way profile selector with the scoring weights for each option inline.
+- `DepositView.tsx` now reads the profile from `useRiskProfile()` instead of component-local state — deposit flows default to whatever was last picked in Settings.
+
+---
+
 ## Notes
 
 - Yieldfy owns the Anchor program (`programs/yieldfy/`) + venue CPIs + bankrun tests. Phases 5 & 6 cannot finish until his W3–W4 lands (Kamino CPI deposit + yXRP mint + Position PDA).

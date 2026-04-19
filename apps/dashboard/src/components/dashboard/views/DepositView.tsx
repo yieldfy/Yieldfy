@@ -10,6 +10,7 @@ import {
 } from "@yieldfy/sdk";
 import { useWxrpBalance, WXRP_MINT } from "@/hooks/useWxrpBalance";
 import { useYieldfyClient } from "@/hooks/useYieldfyClient";
+import { useRiskProfile } from "@/hooks/useRiskProfile";
 
 type Stage = "idle" | "attesting" | "signing" | "confirming" | "done" | "error";
 
@@ -42,7 +43,7 @@ const DepositView = () => {
 
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [amount, setAmount] = useState("");
-  const [profile, setProfile] = useState<RiskProfile>("balanced");
+  const [profile, setProfile] = useRiskProfile();
 
   const [stage, setStage] = useState<Stage>("idle");
   const [attestation, setAttestation] = useState<Attestation | null>(null);
@@ -66,7 +67,6 @@ const DepositView = () => {
   const reset = useCallback(() => {
     setStep(1);
     setAmount("");
-    setProfile("balanced");
     setStage("idle");
     setAttestation(null);
     setTxSig(null);
