@@ -194,6 +194,16 @@ All method signatures, account lists, and discriminator derivations already matc
 
 ---
 
+### ✅ Vercel deploy + optimizer Dockerfile
+
+**Delivered:**
+- `vercel.json` at repo root: `installCommand: npm install`, `buildCommand: npm run sdk:build && npm -w @yieldfy/dashboard run build`, `outputDirectory: apps/dashboard/dist`, Vite framework preset, SPA rewrite to `/index.html` (except `/assets/`), immutable cache header on `/assets/`.
+- `services/optimizer/Dockerfile` — multi-stage `node:20-slim` build. Builder runs `npm ci` against the optimizer's standalone lockfile, compiles TypeScript, then re-installs omitting dev deps. Runtime stage copies `node_modules` + `dist` into a non-root `yieldfy:yieldfy` user, exposes 4000, `HEALTHCHECK` hits `/health` every 30 s.
+- `services/optimizer/.dockerignore` — keeps tests, source maps, and `.env` out of the build context.
+- Optimizer README gained a Docker section with the expected build + run invocations (including `YIELDFY_ATTESTOR_KEY` env var).
+
+---
+
 ### ✅ Risk-profile selector in Settings
 
 **Delivered:**

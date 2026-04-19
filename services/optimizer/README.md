@@ -12,6 +12,18 @@ npm start      # node dist/server.js
 npm test       # vitest run
 ```
 
+## Docker
+
+```bash
+docker build -t yieldfy/optimizer services/optimizer
+docker run --rm -p 4000:4000 \
+  -e YIELDFY_ATTESTOR_KEY="$(cat attestor.json)" \
+  -e SOLANA_RPC_URL=https://api.devnet.solana.com \
+  yieldfy/optimizer
+```
+
+Image runs as a non-root user, ships only production deps, and exposes a `HEALTHCHECK` that hits `/health`.
+
 ## Endpoints
 
 | Path                | Method | Description                                    |
