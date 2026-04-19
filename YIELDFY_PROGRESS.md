@@ -11,7 +11,7 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 |-------|---------|-------|--------|
 | 1 | W1 | Wallet adapter + Phantom/Backpack connect + `.env.example` | ✅ completed |
 | 2 | W2 | `useWxrpBalance` + `useVenueData` hooks, delete `mockData.ts`, empty states | ✅ completed |
-| 0 | — | Monorepo migration (`apps/`, `packages/`, `services/`) | ⬜ pending |
+| 0 | — | Monorepo migration (`apps/`, `packages/`, `services/`) | ✅ completed |
 | 3 | W6 | Optimizer service: `score.ts`, `feeds.ts`, Fastify `server.ts` | ✅ completed |
 | 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ✅ completed |
 | 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ✅ stub complete · swap IDL to finish |
@@ -175,6 +175,22 @@ cp programs/yieldfy/target/idl/yieldfy.json packages/sdk/src/idl/yieldfy.json
 # then bump packages/sdk package.json version + tag sdk-vX.Y.Z
 ```
 All method signatures, account lists, and discriminator derivations already match §05–§07; the only expected delta is the `address` field, which the Yieldfy constructor overrides at runtime anyway.
+
+---
+
+### ✅ Phase 0 — Monorepo migration
+
+**Delivered:**
+- `apps/dashboard/` — dashboard Vite app `git mv`'d from the repo root (preserved git history). Its own `package.json` as `@yieldfy/dashboard`, workspace-linked to `@yieldfy/sdk` via `"*"`.
+- Root `package.json` rewritten as an npm-workspaces manifest covering `apps/*`, `packages/*`, `services/*`. Thin root scripts: `dev` (dashboard), `optimizer:dev`, `sdk:build`, `build` (sdk → dashboard), `test` (all workspaces with tests), `lint`.
+- Root `package-lock.json` regenerated (1,550 deps, all workspaces hoisted). Old `packages/sdk/package-lock.json` removed — it's managed from root now.
+- `.github/workflows/ci.yml` rewritten to use `npm -w <name>` scoped scripts; single `npm ci` at repo root per job.
+- `.github/workflows/release-sdk.yml` uses `npm ci` at root + `working-directory: packages/sdk` only for tag verification and publish.
+- Root `README.md` describes the new layout and one-install workflow.
+
+**Verified:** `npm run dev` serves dashboard at :8080 (HTTP 200 from curl), `npm test` green across all three workspaces (27 total), `npm run build` produces 1.02 MB dashboard bundle (workspace hoisting dropped 330 kB of duplicate anchor/spl-token from the previous file: dep install).
+
+**Not moved:** `services/optimizer/` and `packages/sdk/` already live at the target paths. `programs/yieldfy/` will be initialized by yieldfy via `anchor init`.
 
 ---
 

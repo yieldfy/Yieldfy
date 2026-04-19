@@ -21,13 +21,15 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: build sdk (dashboard consumes @yieldfy/sdk)
+        run: npm -w @yieldfy/sdk run build
       - name: lint
-        run: npm run lint
+        run: npm -w @yieldfy/dashboard run lint
         continue-on-error: true # pre-existing shadcn warnings — track in follow-up
       - name: test
-        run: npm test
+        run: npm -w @yieldfy/dashboard run test
       - name: build
-        run: npm run build
+        run: npm -w @yieldfy/dashboard run build
 
   optimizer:
     name: optimizer · test · build
@@ -49,16 +51,14 @@ jobs:
   sdk:
     name: sdk · build · pack (dry run)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/sdk
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: packages/sdk/package-lock.json
       - run: npm ci
-      - run: npm run build
-      - run: npm pack --dry-run
+      - run: npm -w @yieldfy/sdk run test
+      - run: npm -w @yieldfy/sdk run build
+      - name: pack dry-run
+        run: npm -w @yieldfy/sdk pack --dry-run

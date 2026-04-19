@@ -12,9 +12,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    defaults:
-      run:
-        working-directory: packages/sdk
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,11 +19,11 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
           cache: npm
-          cache-dependency-path: packages/sdk/package-lock.json
       - run: npm ci
-      - run: npm test --if-present
-      - run: npm run build
+      - run: npm -w @yieldfy/sdk run test
+      - run: npm -w @yieldfy/sdk run build
       - name: verify tag matches package.json
+        working-directory: packages/sdk
         run: |
           PKG_VERSION=$(node -p "require('./package.json').version")
           TAG_VERSION="${GITHUB_REF_NAME#sdk-v}"
@@ -34,6 +31,8 @@ jobs:
             echo "tag $TAG_VERSION does not match package.json $PKG_VERSION"
             exit 1
           fi
-      - run: npm publish --provenance --access public
+      - name: publish
+        working-directory: packages/sdk
+        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
