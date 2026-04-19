@@ -13,7 +13,7 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | 2 | W2 | `useWxrpBalance` + `useVenueData` hooks, delete `mockData.ts`, empty states | ✅ completed |
 | 0 | — | Monorepo migration (`apps/`, `packages/`, `services/`) | ⬜ pending |
 | 3 | W6 | Optimizer service: `score.ts`, `feeds.ts`, Fastify `server.ts` | ✅ completed |
-| 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ⬜ pending |
+| 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ✅ completed |
 | 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ⏳ waiting for yieldfy |
 | 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
 | 7 | W8 | Webhook emitters + Prometheus `/metrics` | ⬜ pending |
@@ -80,6 +80,20 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 - `services/optimizer/README.md` — endpoints, env vars, scoring weights table.
 
 **Verified:** `npm run dev` starts on `http://localhost:4000`. `/health` returns `{ok:true}`, `/choose?profile=balanced` returns a scored winner using live DeFiLlama data.
+
+---
+
+### ✅ Phase 4 — Attestation signer (W7)
+
+**Delivered:**
+- `services/optimizer/src/attest.ts` — `loadSigner()` reads `YIELDFY_ATTESTOR_KEY` (JSON byte array) or generates an ephemeral keypair with a loud warning log. `signAttestation(venue, slot)` builds the 9-byte `[venue_u8, slot_u64_le]` message the Anchor ed25519 precompile check expects (§07) and returns `{ venue, venueCode, slot, sigHex, pubkeyBase58 }`.
+- `services/optimizer/src/server.ts` — `/attestor/pubkey`, full `/attest?profile=…` that reads the current Solana slot via `Connection.getSlot()`, scores, signs, returns the attestation + snapshot.
+- `services/optimizer/src/attest.test.ts` — 6 vitest cases covering signature shape, verification round-trip, tamper detection, determinism.
+- README updated with attestor key generation + endpoint table.
+
+**Verified:** `npm test` — 9/9 passing (3 score + 6 attest). `curl /attest?profile=balanced` against a running server returns a live signed attestation with a real devnet slot.
+
+**Integration note for yieldfy:** the `attestor` pubkey to bake into `Config.attestor` is whatever `/attestor/pubkey` returns for the server instance we end up deploying. Locally it regenerates every restart unless `YIELDFY_ATTESTOR_KEY` is set.
 
 ---
 

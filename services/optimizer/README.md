@@ -14,19 +14,31 @@ npm test       # vitest run
 
 ## Endpoints
 
-| Path       | Method | Description                                    |
-| ---------- | ------ | ---------------------------------------------- |
-| `/health`  | GET    | Liveness check.                                |
-| `/venues`  | GET    | Current DeFiLlama snapshots for all venues.    |
-| `/choose`  | GET    | `?profile=conservative\|balanced\|opportunistic` — returns the top-scoring venue. |
-| `/attest`  | GET    | Placeholder. Signed attestation lands in Phase 4. |
+| Path                | Method | Description                                    |
+| ------------------- | ------ | ---------------------------------------------- |
+| `/health`           | GET    | Liveness check.                                |
+| `/attestor/pubkey`  | GET    | Ed25519 public key used to sign attestations. Whitelist this in the Anchor `Config.attestor` field. |
+| `/venues`           | GET    | Current DeFiLlama snapshots for all venues.    |
+| `/choose`           | GET    | `?profile=conservative\|balanced\|opportunistic` — returns the top-scoring venue (unsigned). |
+| `/attest`           | GET    | `?profile=…` — selects the top venue, fetches the current Solana slot, and returns a signed attestation the SDK passes to `deposit_wxrp_to_kamino` via an ed25519 pre-instruction. |
 
 ## Environment
 
-| Var    | Default                     |
-| ------ | --------------------------- |
-| `PORT` | `4000`                      |
-| `HOST` | `0.0.0.0`                   |
+| Var                    | Default                              | Purpose                                                    |
+| ---------------------- | ------------------------------------ | ---------------------------------------------------------- |
+| `PORT`                 | `4000`                               | HTTP listen port.                                          |
+| `HOST`                 | `0.0.0.0`                            | HTTP listen host.                                          |
+| `SOLANA_RPC_URL`       | `https://api.devnet.solana.com`      | RPC used to read the current slot for attestation freshness. |
+| `YIELDFY_ATTESTOR_KEY` | *(ephemeral)*                        | JSON array of 64 bytes (solana-keygen output). When unset, the server generates a fresh keypair on boot and logs its pubkey — convenient for dev, fatal for prod. |
+
+### Generating a persistent attestor key
+
+```bash
+solana-keygen new --no-bip39-passphrase -o attestor.json
+export YIELDFY_ATTESTOR_KEY="$(cat attestor.json)"
+```
+
+Then whitelist the printed `/attestor/pubkey` in the Anchor `Config.attestor` field.
 
 ## Scoring weights (§09)
 
