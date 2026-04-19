@@ -1,5 +1,4 @@
-import { Buffer } from "buffer";
-(globalThis as typeof globalThis & { Buffer: typeof Buffer }).Buffer ??= Buffer;
+import "./polyfills";
 
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

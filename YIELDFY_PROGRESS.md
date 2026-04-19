@@ -10,9 +10,9 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | Phase | Maps to | Scope | Status |
 |-------|---------|-------|--------|
 | 1 | W1 | Wallet adapter + Phantom/Backpack connect + `.env.example` | ✅ completed |
-| 2 | W2 | `useWxrpBalance` + `useVenueData` hooks, delete `mockData.ts`, empty states | ⬜ pending |
+| 2 | W2 | `useWxrpBalance` + `useVenueData` hooks, delete `mockData.ts`, empty states | ✅ completed |
 | 0 | — | Monorepo migration (`apps/`, `packages/`, `services/`) | ⬜ pending |
-| 3 | W6 | Optimizer service: `score.ts`, `feeds.ts`, Fastify `server.ts` | ⬜ pending |
+| 3 | W6 | Optimizer service: `score.ts`, `feeds.ts`, Fastify `server.ts` | ✅ completed |
 | 4 | W7 | `attest.ts` signer + risk-profile weights + `/attest` endpoint | ⬜ pending |
 | 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ⏳ waiting for yieldfy |
 | 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
@@ -45,6 +45,41 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 **Deviation from §03:** used only `PhantomWalletAdapter` explicitly — `BackpackWalletAdapter` is no longer exported from `@solana/wallet-adapter-wallets`; Backpack/Solflare etc. are auto-detected via Wallet Standard.
 
 **Landing CTAs wired (Phase 1 extension):** replaced all "Coming soon" buttons in `HeroSection.tsx` (4) + `YieldfyLanding.tsx` (6) with `Link to="/dashboard"` ("Launch App") and `https://github.com/yieldfy` ("View on GitHub") where paired.
+
+---
+
+### ✅ Phase 2 — Live balance + DeFiLlama venues (W2)
+
+**Delivered:**
+- `src/hooks/useWxrpBalance.ts` — connected wallet's wXRP ATA balance via `@solana/spl-token`; gracefully handles missing `VITE_WXRP_MINT` and non-existent ATAs.
+- `src/hooks/useVenueData.ts` — fetches DeFiLlama `yields.llama.fi/pools`, maps to Kamino/MarginFi/Drift/Meteora snapshots with 60 s refetch.
+- `src/components/dashboard/EmptyState.tsx` — reusable dashed-border empty card.
+- `OverviewView.tsx` — metrics card shows live wXRP balance; yield chart, active positions, recent activity replaced with empty states (⏳ yieldfy).
+- `PositionsView.tsx` — empty state until Position PDAs exist (⏳ yieldfy).
+- `VenuesView.tsx` — live APY / TVL / utilization for 4 venues, sorted by APY by default; renders "No live wXRP markets yet" banner if DeFiLlama has no data for the mapped pool IDs. Decision log → empty state until optimizer attests (Phase 4).
+- `HistoryView.tsx` — empty state + export CSV disabled until activity exists.
+- **Deleted** `src/components/dashboard/mockData.ts` (the file that actually held the mocks; §04 refers to `src/lib/mockData.ts` which never existed in this repo).
+
+**Notes:**
+- DeFiLlama pool IDs (`kamino-lend-wxrp`, etc.) are placeholders. Swap once each venue publishes its wXRP market ID.
+- Balance decimals hardcoded to 6 — confirm at mainnet launch per §04 PDF note.
+
+**Buffer polyfill fix:** `@solana/spl-token` references `Buffer` at module top-level; the original `main.tsx` polyfill ran after all imports resolved. Fix: new `src/polyfills.ts` imported first in `main.tsx` so `globalThis.Buffer` is set before any transitive Solana import evaluates.
+
+---
+
+### ✅ Phase 3 — Optimizer service scaffold (W6)
+
+**Delivered:**
+- `services/optimizer/package.json` — `@yieldfy/optimizer@0.1.0` standalone Node 20 service (Fastify + tweetnacl + @solana/web3.js, tsx for dev, vitest for tests).
+- `services/optimizer/tsconfig.json` + `vitest.config.ts` — scoped to node env, keeps the root dashboard's vitest setup isolated.
+- `services/optimizer/src/score.ts` — `scoreVenue` + `chooseVenue` pure functions, `WEIGHTS` for all three risk profiles (conservative / balanced / opportunistic), `VENUE_CODE` mapping.
+- `services/optimizer/src/feeds.ts` — DeFiLlama fetcher returning `VenueSnapshot[]` with per-venue static `oracleAgeSec` + `auditScore` meta.
+- `services/optimizer/src/server.ts` — Fastify app exposing `/health`, `/venues`, `/choose?profile=…`. `/attest` returns a stub "Not implemented" until Phase 4.
+- `services/optimizer/src/score.test.ts` — 3 vitest unit tests covering profile weighting + winner selection (all passing).
+- `services/optimizer/README.md` — endpoints, env vars, scoring weights table.
+
+**Verified:** `npm run dev` starts on `http://localhost:4000`. `/health` returns `{ok:true}`, `/choose?profile=balanced` returns a scored winner using live DeFiLlama data.
 
 ---
 
