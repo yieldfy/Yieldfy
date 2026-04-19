@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
 
 const TEXT = "text-[#0F1923]";
@@ -554,9 +555,12 @@ function Pricing() {
                     </li>
                   ))}
                 </ul>
-                <button disabled className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full opacity-60 cursor-not-allowed min-h-[44px]`}>
-                  Coming soon
-                </button>
+                <Link
+                  to="/dashboard"
+                  className={`${t.featured ? "btn-primary" : "btn-secondary"} w-full min-h-[44px] inline-flex items-center justify-center`}
+                >
+                  Launch App
+                </Link>
               </div>
             );
             return t.featured ? (
@@ -650,8 +654,20 @@ function CTASection() {
                 Onboard in a single call. Full integration in under two weeks.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
-                <button disabled className="btn-primary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
-                <button disabled className="btn-secondary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
+                <Link
+                  to="/dashboard"
+                  className="btn-primary w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center"
+                >
+                  Launch App
+                </Link>
+                <a
+                  href="https://github.com/yieldfy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center"
+                >
+                  View on GitHub
+                </a>
               </div>
             </CornerFrame>
           </div>
@@ -753,7 +769,9 @@ function ScrolledNav() {
           </li>
         ))}
       </ul>
-      <button disabled className="btn-primary !py-2 !px-4 md:!px-5 !text-xs md:!text-sm opacity-60 cursor-not-allowed min-h-[44px]">Coming soon</button>
+      <Link to="/dashboard" className="btn-primary !py-2 !px-4 md:!px-5 !text-xs md:!text-sm min-h-[44px] inline-flex items-center justify-center">
+        Launch App
+      </Link>
     </nav>
   );
 }

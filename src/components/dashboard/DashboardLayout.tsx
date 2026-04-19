@@ -1,7 +1,10 @@
 import { ReactNode, useState } from "react";
 import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Bell, Menu, X } from "lucide-react";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
-import { WALLET } from "./mockData";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+
+const truncate = (addr: string) => `${addr.slice(0, 4)}…${addr.slice(-4)}`;
 
 export type ViewKey = "overview" | "deposit" | "positions" | "venues" | "history" | "settings";
 
@@ -49,6 +52,7 @@ const NavItem = ({ item, active, onClick }: { item: typeof NAV[number]; active: 
 const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props) => {
   const [mobileNetwork, setMobileNetwork] = useState<"Mainnet" | "Devnet">("Mainnet");
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { publicKey, connected } = useWallet();
 
   const Sidebar = (
     <aside
@@ -82,10 +86,20 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
       <div className="border-t border-[#0F1923]/06 p-4">
         <div className="flex items-center gap-3 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#2EC4B6] opacity-50" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2EC4B6]" />
+            <span
+              className={`absolute inline-flex h-full w-full rounded-full opacity-50 ${
+                connected ? "animate-ping bg-[#2EC4B6]" : "bg-[#0F1923]/30"
+              }`}
+            />
+            <span
+              className={`relative inline-flex h-2 w-2 rounded-full ${
+                connected ? "bg-[#2EC4B6]" : "bg-[#0F1923]/40"
+              }`}
+            />
           </span>
-          <span className="font-mono text-xs text-[#0F1923]/70">{WALLET}</span>
+          <span className="font-mono text-xs text-[#0F1923]/70">
+            {publicKey ? truncate(publicKey.toBase58()) : "Not connected"}
+          </span>
         </div>
       </div>
     </aside>
@@ -144,6 +158,9 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
             <button className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[#0F1923]/70 hover:bg-white/50 transition-colors">
               <Bell size={18} />
             </button>
+            <div className="yieldfy-wallet-btn">
+              <WalletMultiButton />
+            </div>
             <button onClick={onDepositClick} className="btn-primary !py-2 !px-4 md:!px-5 text-xs md:text-sm">
               Deposit
             </button>

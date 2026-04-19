@@ -347,3 +347,33 @@
     transform: translateY(0);
   }
 }
+
+/* Wallet adapter button — blend with Yieldfy glass aesthetic */
+.yieldfy-wallet-btn .wallet-adapter-button {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(15, 25, 35, 0.08);
+  color: #0F1923;
+  font-family: 'Barlow', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  line-height: 1;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.yieldfy-wallet-btn .wallet-adapter-button:not([disabled]):hover {
+  background: rgba(255, 255, 255, 0.7);
+  border-color: rgba(15, 25, 35, 0.12);
+}
+.yieldfy-wallet-btn .wallet-adapter-button-trigger {
+  background: rgba(255, 255, 255, 0.5);
+}
+.yieldfy-wallet-btn .wallet-adapter-button-start-icon,
+.yieldfy-wallet-btn .wallet-adapter-button-end-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+}

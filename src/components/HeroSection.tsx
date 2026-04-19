@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
 
 const VIDEO_SRC =
@@ -64,12 +65,12 @@ const HeroSection = () => {
             ))}
           </ul>
 
-          <button
-            disabled
-            className="hidden md:inline-flex btn-primary !py-2 !px-5 opacity-60 cursor-not-allowed"
+          <Link
+            to="/dashboard"
+            className="hidden md:inline-flex btn-primary !py-2 !px-5"
           >
-            Coming soon
-          </button>
+            Launch App
+          </Link>
 
           {/* Mobile hamburger */}
           <button
@@ -105,9 +106,13 @@ const HeroSection = () => {
                 </li>
               ))}
             </ul>
-            <button disabled className="btn-primary opacity-60 cursor-not-allowed min-h-[44px]">
-              Coming soon
-            </button>
+            <Link
+              to="/dashboard"
+              onClick={() => setMenuOpen(false)}
+              className="btn-primary min-h-[44px] inline-flex items-center justify-center"
+            >
+              Launch App
+            </Link>
           </div>
         )}
 
@@ -142,8 +147,17 @@ const HeroSection = () => {
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto max-w-xs sm:max-w-none">
-            <button disabled className="btn-primary opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
-            <button disabled className="btn-secondary-dark opacity-60 cursor-not-allowed w-full sm:w-auto min-h-[44px]">Coming soon</button>
+            <Link to="/dashboard" className="btn-primary w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center">
+              Launch App
+            </Link>
+            <a
+              href="https://github.com/yieldfy"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-secondary-dark w-full sm:w-auto min-h-[44px] inline-flex items-center justify-center"
+            >
+              View on GitHub
+            </a>
           </div>
         </div>
       </div>
