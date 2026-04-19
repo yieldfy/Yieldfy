@@ -16,6 +16,12 @@ import {
   listSubscriptions,
   type WebhookEvent,
 } from "./webhooks.js";
+import {
+  CORRELATION_ID_HEADER,
+  axiomConfigured,
+  getCorrelationId,
+  logEvent,
+} from "./observability.js";
 
 const PORT = Number(process.env.PORT ?? 4000);
 const HOST = process.env.HOST ?? "0.0.0.0";
@@ -26,8 +32,15 @@ const PROFILES = ["conservative", "balanced", "opportunistic"] as const;
 const isProfile = (s: string): s is RiskProfile =>
   (PROFILES as readonly string[]).includes(s);
 
-const app = Fastify({ logger: true });
+const app = Fastify({
+  logger: true,
+  genReqId: (req) => getCorrelationId(req.headers as Record<string, unknown>),
+});
 const connection = new Connection(SOLANA_RPC_URL, "confirmed");
+
+app.addHook("onRequest", async (req, reply) => {
+  reply.header(CORRELATION_ID_HEADER, req.id);
+});
 
 app.get("/health", async () => ({ ok: true, ts: Date.now() }));
 
@@ -62,10 +75,11 @@ app.get("/choose", async (req) => {
 });
 
 app.get("/attest", async (req, reply) => {
+  const corrId = req.id;
   const profile = (req.query as { profile?: string }).profile ?? "balanced";
   if (!isProfile(profile)) {
     reply.code(400);
-    return { error: `Invalid profile: ${profile}` };
+    return { error: `Invalid profile: ${profile}`, corrId };
   }
 
   const stop = attestationDuration.startTimer({ profile });
@@ -83,6 +97,7 @@ app.get("/attest", async (req, reply) => {
     const response = {
       profile,
       slot: slot.toString(),
+      corrId,
       winner: {
         venue: winner.s.venue,
         score: winner.score,
@@ -91,7 +106,16 @@ app.get("/attest", async (req, reply) => {
       attestation,
     };
 
-    dispatchEvent("attestation.created", response);
+    logEvent(app.log, {
+      event: "attestation.created",
+      corrId,
+      profile,
+      venue: winner.s.venue,
+      score: winner.score,
+      slot: slot.toString(),
+    });
+
+    dispatchEvent("attestation.created", response, { corrId });
 
     return response;
   } finally {
@@ -113,6 +137,12 @@ app.post("/webhooks", async (req, reply) => {
   }
   try {
     const sub = createSubscription(body.url, body.events, body.secret);
+    logEvent(app.log, {
+      event: "webhook.subscribed",
+      corrId: req.id,
+      subscriptionId: sub.id,
+      url: sub.url,
+    });
     return sub;
   } catch (e) {
     reply.code(400);
@@ -126,6 +156,11 @@ app.delete<{ Params: { id: string } }>("/webhooks/:id", async (req, reply) => {
     reply.code(404);
     return { error: "subscription not found" };
   }
+  logEvent(app.log, {
+    event: "webhook.unsubscribed",
+    corrId: req.id,
+    subscriptionId: req.params.id,
+  });
   return { ok: true };
 });
 
@@ -134,6 +169,7 @@ app
   .then(() => {
     app.log.info(`attestor pubkey: ${attestorPubkey}`);
     app.log.info(`solana rpc: ${SOLANA_RPC_URL}`);
+    app.log.info(`axiom ingest: ${axiomConfigured ? "enabled" : "disabled"}`);
   })
   .catch((err) => {
     app.log.error(err);

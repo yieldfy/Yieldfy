@@ -54,9 +54,15 @@ export function verifySignature(body: string, secret: string, header: string): b
   return timingSafeEqual(a, b);
 }
 
-type DispatchOptions = { timeoutMs?: number };
+type DispatchOptions = { timeoutMs?: number; corrId?: string };
 
-async function post(sub: Subscription, body: string, event: WebhookEvent, opts: DispatchOptions) {
+async function post(
+  sub: Subscription,
+  body: string,
+  event: WebhookEvent,
+  corrId: string,
+  opts: DispatchOptions,
+) {
   const controller = new AbortController();
   const to = setTimeout(() => controller.abort(), opts.timeoutMs ?? 5_000);
   try {
@@ -67,6 +73,7 @@ async function post(sub: Subscription, body: string, event: WebhookEvent, opts: 
         "X-Yieldfy-Event": event,
         "X-Yieldfy-Delivery": randomUUID(),
         "X-Yieldfy-Signature": signBody(body, sub.secret),
+        "X-Yieldfy-Correlation-Id": corrId,
       },
       body,
       signal: controller.signal,
@@ -86,16 +93,21 @@ async function post(sub: Subscription, body: string, event: WebhookEvent, opts: 
  * Fire-and-forget: returns immediately; dispatches to each matching subscription
  * in parallel without blocking the caller's response.
  */
-export function dispatchEvent(event: WebhookEvent, payload: unknown, opts: DispatchOptions = {}) {
-  const body = JSON.stringify({ event, payload, ts: Date.now() });
+export function dispatchEvent(
+  event: WebhookEvent,
+  payload: unknown,
+  opts: DispatchOptions = {},
+) {
+  const corrId = opts.corrId ?? randomUUID();
+  const body = JSON.stringify({ event, payload, corrId, ts: Date.now() });
   const targets = listSubscriptions().filter((s) => s.events.includes(event));
   for (const sub of targets) {
-    post(sub, body, event, opts).catch((err) => {
+    post(sub, body, event, corrId, opts).catch((err) => {
       // eslint-disable-next-line no-console
       console.warn(`[webhooks] dispatch to ${sub.url} failed:`, err);
     });
   }
-  return { dispatched: targets.length };
+  return { dispatched: targets.length, corrId };
 }
 
 /** Test hook — wipe the in-memory store between specs. */

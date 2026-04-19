@@ -1,0 +1,15 @@
+# Drop in a Prometheus server (or add to an existing scrape_configs list).
+# The optimizer exposes metrics at :4000/metrics by default.
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: yieldfy-optimizer
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["optimizer:4000"]
+        labels:
+          service: yieldfy-optimizer
+          env: dev

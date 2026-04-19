@@ -17,7 +17,7 @@ Status legend: `⬜ pending` · `🟨 in progress` · `✅ completed` · `⏳ wa
 | 5 | W3+W5 | `packages/sdk` + `client.deposit()` against stub IDL | ⏳ waiting for yieldfy |
 | 6 | W4 | Positions view reads on-chain PDAs | ⏳ waiting for yieldfy |
 | 7 | W8 | Webhook emitters + Prometheus `/metrics` | ✅ completed |
-| 8 | W9 | Observability end-to-end (Grafana JSON, Axiom, correlation IDs) | ⬜ pending |
+| 8 | W9 | Observability end-to-end (Grafana JSON, Axiom, correlation IDs) | ✅ completed |
 | 9 | W10 | Docs + `@yieldfy/sdk@1.0.0` publish pipeline | ⬜ pending |
 
 ---
@@ -114,6 +114,21 @@ curl -X POST http://optimizer/webhooks \
   -d '{"url":"https://tenant.example/hook","events":["attestation.created"]}'
 # → { id, secret, ... }  — verify inbound X-Yieldfy-Signature with HMAC-SHA256(body, secret)
 ```
+
+---
+
+### ✅ Phase 8 — Observability end-to-end (W9)
+
+**Delivered:**
+- `services/optimizer/src/observability.ts` — `getCorrelationId()` prefers inbound `x-correlation-id` header (bounded at 128 chars) or generates UUID. `logEvent(logger, record)` writes structured info line + fires non-blocking POST to Axiom when `AXIOM_TOKEN` + `AXIOM_DATASET` are set (`AXIOM_ORG_ID` optional for orgs on org-scoped tokens).
+- `services/optimizer/src/server.ts` — Fastify `genReqId` uses `getCorrelationId`, `onRequest` hook echoes `x-correlation-id` header on responses, `/attest` + webhook CRUD emit `logEvent` with `corrId`, startup log shows axiom state.
+- `services/optimizer/src/webhooks.ts` — `dispatchEvent` accepts `corrId`, forwards via `X-Yieldfy-Correlation-Id` header, embeds it in the JSON body.
+- `services/optimizer/src/observability.test.ts` — 4 vitest cases: incoming header pass-through, UUID fallback, oversized-id rejection, logEvent shape + timestamp.
+- `ops/grafana/yieldfy-optimizer.json` — 7-panel dashboard: attestations/min by venue, latency p50/p95/p99 by profile, chosen-venue pie, DeFiLlama fetch p95, webhook dispatch success rate (green ≥99%), process CPU + RSS. Grafana 38 schema, `DS_PROMETHEUS` data source variable so it imports cleanly.
+- `ops/prometheus/prometheus.yml` — 15 s scrape config targeting `optimizer:4000`.
+- `ops/README.md` — import instructions, panel list, Axiom setup.
+
+**Verified:** `npm test` 19/19 passing (3 score + 6 attest + 6 webhooks + 4 observability). `curl -H "X-Correlation-Id: ext-test-abc" /health` round-trips the ID on the response header.
 
 ---
 
