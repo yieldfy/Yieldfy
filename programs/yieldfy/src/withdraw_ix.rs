@@ -42,5 +42,18 @@ pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         amount <= ctx.accounts.position.receipt_supply,
         YieldfyError::InsufficientBalance
     );
+
+    // 1. Burn user's yXRP.
+    token::burn(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Burn {
+                mint: ctx.accounts.yxrp_mint.to_account_info(),
+                from: ctx.accounts.user_yxrp.to_account_info(),
+                authority: ctx.accounts.user.to_account_info(),
+            },
+        ),
+        amount,
+    )?;
     Ok(())
 }
