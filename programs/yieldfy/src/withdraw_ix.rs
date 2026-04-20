@@ -31,4 +31,8 @@ pub struct Withdraw<'info> {
         bump,
     )]
     pub vault_wxrp: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub token_program: Program<'info, Token>,
 }
