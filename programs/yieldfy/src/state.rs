@@ -61,4 +61,6 @@ pub enum YieldfyError {
     BadAttestor,
     #[msg("Attestation is stale")]
     AttestationStale,
+    #[msg("Insufficient position balance")]
+    InsufficientBalance,
 }
