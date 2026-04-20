@@ -58,13 +58,25 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
     );
     require!(args.expected_venue == 0u8, YieldfyError::VenueMismatch);
 
-    // 1. Verify optimizer attestation (ed25519 pre-ix at index 0).
     attest::verify(
         &ctx.accounts.ix_sysvar,
         cfg.attestor,
         args.expected_venue,
         args.attestation_slot,
         cfg.staleness_slots,
+    )?;
+
+    // 2. Pull wXRP: user -> vault.
+    token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.user_wxrp.to_account_info(),
+                to: ctx.accounts.vault_wxrp.to_account_info(),
+                authority: ctx.accounts.user.to_account_info(),
+            },
+        ),
+        args.amount,
     )?;
     Ok(())
 }
