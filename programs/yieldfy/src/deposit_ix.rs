@@ -29,4 +29,10 @@ pub struct DepositToKamino<'info> {
         bump,
     )]
     pub vault_wxrp: Account<'info, TokenAccount>,
+
+    #[account(mut, address = config.yxrp_mint)]
+    pub yxrp_mint: Account<'info, Mint>,
+
+    #[account(mut, constraint = user_yxrp.mint == yxrp_mint.key())]
+    pub user_yxrp: Account<'info, TokenAccount>,
 }
