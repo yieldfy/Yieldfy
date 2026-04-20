@@ -3,9 +3,6 @@ use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer};
 
 use crate::{attest, state::*};
 
-/// Kamino lending program ID. Verified via address constraint on
-/// `venue_program`. Full Kamino CPI lands in a W3.5 follow-up; for MVP the
-/// vault holds wXRP directly and the receipt is still minted 1:1.
 pub const KAMINO_PROGRAM_ID: Pubkey =
     pubkey!("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
 
@@ -13,4 +10,13 @@ pub const KAMINO_PROGRAM_ID: Pubkey =
 pub struct DepositToKamino<'info> {
     #[account(seeds = [b"config"], bump = config.bump)]
     pub config: Account<'info, Config>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        space = 8 + Position::INIT_SPACE,
+        seeds = [b"position", user.key().as_ref()],
+        bump
+    )]
+    pub position: Account<'info, Position>,
 }
