@@ -25,5 +25,10 @@ pub fn verify(
     staleness_slots: u64,
 ) -> Result<()> {
     require_keys_eq!(*ix_sysvar.key, IX_SYSVAR_ID, YieldfyError::BadAttestIx);
+
+    // ed25519 precompile must be at index 0; the current Yieldfy ix is at 1+.
+    let ix = load_instruction_at_checked(0, ix_sysvar)
+        .map_err(|_| YieldfyError::BadAttestIx)?;
+    require!(ix.program_id == ED25519_PROGRAM_ID, YieldfyError::BadAttestIx);
     Ok(())
 }
