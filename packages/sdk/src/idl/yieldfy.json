@@ -1,41 +1,41 @@
 {
-  "address": "YieLdFy11111111111111111111111111111111111",
+  "address": "CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK",
   "metadata": {
     "name": "yieldfy",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "spec": "0.1.0",
-    "description": "Yieldfy wXRP auto-router (stub IDL — replaced by anchor build output once programs/yieldfy ships)."
+    "description": "Yieldfy — wXRP auto-router on Solana"
   },
   "instructions": [
     {
-      "name": "initialize",
-      "discriminator": [175, 175, 109, 31, 13, 152, 155, 237],
-      "accounts": [
-        {
-          "name": "config",
-          "writable": true,
-          "pda": {
-            "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }]
-          }
-        },
-        { "name": "wxrp_mint" },
-        { "name": "yxrp_mint" },
-        { "name": "authority", "writable": true, "signer": true },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [{ "name": "args", "type": { "defined": { "name": "ConfigArgs" } } }]
-    },
-    {
       "name": "deposit_wxrp_to_kamino",
-      "discriminator": [218, 195, 224, 177, 250, 248, 200, 71],
+      "discriminator": [
+        218,
+        195,
+        224,
+        177,
+        250,
+        248,
+        200,
+        71
+      ],
       "accounts": [
         {
           "name": "config",
           "pda": {
-            "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }]
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
           }
         },
         {
@@ -43,18 +43,73 @@
           "writable": true,
           "pda": {
             "seeds": [
-              { "kind": "const", "value": [112, 111, 115, 105, 116, 105, 111, 110] },
-              { "kind": "account", "path": "user" }
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
             ]
           }
         },
-        { "name": "user_wxrp", "writable": true },
-        { "name": "vault_wxrp", "writable": true },
-        { "name": "yxrp_mint", "writable": true },
-        { "name": "user_yxrp", "writable": true },
-        { "name": "venue_program" },
-        { "name": "ix_sysvar" },
-        { "name": "user", "writable": true, "signer": true },
+        {
+          "name": "user_wxrp",
+          "writable": true
+        },
+        {
+          "name": "vault_wxrp",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.wxrp_mint",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "yxrp_mint",
+          "writable": true
+        },
+        {
+          "name": "user_yxrp",
+          "writable": true
+        },
+        {
+          "name": "venue_program",
+          "address": "KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD"
+        },
+        {
+          "name": "ix_sysvar"
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
@@ -64,16 +119,141 @@
           "address": "11111111111111111111111111111111"
         }
       ],
-      "args": [{ "name": "args", "type": { "defined": { "name": "DepositArgs" } } }]
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "DepositArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "One-time setup. Creates the Config PDA and the wXRP vault PDA. The",
+        "yXRP mint must already exist and have its mint-authority transferred",
+        "to the Config PDA before the first deposit — do that with a plain",
+        "`spl-token authorize` call post-initialize."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "wxrp_mint"
+        },
+        {
+          "name": "yxrp_mint"
+        },
+        {
+          "name": "vault_wxrp",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "wxrp_mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "ConfigArgs"
+            }
+          }
+        }
+      ]
     },
     {
       "name": "withdraw",
-      "discriminator": [183, 18, 70, 156, 148, 109, 161, 34],
+      "discriminator": [
+        183,
+        18,
+        70,
+        156,
+        148,
+        109,
+        161,
+        34
+      ],
       "accounts": [
         {
           "name": "config",
           "pda": {
-            "seeds": [{ "kind": "const", "value": [99, 111, 110, 102, 105, 103] }]
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
           }
         },
         {
@@ -81,48 +261,158 @@
           "writable": true,
           "pda": {
             "seeds": [
-              { "kind": "const", "value": [112, 111, 115, 105, 116, 105, 111, 110] },
-              { "kind": "account", "path": "user" }
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
             ]
           }
         },
-        { "name": "yxrp_mint", "writable": true },
-        { "name": "user_yxrp", "writable": true },
-        { "name": "user_wxrp", "writable": true },
-        { "name": "vault_wxrp", "writable": true },
-        { "name": "user", "writable": true, "signer": true },
+        {
+          "name": "yxrp_mint",
+          "writable": true
+        },
+        {
+          "name": "user_yxrp",
+          "writable": true
+        },
+        {
+          "name": "user_wxrp",
+          "writable": true
+        },
+        {
+          "name": "vault_wxrp",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.wxrp_mint",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
         {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
-      "args": [{ "name": "amount", "type": "u64" }]
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
     {
       "name": "Config",
-      "discriminator": [155, 12, 170, 224, 30, 250, 204, 130]
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
     },
     {
       "name": "Position",
-      "discriminator": [170, 188, 143, 228, 122, 64, 247, 208]
+      "discriminator": [
+        170,
+        188,
+        143,
+        228,
+        122,
+        64,
+        247,
+        208
+      ]
     }
   ],
   "events": [
     {
       "name": "DepositEvent",
-      "discriminator": [120, 248, 61, 83, 31, 142, 107, 144]
+      "discriminator": [
+        120,
+        248,
+        61,
+        83,
+        31,
+        142,
+        107,
+        144
+      ]
     }
   ],
   "errors": [
-    { "code": 6000, "name": "Paused", "msg": "Program is paused" },
-    { "code": 6001, "name": "CapExceeded", "msg": "Exceeds per-tx cap" },
-    { "code": 6002, "name": "VenueMismatch", "msg": "Venue mismatch" },
-    { "code": 6003, "name": "BadAttestIx", "msg": "Bad attestation instruction" },
-    { "code": 6004, "name": "BadAttestor", "msg": "Attestor not whitelisted" },
-    { "code": 6005, "name": "AttestationStale", "msg": "Attestation stale" },
-    { "code": 6006, "name": "InsufficientBalance", "msg": "Insufficient balance" }
+    {
+      "code": 6000,
+      "name": "Paused",
+      "msg": "Program is paused"
+    },
+    {
+      "code": 6001,
+      "name": "CapExceeded",
+      "msg": "Exceeds per-transaction cap"
+    },
+    {
+      "code": 6002,
+      "name": "VenueMismatch",
+      "msg": "Venue mismatch vs attestation"
+    },
+    {
+      "code": 6003,
+      "name": "BadAttestIx",
+      "msg": "Missing or malformed attestation instruction"
+    },
+    {
+      "code": 6004,
+      "name": "BadAttestor",
+      "msg": "Attestor is not whitelisted in Config"
+    },
+    {
+      "code": 6005,
+      "name": "AttestationStale",
+      "msg": "Attestation is stale"
+    },
+    {
+      "code": 6006,
+      "name": "InsufficientBalance",
+      "msg": "Insufficient position balance"
+    }
   ],
   "types": [
     {
@@ -130,28 +420,38 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "authority", "type": "pubkey" },
-          { "name": "wxrp_mint", "type": "pubkey" },
-          { "name": "yxrp_mint", "type": "pubkey" },
-          { "name": "attestor", "type": "pubkey" },
-          { "name": "max_single_deposit", "type": "u64" },
-          { "name": "staleness_slots", "type": "u64" },
-          { "name": "paused", "type": "bool" },
-          { "name": "bump", "type": "u8" }
-        ]
-      }
-    },
-    {
-      "name": "Position",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          { "name": "owner", "type": "pubkey" },
-          { "name": "venue", "type": "u8" },
-          { "name": "principal", "type": "u64" },
-          { "name": "receipt_supply", "type": "u64" },
-          { "name": "last_update", "type": "i64" },
-          { "name": "bump", "type": "u8" }
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "wxrp_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "yxrp_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestor",
+            "type": "pubkey"
+          },
+          {
+            "name": "max_single_deposit",
+            "type": "u64"
+          },
+          {
+            "name": "staleness_slots",
+            "type": "u64"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
         ]
       }
     },
@@ -160,9 +460,18 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "attestor", "type": "pubkey" },
-          { "name": "max_single_deposit", "type": "u64" },
-          { "name": "staleness_slots", "type": "u64" }
+          {
+            "name": "attestor",
+            "type": "pubkey"
+          },
+          {
+            "name": "max_single_deposit",
+            "type": "u64"
+          },
+          {
+            "name": "staleness_slots",
+            "type": "u64"
+          }
         ]
       }
     },
@@ -171,13 +480,27 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "amount", "type": "u64" },
-          { "name": "attestation_slot", "type": "u64" },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "attestation_slot",
+            "type": "u64"
+          },
           {
             "name": "attestation_sig",
-            "type": { "array": ["u8", 64] }
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
           },
-          { "name": "expected_venue", "type": "u8" }
+          {
+            "name": "expected_venue",
+            "type": "u8"
+          }
         ]
       }
     },
@@ -186,9 +509,53 @@
       "type": {
         "kind": "struct",
         "fields": [
-          { "name": "user", "type": "pubkey" },
-          { "name": "venue", "type": "u8" },
-          { "name": "amount", "type": "u64" }
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "venue",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Position",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "venue",
+            "docs": [
+              "0 = kamino, 1 = marginfi, 2 = drift, 3 = meteora"
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "principal",
+            "type": "u64"
+          },
+          {
+            "name": "receipt_supply",
+            "type": "u64"
+          },
+          {
+            "name": "last_update",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
         ]
       }
     }
