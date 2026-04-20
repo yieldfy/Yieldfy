@@ -21,4 +21,14 @@ pub struct Withdraw<'info> {
 
     #[account(mut, constraint = user_yxrp.mint == yxrp_mint.key())]
     pub user_yxrp: Account<'info, TokenAccount>,
+
+    #[account(mut, constraint = user_wxrp.mint == config.wxrp_mint)]
+    pub user_wxrp: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        seeds = [b"vault", config.wxrp_mint.as_ref()],
+        bump,
+    )]
+    pub vault_wxrp: Account<'info, TokenAccount>,
 }
