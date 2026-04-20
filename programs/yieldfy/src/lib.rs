@@ -16,10 +16,6 @@ pub use withdraw_ix::*;
 pub mod yieldfy {
     use super::*;
 
-    /// One-time setup. Creates the Config PDA and the wXRP vault PDA. The
-    /// yXRP mint must already exist and have its mint-authority transferred
-    /// to the Config PDA before the first deposit — do that with a plain
-    /// `spl-token authorize` call post-initialize.
     pub fn initialize(ctx: Context<Initialize>, args: ConfigArgs) -> Result<()> {
         let c = &mut ctx.accounts.config;
         c.authority = ctx.accounts.authority.key();
@@ -31,5 +27,12 @@ pub mod yieldfy {
         c.paused = false;
         c.bump = ctx.bumps.config;
         Ok(())
+    }
+
+    pub fn deposit_wxrp_to_kamino(
+        ctx: Context<DepositToKamino>,
+        args: DepositArgs,
+    ) -> Result<()> {
+        deposit_ix::handle(ctx, args)
     }
 }
