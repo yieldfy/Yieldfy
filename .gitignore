@@ -32,3 +32,4 @@ dist-ssr
 target/
 **/*.rs.bk
 test-ledger/
+.anchor/
