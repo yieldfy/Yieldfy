@@ -35,4 +35,8 @@ pub mod yieldfy {
     ) -> Result<()> {
         deposit_ix::handle(ctx, args)
     }
+
+    pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+        withdraw_ix::handle(ctx, amount)
+    }
 }
