@@ -35,4 +35,11 @@ pub struct DepositToKamino<'info> {
 
     #[account(mut, constraint = user_yxrp.mint == yxrp_mint.key())]
     pub user_yxrp: Account<'info, TokenAccount>,
+
+    /// CHECK: address-constrained to the Kamino program
+    #[account(address = KAMINO_PROGRAM_ID)]
+    pub venue_program: AccountInfo<'info>,
+
+    /// CHECK: the instructions sysvar; content validated in `attest::verify`
+    pub ix_sysvar: AccountInfo<'info>,
 }
