@@ -56,7 +56,15 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         args.amount <= cfg.max_single_deposit,
         YieldfyError::CapExceeded
     );
-    // MVP: only venue 0 (Kamino). Multi-venue routing lands at Phase C.
     require!(args.expected_venue == 0u8, YieldfyError::VenueMismatch);
+
+    // 1. Verify optimizer attestation (ed25519 pre-ix at index 0).
+    attest::verify(
+        &ctx.accounts.ix_sysvar,
+        cfg.attestor,
+        args.expected_venue,
+        args.attestation_slot,
+        cfg.staleness_slots,
+    )?;
     Ok(())
 }
