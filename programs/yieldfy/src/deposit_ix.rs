@@ -19,4 +19,14 @@ pub struct DepositToKamino<'info> {
         bump
     )]
     pub position: Account<'info, Position>,
+
+    #[account(mut, constraint = user_wxrp.mint == config.wxrp_mint)]
+    pub user_wxrp: Account<'info, TokenAccount>,
+
+    #[account(
+        mut,
+        seeds = [b"vault", config.wxrp_mint.as_ref()],
+        bump,
+    )]
+    pub vault_wxrp: Account<'info, TokenAccount>,
 }
