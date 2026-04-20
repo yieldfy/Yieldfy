@@ -55,4 +55,10 @@ pub enum YieldfyError {
     CapExceeded,
     #[msg("Venue mismatch vs attestation")]
     VenueMismatch,
+    #[msg("Missing or malformed attestation instruction")]
+    BadAttestIx,
+    #[msg("Attestor is not whitelisted in Config")]
+    BadAttestor,
+    #[msg("Attestation is stale")]
+    AttestationStale,
 }
