@@ -39,3 +39,10 @@ pub struct DepositArgs {
     pub attestation_sig: [u8; 64],
     pub expected_venue: u8,
 }
+
+#[event]
+pub struct DepositEvent {
+    pub user: Pubkey,
+    pub venue: u8,
+    pub amount: u64,
+}
