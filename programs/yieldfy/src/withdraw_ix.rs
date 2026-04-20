@@ -43,7 +43,6 @@ pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         YieldfyError::InsufficientBalance
     );
 
-    // 1. Burn user's yXRP.
     token::burn(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -52,6 +51,26 @@ pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
                 from: ctx.accounts.user_yxrp.to_account_info(),
                 authority: ctx.accounts.user.to_account_info(),
             },
+        ),
+        amount,
+    )?;
+
+    // 2. TODO(W3.5): CPI into Kamino to redeem wXRP back into the vault
+    //    before transferring it to the user. MVP holds wXRP in the vault
+    //    directly so this step is a no-op.
+
+    // 3. Return wXRP: vault -> user, signed by the Config PDA.
+    let bump = ctx.accounts.config.bump;
+    let seeds: &[&[u8]] = &[b"config", std::slice::from_ref(&bump)];
+    token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.vault_wxrp.to_account_info(),
+                to: ctx.accounts.user_wxrp.to_account_info(),
+                authority: ctx.accounts.config.to_account_info(),
+            },
+            &[seeds],
         ),
         amount,
     )?;
