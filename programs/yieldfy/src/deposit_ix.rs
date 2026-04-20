@@ -66,7 +66,6 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         cfg.staleness_slots,
     )?;
 
-    // 2. Pull wXRP: user -> vault.
     token::transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -78,5 +77,8 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         ),
         args.amount,
     )?;
+
+    // 3. TODO(W3.5): CPI into Kamino (venue_program) to supply the wXRP.
+    //    For MVP the vault holds wXRP directly so the round-trip works.
     Ok(())
 }
