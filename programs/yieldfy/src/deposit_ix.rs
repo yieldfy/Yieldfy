@@ -8,3 +8,9 @@ use crate::{attest, state::*};
 /// vault holds wXRP directly and the receipt is still minted 1:1.
 pub const KAMINO_PROGRAM_ID: Pubkey =
     pubkey!("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
+
+#[derive(Accounts)]
+pub struct DepositToKamino<'info> {
+    #[account(seeds = [b"config"], bump = config.bump)]
+    pub config: Account<'info, Config>,
+}
