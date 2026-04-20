@@ -31,3 +31,11 @@ pub struct ConfigArgs {
     pub max_single_deposit: u64,
     pub staleness_slots: u64,
 }
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct DepositArgs {
+    pub amount: u64,
+    pub attestation_slot: u64,
+    pub attestation_sig: [u8; 64],
+    pub expected_venue: u8,
+}
