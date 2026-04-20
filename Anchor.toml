@@ -1,2 +1,9 @@
 [toolchain]
 package_manager = "yarn"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+yieldfy = "CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK"
