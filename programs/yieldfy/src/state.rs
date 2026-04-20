@@ -12,3 +12,15 @@ pub struct Config {
     pub paused: bool,
     pub bump: u8,
 }
+
+#[account]
+#[derive(InitSpace)]
+pub struct Position {
+    pub owner: Pubkey,
+    /// 0 = kamino, 1 = marginfi, 2 = drift, 3 = meteora
+    pub venue: u8,
+    pub principal: u64,
+    pub receipt_supply: u64,
+    pub last_update: i64,
+    pub bump: u8,
+}
