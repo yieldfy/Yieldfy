@@ -16,3 +16,8 @@ pub use state::*;
 // expansion resolves the wrong path and emits "unresolved import crate".)
 pub use deposit_ix::*;
 pub use withdraw_ix::*;
+
+#[program]
+pub mod yieldfy {
+    use super::*;
+}
