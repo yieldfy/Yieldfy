@@ -48,3 +48,15 @@ pub struct DepositToKamino<'info> {
     pub token_program: Program<'info, Token>,
     pub system_program: Program<'info, System>,
 }
+
+pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
+    let cfg = &ctx.accounts.config;
+    require!(!cfg.paused, YieldfyError::Paused);
+    require!(
+        args.amount <= cfg.max_single_deposit,
+        YieldfyError::CapExceeded
+    );
+    // MVP: only venue 0 (Kamino). Multi-venue routing lands at Phase C.
+    require!(args.expected_venue == 0u8, YieldfyError::VenueMismatch);
+    Ok(())
+}
