@@ -24,3 +24,10 @@ pub struct Position {
     pub last_update: i64,
     pub bump: u8,
 }
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct ConfigArgs {
+    pub attestor: Pubkey,
+    pub max_single_deposit: u64,
+    pub staleness_slots: u64,
+}
