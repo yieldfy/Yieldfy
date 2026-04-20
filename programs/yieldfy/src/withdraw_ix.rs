@@ -43,6 +43,7 @@ pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         YieldfyError::InsufficientBalance
     );
 
+    // 1. Burn user's yXRP.
     token::burn(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -74,5 +75,10 @@ pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         ),
         amount,
     )?;
+
+    let p = &mut ctx.accounts.position;
+    p.principal = p.principal.saturating_sub(amount);
+    p.receipt_supply = p.receipt_supply.saturating_sub(amount);
+    p.last_update = Clock::get()?.unix_timestamp;
     Ok(())
 }
