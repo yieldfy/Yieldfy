@@ -1,0 +1,5 @@
+[package]
+name = "yieldfy"
+version = "0.1.0"
+description = "Yieldfy — wXRP auto-router on Solana"
+edition = "2021"
