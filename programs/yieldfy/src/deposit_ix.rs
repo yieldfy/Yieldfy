@@ -42,4 +42,9 @@ pub struct DepositToKamino<'info> {
 
     /// CHECK: the instructions sysvar; content validated in `attest::verify`
     pub ix_sysvar: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub user: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub system_program: Program<'info, System>,
 }
