@@ -46,3 +46,13 @@ pub struct DepositEvent {
     pub venue: u8,
     pub amount: u64,
 }
+
+#[error_code]
+pub enum YieldfyError {
+    #[msg("Program is paused")]
+    Paused,
+    #[msg("Exceeds per-transaction cap")]
+    CapExceeded,
+    #[msg("Venue mismatch vs attestation")]
+    VenueMismatch,
+}
