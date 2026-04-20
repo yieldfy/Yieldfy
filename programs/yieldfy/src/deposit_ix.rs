@@ -3,6 +3,9 @@ use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer};
 
 use crate::{attest, state::*};
 
+/// Kamino lending program ID. Verified via address constraint on
+/// `venue_program`. Full Kamino CPI lands in a W3.5 follow-up; for MVP the
+/// vault holds wXRP directly and the receipt is still minted 1:1.
 pub const KAMINO_PROGRAM_ID: Pubkey =
     pubkey!("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
 
@@ -56,8 +59,10 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         args.amount <= cfg.max_single_deposit,
         YieldfyError::CapExceeded
     );
+    // MVP: only venue 0 (Kamino). Multi-venue routing lands at Phase C.
     require!(args.expected_venue == 0u8, YieldfyError::VenueMismatch);
 
+    // 1. Verify optimizer attestation (ed25519 pre-ix at index 0).
     attest::verify(
         &ctx.accounts.ix_sysvar,
         cfg.attestor,
@@ -66,6 +71,7 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         cfg.staleness_slots,
     )?;
 
+    // 2. Pull wXRP: user -> vault.
     token::transfer(
         CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
@@ -79,6 +85,7 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
     )?;
 
     // 3. TODO(W3.5): CPI into Kamino (venue_program) to supply the wXRP.
+    //    For MVP the vault holds wXRP directly so the round-trip works.
 
     // 4. Mint yXRP receipt 1:1, signed by the Config PDA.
     let bump = cfg.bump;
@@ -95,5 +102,20 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
         ),
         args.amount,
     )?;
+
+    // 5. Update position.
+    let p = &mut ctx.accounts.position;
+    p.owner = ctx.accounts.user.key();
+    p.venue = 0;
+    p.principal = p.principal.saturating_add(args.amount);
+    p.receipt_supply = p.receipt_supply.saturating_add(args.amount);
+    p.last_update = Clock::get()?.unix_timestamp;
+    p.bump = ctx.bumps.position;
+
+    emit!(DepositEvent {
+        user: p.owner,
+        venue: 0,
+        amount: args.amount,
+    });
     Ok(())
 }
