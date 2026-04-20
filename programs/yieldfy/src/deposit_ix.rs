@@ -79,6 +79,21 @@ pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
     )?;
 
     // 3. TODO(W3.5): CPI into Kamino (venue_program) to supply the wXRP.
-    //    For MVP the vault holds wXRP directly so the round-trip works.
+
+    // 4. Mint yXRP receipt 1:1, signed by the Config PDA.
+    let bump = cfg.bump;
+    let seeds: &[&[u8]] = &[b"config", std::slice::from_ref(&bump)];
+    token::mint_to(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            MintTo {
+                mint: ctx.accounts.yxrp_mint.to_account_info(),
+                to: ctx.accounts.user_yxrp.to_account_info(),
+                authority: ctx.accounts.config.to_account_info(),
+            },
+            &[seeds],
+        ),
+        args.amount,
+    )?;
     Ok(())
 }
