@@ -1,0 +1,79 @@
+name: anchor
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "programs/**"
+      - "tests/**"
+      - "Anchor.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/anchor.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "programs/**"
+      - "tests/**"
+      - "Anchor.toml"
+      - "Cargo.toml"
+      - "Cargo.lock"
+      - "rust-toolchain.toml"
+      - ".github/workflows/anchor.yml"
+
+concurrency:
+  group: anchor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: anchor build · bankrun
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Solana + Anchor CLI
+        id: cache-cli
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/solana
+            ~/.avm
+            ~/.cargo/bin/anchor
+          key: solana-1.18.26-anchor-0.32.1
+
+      - name: Install Solana CLI
+        if: steps.cache-cli.outputs.cache-hit != 'true'
+        run: |
+          sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.26/install)"
+          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Install AVM + Anchor CLI 0.32.1
+        if: steps.cache-cli.outputs.cache-hit != 'true'
+        run: |
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install 0.32.1
+          avm use 0.32.1
+
+      - name: Persist PATH when cache hit
+        if: steps.cache-cli.outputs.cache-hit == 'true'
+        run: echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: anchor build
+
+      - name: Bankrun integration tests
+        run: npm run anchor:test
