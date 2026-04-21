@@ -355,6 +355,62 @@
       ]
     },
     {
+      "name": "set_cap",
+      "docs": [
+        "Authority-only. Updates the per-tx deposit cap and the attestation",
+        "staleness window. Both must be > 0 — use `set_paused(true)` if the",
+        "intent is to halt activity."
+      ],
+      "discriminator": [
+        209,
+        207,
+        121,
+        129,
+        115,
+        39,
+        220,
+        4
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "max_single_deposit",
+          "type": "u64"
+        },
+        {
+          "name": "staleness_slots",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "set_paused",
       "docs": [
         "Authority-only circuit breaker. Pausing causes every deposit and",
@@ -558,6 +614,19 @@
       ]
     },
     {
+      "name": "CapsUpdated",
+      "discriminator": [
+        147,
+        181,
+        117,
+        249,
+        72,
+        147,
+        156,
+        255
+      ]
+    },
+    {
       "name": "DepositEvent",
       "discriminator": [
         120,
@@ -651,6 +720,34 @@
           {
             "name": "current",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CapsUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_max_single_deposit",
+            "type": "u64"
+          },
+          {
+            "name": "previous_staleness_slots",
+            "type": "u64"
+          },
+          {
+            "name": "current_max_single_deposit",
+            "type": "u64"
+          },
+          {
+            "name": "current_staleness_slots",
+            "type": "u64"
           }
         ]
       }

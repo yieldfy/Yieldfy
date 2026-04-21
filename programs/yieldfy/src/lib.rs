@@ -70,6 +70,17 @@ pub mod yieldfy {
     pub fn rotate_attestor(ctx: Context<AdminOnly>, new_attestor: Pubkey) -> Result<()> {
         admin::handle_rotate_attestor(ctx, new_attestor)
     }
+
+    /// Authority-only. Updates the per-tx deposit cap and the attestation
+    /// staleness window. Both must be > 0 — use `set_paused(true)` if the
+    /// intent is to halt activity.
+    pub fn set_cap(
+        ctx: Context<AdminOnly>,
+        max_single_deposit: u64,
+        staleness_slots: u64,
+    ) -> Result<()> {
+        admin::handle_set_cap(ctx, max_single_deposit, staleness_slots)
+    }
 }
 
 #[derive(Accounts)]
