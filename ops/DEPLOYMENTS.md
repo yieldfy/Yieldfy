@@ -24,7 +24,7 @@ Canonical record of every Yieldfy program deployment. Append-only — do not edi
 - [x] `initialize()` called with devnet attestor pubkey → Config PDA created.
 - [x] wXRP mint set in `apps/dashboard/.env.example` (`VITE_WXRP_MINT`).
 - [x] yXRP mint created + mint authority handed to the Config PDA.
-- [ ] Optimizer `YIELDFY_ATTESTOR_KEY` published and `/attestor/pubkey` matches `Config.attestor`.
+- [x] Optimizer `YIELDFY_ATTESTOR_KEY` loaded from `ops/artifacts/devnet/attestor.json`; `/attestor/pubkey` returns `76XD6xfJhXoH7HhyywhTvkX5RT1etAoot3HN4AF1wHXb` — matches `Config.attestor`.
 - [x] First end-to-end `deposit` transaction recorded ([`4jCiLJTrVg8c…S2tU`](https://explorer.solana.com/tx/4jCiLJTrVg8ceG551NWfErpgXmbR4tpJHeimoyNXKkRv8wwpsn9KgCSc32BkAmwogx9TSZAaJZLXBEyEbL68S2tU?cluster=devnet), 2026-04-21).
 
 ### Initialized state
