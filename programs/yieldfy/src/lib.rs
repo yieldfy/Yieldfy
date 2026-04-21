@@ -62,6 +62,14 @@ pub mod yieldfy {
     pub fn set_paused(ctx: Context<AdminOnly>, paused: bool) -> Result<()> {
         admin::handle_set_paused(ctx, paused)
     }
+
+    /// Authority-only. Replaces `Config.attestor` so subsequent deposits
+    /// must be signed by the new key. Existing attestations with the old
+    /// key still need to clear the staleness window — operators should
+    /// drain any in-flight optimizer work before rotating.
+    pub fn rotate_attestor(ctx: Context<AdminOnly>, new_attestor: Pubkey) -> Result<()> {
+        admin::handle_rotate_attestor(ctx, new_attestor)
+    }
 }
 
 #[derive(Accounts)]

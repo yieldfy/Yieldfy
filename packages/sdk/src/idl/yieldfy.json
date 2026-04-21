@@ -302,6 +302,59 @@
       ]
     },
     {
+      "name": "rotate_attestor",
+      "docs": [
+        "Authority-only. Replaces `Config.attestor` so subsequent deposits",
+        "must be signed by the new key. Existing attestations with the old",
+        "key still need to clear the staleness window — operators should",
+        "drain any in-flight optimizer work before rotating."
+      ],
+      "discriminator": [
+        210,
+        240,
+        181,
+        158,
+        51,
+        168,
+        80,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_attestor",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "set_paused",
       "docs": [
         "Authority-only circuit breaker. Pausing causes every deposit and",
@@ -492,6 +545,19 @@
   ],
   "events": [
     {
+      "name": "AttestorRotated",
+      "discriminator": [
+        44,
+        86,
+        231,
+        16,
+        98,
+        189,
+        12,
+        63
+      ]
+    },
+    {
       "name": "DepositEvent",
       "discriminator": [
         120,
@@ -569,6 +635,26 @@
     }
   ],
   "types": [
+    {
+      "name": "AttestorRotated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "current",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "Config",
       "type": {
