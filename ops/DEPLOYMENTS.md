@@ -25,7 +25,7 @@ Canonical record of every Yieldfy program deployment. Append-only — do not edi
 - [x] wXRP mint set in `apps/dashboard/.env.example` (`VITE_WXRP_MINT`).
 - [x] yXRP mint created + mint authority handed to the Config PDA.
 - [ ] Optimizer `YIELDFY_ATTESTOR_KEY` published and `/attestor/pubkey` matches `Config.attestor`.
-- [ ] First end-to-end `deposit` transaction recorded from the dashboard.
+- [x] First end-to-end `deposit` transaction recorded ([`4jCiLJTrVg8c…S2tU`](https://explorer.solana.com/tx/4jCiLJTrVg8ceG551NWfErpgXmbR4tpJHeimoyNXKkRv8wwpsn9KgCSc32BkAmwogx9TSZAaJZLXBEyEbL68S2tU?cluster=devnet), 2026-04-21).
 
 ### Initialized state
 
@@ -42,6 +42,20 @@ Canonical record of every Yieldfy program deployment. Append-only — do not edi
 | Config `staleness_slots` | `150` |
 
 Attestor secret key + mint secret keys live under `ops/artifacts/devnet/` (git-ignored). Do not commit.
+
+### First deposit (2026-04-21)
+
+| Field | Value |
+| --- | --- |
+| User | `4e4Xf6ZtLuPqV8z5Ewp7e6GUCqbgUq3YVwigGPJYNyTM` |
+| Position PDA | [`BTcsQEra85QtDo4c2KWCwq1jewEHkySFTeNx3ZQriaa9`](https://explorer.solana.com/address/BTcsQEra85QtDo4c2KWCwq1jewEHkySFTeNx3ZQriaa9?cluster=devnet) |
+| Amount | `10_000_000` base units (10 wXRP) |
+| Venue | `0` (kamino) |
+| Attestation slot | `457094693` |
+| Deposit tx | [`4jCiLJTrVg8ceG551NWfErpgXmbR4tpJHeimoyNXKkRv8wwpsn9KgCSc32BkAmwogx9TSZAaJZLXBEyEbL68S2tU`](https://explorer.solana.com/tx/4jCiLJTrVg8ceG551NWfErpgXmbR4tpJHeimoyNXKkRv8wwpsn9KgCSc32BkAmwogx9TSZAaJZLXBEyEbL68S2tU?cluster=devnet) |
+| Prep tx (mint + ATAs) | [`4Wu7oPuqLBPxcMrgpcZQGXedWj1xfyd3zF6azf7DTeSeidm3UveqHhQvkCXC6ykXQ35Tw2cgzhq5cddBhDGJpWmn`](https://explorer.solana.com/tx/4Wu7oPuqLBPxcMrgpcZQGXedWj1xfyd3zF6azf7DTeSeidm3UveqHhQvkCXC6ykXQ35Tw2cgzhq5cddBhDGJpWmn?cluster=devnet) |
+| Principal | `10_000_000` |
+| Receipt supply | `10_000_000` (yXRP minted 1:1) |
 
 ## mainnet-beta
 
