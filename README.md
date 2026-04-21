@@ -96,6 +96,15 @@ The script builds the program, deploys, copies the IDL into `@yieldfy/sdk`, and 
 | Drift | Scheduled | C |
 | Meteora | Scheduled | C |
 
+## Live deployments
+
+| Cluster | Program ID | Status |
+| --- | --- | --- |
+| devnet | [`3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE`](https://explorer.solana.com/address/3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE?cluster=devnet) | Live (2026-04-21) |
+| mainnet-beta | — | Audit pending |
+
+Full deployment log in [ops/DEPLOYMENTS.md](./ops/DEPLOYMENTS.md).
+
 ## Observability
 
 - **Prometheus** — `/metrics` on both the optimizer and the wXRP indexer
