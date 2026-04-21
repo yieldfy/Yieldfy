@@ -2,6 +2,7 @@
 import { env } from "./env.js";
 
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { Connection } from "@solana/web3.js";
 import { fetchSnapshots } from "./feeds.js";
@@ -47,6 +48,21 @@ const app = Fastify({
   genReqId: (req) => getCorrelationId(req.headers as Record<string, unknown>),
 });
 const connection = new Connection(SOLANA_RPC_URL, "confirmed");
+
+// Origin allow-list: comma-separated list of full origins in CORS_ORIGIN,
+// or `*` in dev. Browser-side clients at yieldfy.ai (prod) and localhost
+// (dev) are the only consumers; rate-limit + webhook-HMAC cover the rest.
+const corsOrigins = (process.env.CORS_ORIGIN ?? "http://localhost:8080")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+await app.register(cors, {
+  origin: corsOrigins.includes("*") ? true : corsOrigins,
+  methods: ["GET", "POST", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "X-Correlation-Id"],
+  exposedHeaders: [CORRELATION_ID_HEADER],
+  maxAge: 600,
+});
 
 await app.register(rateLimit, {
   global: false,

@@ -1,0 +1,50 @@
+# DigitalOcean App Platform spec for @yieldfy/wxrp-indexer.
+#
+# Polls the wXRP mint supply on Solana and emits deltas as Prometheus
+# counters + structured logs. Stateless — no Redis needed. Small instance.
+
+name: yieldfy-wxrp-indexer
+region: nyc
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+services:
+  - name: indexer
+    source_dir: services/wxrp-indexer
+    dockerfile_path: services/wxrp-indexer/Dockerfile
+    github:
+      repo: yieldfy/Yieldfy
+      branch: main
+      deploy_on_push: false
+    http_port: 4100
+    instance_size_slug: basic-xxs
+    instance_count: 1
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      failure_threshold: 3
+    envs:
+      - key: NODE_ENV
+        scope: RUN_TIME
+        value: production
+      - key: PORT
+        scope: RUN_TIME
+        value: "4100"
+      - key: SOLANA_RPC_URL
+        scope: RUN_TIME
+        value: https://api.devnet.solana.com
+      - key: WXRP_MINT
+        scope: RUN_TIME
+        value: 7CRLtijwzVMRH2JKMD49VDFkNrHxz26mNcP1Muybdak1
+      - key: INDEXER_POLL_MS
+        scope: RUN_TIME
+        value: "30000"
+
+domains:
+  - domain: indexer.yieldfy.ai
+    type: PRIMARY
+    zone: yieldfy.ai

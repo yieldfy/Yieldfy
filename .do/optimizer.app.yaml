@@ -1,0 +1,89 @@
+# DigitalOcean App Platform spec for @yieldfy/optimizer.
+#
+# Apply with:
+#   doctl apps create --spec .do/optimizer.app.yaml
+# Update with:
+#   doctl apps update <app-id> --spec .do/optimizer.app.yaml
+#
+# One-time prep:
+#   - doctl auth init (paste DO personal access token)
+#   - A Managed Redis database created in the same region (e.g. nyc3).
+#     Its connection string becomes REDIS_URL below via "value: ${...}".
+#   - The repo is public at github.com/yieldfy/Yieldfy, so no deploy key
+#     needed. If you deploy from the private repo instead, add a GitHub
+#     OAuth connection in DO first.
+#   - YIELDFY_ATTESTOR_KEY stored as an encrypted app-level secret.
+
+name: yieldfy-optimizer
+region: nyc
+
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+services:
+  - name: optimizer
+    source_dir: services/optimizer
+    dockerfile_path: services/optimizer/Dockerfile
+    github:
+      repo: yieldfy/Yieldfy
+      branch: main
+      deploy_on_push: false # driven by our GH Actions workflow instead
+    http_port: 4000
+    instance_size_slug: basic-xxs # $5/mo tier, 512MB RAM, plenty for Fastify
+    instance_count: 1
+    health_check:
+      http_path: /health
+      initial_delay_seconds: 10
+      period_seconds: 30
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    envs:
+      - key: NODE_ENV
+        scope: RUN_TIME
+        value: production
+      - key: PORT
+        scope: RUN_TIME
+        value: "4000"
+      - key: SOLANA_RPC_URL
+        scope: RUN_TIME
+        value: https://api.devnet.solana.com
+      - key: YIELDFY_ATTESTOR_KEY
+        scope: RUN_TIME
+        type: SECRET
+        value: "" # set via: doctl apps update --spec (after) or the UI
+      - key: REDIS_URL
+        scope: RUN_TIME
+        type: SECRET
+        value: ${redis.REDIS_URL}
+      - key: ATTEST_RATE_MAX
+        scope: RUN_TIME
+        value: "60"
+      - key: ATTEST_RATE_WINDOW
+        scope: RUN_TIME
+        value: "1 minute"
+      - key: CORS_ORIGIN
+        scope: RUN_TIME
+        value: https://yieldfy.ai
+      # Optional observability — fill in when Axiom is wired
+      # - key: AXIOM_TOKEN
+      #   scope: RUN_TIME
+      #   type: SECRET
+      #   value: ""
+      # - key: AXIOM_DATASET
+      #   scope: RUN_TIME
+      #   value: yieldfy-optimizer
+
+databases:
+  - name: redis
+    engine: REDIS
+    # production_dbcluster: true  # uncomment after validating on dev-tier
+    num_nodes: 1
+    size: db-s-1vcpu-1gb # $15/mo minimum for managed Redis
+    version: "7"
+
+domains:
+  - domain: optimizer.yieldfy.ai
+    type: PRIMARY
+    zone: yieldfy.ai
