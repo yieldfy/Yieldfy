@@ -7,6 +7,7 @@ const schema = z.object({
     .optional()
     .default("https://api.devnet.solana.com"),
   VITE_WXRP_MINT: z.string().optional(),
+  VITE_YXRP_MINT: z.string().optional(),
   VITE_YIELDFY_PROGRAM_ID: z.string().optional(),
   VITE_OPTIMIZER_URL: z.string().url().optional().default("http://localhost:4000"),
 });
@@ -17,6 +18,7 @@ function validate(): Env {
   const parsed = schema.safeParse({
     VITE_SOLANA_RPC_URL: import.meta.env.VITE_SOLANA_RPC_URL,
     VITE_WXRP_MINT: import.meta.env.VITE_WXRP_MINT,
+    VITE_YXRP_MINT: import.meta.env.VITE_YXRP_MINT,
     VITE_YIELDFY_PROGRAM_ID: import.meta.env.VITE_YIELDFY_PROGRAM_ID,
     VITE_OPTIMIZER_URL: import.meta.env.VITE_OPTIMIZER_URL,
   });

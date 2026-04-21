@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "dev": "npm -w @yieldfy/dashboard run dev",
+    "dev:all": "./ops/dev.sh",
     "build": "npm -w @yieldfy/sdk run build && npm -w @yieldfy/dashboard run build",
     "lint": "npm -w @yieldfy/dashboard run lint",
     "test": "npm -ws --if-present run test",

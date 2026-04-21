@@ -64,20 +64,16 @@ Every rebalance, every deposit, and every withdrawal is on-chain, event-emitting
 ## Quick start
 
 ```sh
-# 1. Install
+# Install + run against the live devnet program in one shot
 npm install
-
-# 2. Build the on-chain program (requires anchor 0.30.1+)
-anchor build
-
-# 3. Run the optimizer
-npm run optimizer:dev
-
-# 4. Run the dashboard
-npm run dev
+cp apps/dashboard/.env.example apps/dashboard/.env
+./ops/dev.sh
 ```
 
-See [docs/integration.md](./docs/integration.md) for the end-to-end integration path.
+- Dashboard → <http://localhost:8080>
+- Optimizer → <http://localhost:4000>
+
+Full walkthrough (test wXRP seeding, attestation checks, redeploy) in [docs/local-dev.md](./docs/local-dev.md). Integration-partner view in [docs/integration.md](./docs/integration.md).
 
 ## Deploy
 
