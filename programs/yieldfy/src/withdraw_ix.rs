@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Burn, Mint, Token, TokenAccount, Transfer};
 
-use crate::state::*;
+use crate::{state::*, venues::kamino};
 
 #[derive(Accounts)]
 pub struct Withdraw<'info> {
@@ -56,9 +56,29 @@ pub fn handle_withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         amount,
     )?;
 
-    // 2. TODO(W3.5): CPI into Kamino to redeem wXRP back into the vault
-    //    before transferring it to the user. MVP holds wXRP in the vault
-    //    directly so this step is a no-op.
+    // 2. Redeem from Kamino. Phase B is a no-op because the vault already
+    //    holds the wXRP; the venues::kamino::redeem stub locks in the CPI
+    //    shape Phase C will emit.
+    let cfg_bump = ctx.accounts.config.bump;
+    kamino::redeem(
+        &kamino::RedeemAccounts {
+            owner: ctx.accounts.config.to_account_info(),
+            obligation: ctx.accounts.config.to_account_info(),
+            lending_market: ctx.accounts.token_program.to_account_info(),
+            lending_market_authority: ctx.accounts.token_program.to_account_info(),
+            withdraw_reserve: ctx.accounts.token_program.to_account_info(),
+            reserve_liquidity_mint: ctx.accounts.yxrp_mint.to_account_info(),
+            reserve_source_collateral: ctx.accounts.vault_wxrp.to_account_info(),
+            reserve_collateral_mint: ctx.accounts.yxrp_mint.to_account_info(),
+            reserve_liquidity_supply: ctx.accounts.vault_wxrp.to_account_info(),
+            user_destination_liquidity: ctx.accounts.user_wxrp.to_account_info(),
+            user_destination_collateral: ctx.accounts.user_yxrp.to_account_info(),
+            token_program: ctx.accounts.token_program.to_account_info(),
+            instruction_sysvar: ctx.accounts.token_program.to_account_info(),
+        },
+        amount,
+        &[b"config", std::slice::from_ref(&cfg_bump)],
+    )?;
 
     // 3. Return wXRP: vault -> user, signed by the Config PDA.
     let bump = ctx.accounts.config.bump;

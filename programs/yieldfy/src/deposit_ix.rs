@@ -1,13 +1,11 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, MintTo, Token, TokenAccount, Transfer};
 
-use crate::{attest, state::*};
+use crate::{attest, state::*, venues::kamino};
 
-/// Kamino lending program ID. Verified via address constraint on
-/// `venue_program`. Full Kamino CPI lands in a W3.5 follow-up; for MVP the
-/// vault holds wXRP directly and the receipt is still minted 1:1.
-pub const KAMINO_PROGRAM_ID: Pubkey =
-    pubkey!("KLend2g3cP87fffoy8q1mQqGKjrxjC8boSyAYavgmjD");
+/// Re-exported for backwards compatibility with clients that imported the ID
+/// directly. The canonical definition lives in `venues::kamino::PROGRAM_ID`.
+pub const KAMINO_PROGRAM_ID: Pubkey = kamino::PROGRAM_ID;
 
 #[derive(Accounts)]
 pub struct DepositToKamino<'info> {
@@ -84,8 +82,27 @@ pub fn handle_deposit(ctx: Context<DepositToKamino>, args: DepositArgs) -> Resul
         args.amount,
     )?;
 
-    // 3. TODO(W3.5): CPI into Kamino (venue_program) to supply the wXRP.
-    //    For MVP the vault holds wXRP directly so the round-trip works.
+    // 3. Route into Kamino. Phase B leaves wXRP in our own vault; the
+    //    venues::kamino::supply stub describes the exact CPI Phase C will
+    //    issue without changing this call site.
+    kamino::supply(
+        &kamino::SupplyAccounts {
+            owner: ctx.accounts.config.to_account_info(),
+            obligation: ctx.accounts.config.to_account_info(), // Phase C: real obligation PDA
+            lending_market: ctx.accounts.venue_program.to_account_info(),
+            lending_market_authority: ctx.accounts.venue_program.to_account_info(),
+            reserve: ctx.accounts.venue_program.to_account_info(),
+            reserve_liquidity_mint: ctx.accounts.user_wxrp.to_account_info(),
+            reserve_liquidity_supply: ctx.accounts.vault_wxrp.to_account_info(),
+            reserve_collateral_mint: ctx.accounts.yxrp_mint.to_account_info(),
+            user_source_liquidity: ctx.accounts.vault_wxrp.to_account_info(),
+            user_destination_collateral: ctx.accounts.vault_wxrp.to_account_info(),
+            token_program: ctx.accounts.token_program.to_account_info(),
+            instruction_sysvar: ctx.accounts.ix_sysvar.to_account_info(),
+        },
+        args.amount,
+        &[b"config", std::slice::from_ref(&cfg.bump)],
+    )?;
 
     // 4. Mint yXRP receipt 1:1, signed by the Config PDA.
     let bump = cfg.bump;

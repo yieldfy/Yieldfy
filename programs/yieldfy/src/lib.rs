@@ -8,6 +8,7 @@ pub mod attest;
 pub mod deposit_ix;
 pub mod rebalance;
 pub mod state;
+pub mod venues;
 pub mod withdraw_ix;
 pub use admin::*;
 pub use state::*;
