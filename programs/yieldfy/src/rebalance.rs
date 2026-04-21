@@ -29,7 +29,7 @@ pub struct RebalanceArgs {
     pub attestation_sig: [u8; 64],
 }
 
-pub fn handle(ctx: Context<Rebalance>, args: RebalanceArgs) -> Result<()> {
+pub fn handle_rebalance(ctx: Context<Rebalance>, args: RebalanceArgs) -> Result<()> {
     let cfg = &ctx.accounts.config;
     require!(!cfg.paused, YieldfyError::Paused);
     require!(

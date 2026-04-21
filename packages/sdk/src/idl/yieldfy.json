@@ -1,5 +1,5 @@
 {
-  "address": "CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK",
+  "address": "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE",
   "metadata": {
     "name": "yieldfy",
     "version": "0.1.0",
@@ -226,6 +226,82 @@
       ]
     },
     {
+      "name": "rebalance",
+      "discriminator": [
+        108,
+        158,
+        77,
+        9,
+        210,
+        52,
+        88,
+        62
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "ix_sysvar"
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "RebalanceArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "discriminator": [
         183,
@@ -374,6 +450,19 @@
         142,
         107,
         144
+      ]
+    },
+    {
+      "name": "RebalanceEvent",
+      "discriminator": [
+        120,
+        27,
+        117,
+        235,
+        104,
+        42,
+        132,
+        75
       ]
     }
   ],
@@ -555,6 +644,55 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RebalanceArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "target_venue",
+            "type": "u8"
+          },
+          {
+            "name": "attestation_slot",
+            "type": "u64"
+          },
+          {
+            "name": "attestation_sig",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "RebalanceEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "from_venue",
+            "type": "u8"
+          },
+          {
+            "name": "to_venue",
+            "type": "u8"
+          },
+          {
+            "name": "principal",
+            "type": "u64"
           }
         ]
       }

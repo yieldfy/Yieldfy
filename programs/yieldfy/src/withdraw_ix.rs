@@ -37,7 +37,7 @@ pub struct Withdraw<'info> {
     pub token_program: Program<'info, Token>,
 }
 
-pub fn handle(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
+pub fn handle_withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
     require!(
         amount <= ctx.accounts.position.receipt_supply,
         YieldfyError::InsufficientBalance

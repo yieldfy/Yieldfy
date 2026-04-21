@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 
-declare_id!("CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK");
+declare_id!("3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE");
 
 pub mod attest;
 pub mod deposit_ix;
@@ -12,8 +12,8 @@ pub use state::*;
 
 // Re-export Accounts structs at the crate root so the #[program] macro can
 // find their auto-generated `__client_accounts_*` siblings at `crate::*`.
-// (If we keep them inside `deposit_ix::` / `withdraw_ix::`, Anchor's macro
-// expansion resolves the wrong path and emits "unresolved import crate".)
+// Each ix module exposes a uniquely-named handler (handle_deposit /
+// handle_withdraw / handle_rebalance) so the wildcard globs don't collide.
 pub use deposit_ix::*;
 pub use rebalance::*;
 pub use withdraw_ix::*;
@@ -43,15 +43,15 @@ pub mod yieldfy {
         ctx: Context<DepositToKamino>,
         args: DepositArgs,
     ) -> Result<()> {
-        deposit_ix::handle(ctx, args)
+        deposit_ix::handle_deposit(ctx, args)
     }
 
     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
-        withdraw_ix::handle(ctx, amount)
+        withdraw_ix::handle_withdraw(ctx, amount)
     }
 
     pub fn rebalance(ctx: Context<Rebalance>, args: RebalanceArgs) -> Result<()> {
-        rebalance::handle(ctx, args)
+        rebalance::handle_rebalance(ctx, args)
     }
 }
 

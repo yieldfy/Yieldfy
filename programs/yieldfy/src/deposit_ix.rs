@@ -52,7 +52,7 @@ pub struct DepositToKamino<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handle(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
+pub fn handle_deposit(ctx: Context<DepositToKamino>, args: DepositArgs) -> Result<()> {
     let cfg = &ctx.accounts.config;
     require!(!cfg.paused, YieldfyError::Paused);
     require!(

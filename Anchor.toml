@@ -6,7 +6,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-yieldfy = "CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK"
+yieldfy = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"
+
+[programs.devnet]
+yieldfy = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"
 
 [registry]
 url = "https://api.apr.dev"
