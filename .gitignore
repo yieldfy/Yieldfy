@@ -33,3 +33,6 @@ target/
 **/*.rs.bk
 test-ledger/
 .anchor/
+
+# Devnet bootstrap artifacts — secret keypairs, must never be committed
+ops/artifacts/

@@ -1,0 +1,20 @@
+{
+  "name": "@yieldfy/ops-scripts",
+  "private": true,
+  "version": "0.0.0",
+  "description": "One-off operational scripts: devnet bootstrap, key rotation helpers, ...",
+  "type": "module",
+  "scripts": {
+    "init:devnet": "tsx init-devnet.ts"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.1",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3"
+  }
+}
