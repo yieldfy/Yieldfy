@@ -78,10 +78,15 @@ Full walkthrough (test wXRP seeding, attestation checks, redeploy) in [docs/loca
 ## Deploy
 
 ```sh
+# Solana program
 ./ops/deploy.sh devnet        # or: mainnet-beta
 ```
 
-The script builds the program, deploys, copies the IDL into `@yieldfy/sdk`, and prints the program ID. See [ops/DEPLOY.md](./ops/DEPLOY.md) for the mainnet runbook, Squads multisig handoff, and the upgrade checklist.
+Full runbooks:
+
+- **On-chain program** — [ops/DEPLOY.md](./ops/DEPLOY.md): mainnet-beta deploy, Squads multisig handoff, upgrade checklist.
+- **Production services** — [ops/DEPLOY-PRODUCTION.md](./ops/DEPLOY-PRODUCTION.md): DigitalOcean App Platform (`optimizer.yieldfy.ai`, `indexer.yieldfy.ai`), Managed Redis, Vercel dashboard, DNS, pre-launch checklist.
+- **Live deployments** — [ops/DEPLOYMENTS.md](./ops/DEPLOYMENTS.md): append-only record of every cluster, every Config PDA, every first-deposit tx.
 
 ## Supported venues
 
