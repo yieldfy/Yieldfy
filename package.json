@@ -13,7 +13,8 @@
     "lint": "npm -w @yieldfy/dashboard run lint",
     "test": "npm -ws --if-present run test",
     "optimizer:dev": "npm -w @yieldfy/optimizer run dev",
-    "sdk:build": "npm -w @yieldfy/sdk run build"
+    "sdk:build": "npm -w @yieldfy/sdk run build",
+    "anchor:test": "cd tests && npm install --no-save && npm test"
   },
   "engines": {
     "node": ">=20"

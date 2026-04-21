@@ -5,6 +5,7 @@ declare_id!("CNGH7jZbLHJDTWSz5XnbZ5o4QBWQxph6qGWKRe1y6SNK");
 
 pub mod attest;
 pub mod deposit_ix;
+pub mod rebalance;
 pub mod state;
 pub mod withdraw_ix;
 pub use state::*;
@@ -14,6 +15,7 @@ pub use state::*;
 // (If we keep them inside `deposit_ix::` / `withdraw_ix::`, Anchor's macro
 // expansion resolves the wrong path and emits "unresolved import crate".)
 pub use deposit_ix::*;
+pub use rebalance::*;
 pub use withdraw_ix::*;
 
 #[program]
@@ -46,6 +48,10 @@ pub mod yieldfy {
 
     pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
         withdraw_ix::handle(ctx, amount)
+    }
+
+    pub fn rebalance(ctx: Context<Rebalance>, args: RebalanceArgs) -> Result<()> {
+        rebalance::handle(ctx, args)
     }
 }
 

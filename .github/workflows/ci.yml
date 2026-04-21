@@ -62,3 +62,16 @@ jobs:
       - run: npm -w @yieldfy/sdk run build
       - name: pack dry-run
         run: npm -w @yieldfy/sdk pack --dry-run
+
+  wxrp-indexer:
+    name: wxrp-indexer · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm -w @yieldfy/wxrp-indexer run test
+      - run: npm -w @yieldfy/wxrp-indexer run build
