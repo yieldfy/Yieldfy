@@ -69,7 +69,7 @@ describe("deposit_wxrp_to_kamino", () => {
   let yxrpMint: PublicKey;
 
   beforeAll(async () => {
-    const ctx = await startAnchor("./programs/yieldfy", [], []);
+    const ctx = await startAnchor(resolve(here, ".."), [], []);
     provider = new BankrunProvider(ctx);
     program = new Program(
       { ...IDL, address: PROGRAM_ID.toBase58() } as any,

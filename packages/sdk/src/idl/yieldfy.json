@@ -302,6 +302,58 @@
       ]
     },
     {
+      "name": "set_paused",
+      "docs": [
+        "Authority-only circuit breaker. Pausing causes every deposit and",
+        "rebalance to revert with `YieldfyError::Paused`; withdraw is never",
+        "blocked so users can always exit."
+      ],
+      "discriminator": [
+        91,
+        60,
+        125,
+        192,
+        176,
+        225,
+        166,
+        218
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
       "name": "withdraw",
       "discriminator": [
         183,
@@ -450,6 +502,19 @@
         142,
         107,
         144
+      ]
+    },
+    {
+      "name": "PausedToggled",
+      "discriminator": [
+        77,
+        42,
+        45,
+        184,
+        47,
+        55,
+        187,
+        17
       ]
     },
     {
@@ -609,6 +674,26 @@
           {
             "name": "amount",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PausedToggled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous",
+            "type": "bool"
+          },
+          {
+            "name": "current",
+            "type": "bool"
           }
         ]
       }

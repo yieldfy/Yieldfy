@@ -3,11 +3,13 @@ use anchor_spl::token::{Mint, Token, TokenAccount};
 
 declare_id!("3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE");
 
+pub mod admin;
 pub mod attest;
 pub mod deposit_ix;
 pub mod rebalance;
 pub mod state;
 pub mod withdraw_ix;
+pub use admin::*;
 pub use state::*;
 
 // Re-export Accounts structs at the crate root so the #[program] macro can
@@ -52,6 +54,13 @@ pub mod yieldfy {
 
     pub fn rebalance(ctx: Context<Rebalance>, args: RebalanceArgs) -> Result<()> {
         rebalance::handle_rebalance(ctx, args)
+    }
+
+    /// Authority-only circuit breaker. Pausing causes every deposit and
+    /// rebalance to revert with `YieldfyError::Paused`; withdraw is never
+    /// blocked so users can always exit.
+    pub fn set_paused(ctx: Context<AdminOnly>, paused: bool) -> Result<()> {
+        admin::handle_set_paused(ctx, paused)
     }
 }
 
