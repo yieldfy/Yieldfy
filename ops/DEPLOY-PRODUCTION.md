@@ -32,7 +32,7 @@ github.com/yieldfy/yieldfy-api       (private — backend source of truth)
 
 ### 2. Connect DigitalOcean to GitHub
 
-In the DO dashboard → Apps → Create App → "GitHub" → authorize the `yieldfy` GitHub org for **both** `yieldfy/Yieldfy` and `yieldfy/yieldfy-api`. This is one-time OAuth; without it, DO cannot clone the private backend repo.
+DO's App Platform clones the source repo via a GitHub OAuth connection tied to the **personal** GitHub account you signed into DO with. For us that's `yieldfy`. In DO dashboard → Apps → Create App → **GitHub** → pick the `yieldfy/yieldfy-api` repo; if prompted, authorize DigitalOcean on the `yieldfy` account and grant access to that one repo. You can cancel out of the wizard after authorizing — the permission persists.
 
 ### 3. DNS at yieldfy.ai
 
