@@ -113,3 +113,10 @@ Smoke test validated end-to-end on mainnet via [`ops/scripts/smoke-test-mainnet.
 | Receipt supply | `1_000_000` (1 yXRP minted 1:1) |
 
 Invariants I1 (attestation freshness), I2 (venue binding), I3 (cap honored), I5 (1:1 receipt), and I7 (Position PDA accumulation) confirmed on-chain.
+
+### Post-launch housekeeping (2026-04-22)
+
+- Deployer wallet `AzZutCoBEZVTVspNcGtmWbET1sei6srRJurCSNuNDxLH` swept to Squads vault:
+  - wXRP sweep: all 5.045817 wXRP → Squads vault ATA `4rk1wZfsiMBpbxTp9S6DZXbPE1Wp6QqTYZ6smeV1gxPy`, tx [`3gTxdhHaQJXQ66Ej1ACUXv2NosGatSett8zkiePwwcXHCSY6m5QZc9BpHadHBniK5HDe7BX3rHaQWTitTNCbU3rk`](https://explorer.solana.com/tx/3gTxdhHaQJXQ66Ej1ACUXv2NosGatSett8zkiePwwcXHCSY6m5QZc9BpHadHBniK5HDe7BX3rHaQWTitTNCbU3rk).
+  - SOL sweep: 0.015 SOL → Squads vault, tx [`2f7zBF4xzKdkpX2FNwEEug31J2EpLxCnLJrjtf8g7VoxTPBLyiw7yHnzoHwcZwwRyXHNkYctz4VS7Edwepx6C2FK`](https://explorer.solana.com/tx/2f7zBF4xzKdkpX2FNwEEug31J2EpLxCnLJrjtf8g7VoxTPBLyiw7yHnzoHwcZwwRyXHNkYctz4VS7Edwepx6C2FK).
+  - Deployer now holds 0.0065 SOL dust only. Leaked keypair effectively defanged.
