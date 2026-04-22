@@ -95,14 +95,19 @@ describe("invariants (AUDIT.md)", () => {
       const cfgBefore = await (fx.program.account as any).config.fetch(cfg);
       expect(cfgBefore.maxSingleDeposit.toString()).toBe(CAP.toString());
 
-      // First user: amount == CAP should succeed.
-      const u1 = await fundUser(fx, fx.payer.publicKey, CAP);
-      await deposit(fx, CAP, u1.userWxrp, u1.userYxrp);
+      // Fund enough wXRP for both attempts so the revert is solely driven by
+      // the per-tx cap, not by balance.
+      const { userWxrp, userYxrp } = await fundUser(
+        fx,
+        fx.payer.publicKey,
+        CAP * 2n + 10n,
+      );
 
-      // amount == CAP + 1 must revert. Fund a generous extra so the revert is
-      // solely driven by the cap, not by balance.
-      const u2 = await fundUser(fx, fx.payer.publicKey, CAP + 10n);
-      await expect(deposit(fx, CAP + 1n, u2.userWxrp, u2.userYxrp)).rejects.toThrow(
+      // amount == CAP: succeeds.
+      await deposit(fx, CAP, userWxrp, userYxrp);
+
+      // amount == CAP + 1: must revert with CapExceeded. Same user, same ATAs.
+      await expect(deposit(fx, CAP + 1n, userWxrp, userYxrp)).rejects.toThrow(
         /CapExceeded/,
       );
     });
