@@ -42,12 +42,12 @@ jobs:
             ~/.local/share/solana
             ~/.avm
             ~/.cargo/bin/anchor
-          key: solana-1.18.26-anchor-0.32.1
+          key: solana-2.1.14-anchor-0.32.1
 
       - name: Install Solana CLI
         if: steps.cache-cli.outputs.cache-hit != 'true'
         run: |
-          sh -c "$(curl -sSfL https://release.anza.xyz/v1.18.26/install)"
+          sh -c "$(curl -sSfL https://release.anza.xyz/v2.1.14/install)"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
 
       - name: Install AVM + Anchor CLI 0.32.1
