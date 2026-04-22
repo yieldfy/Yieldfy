@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="./assets/yieldfy-icon.png" width="120" alt="Yieldfy" />
+
 # Yieldfy
 
 **Institutional wXRP yield routing on Solana.**
@@ -8,7 +10,8 @@ Deposit wXRP. Receive yXRP 1:1. The router selects the best venue, attests the c
 
 [![ci](https://github.com/yieldfy/Yieldfy/actions/workflows/ci.yml/badge.svg)](https://github.com/yieldfy/Yieldfy/actions/workflows/ci.yml)
 [![license](https://img.shields.io/badge/license-MIT-000.svg)](./LICENSE)
-[![solana](https://img.shields.io/badge/solana-mainnet--beta-14F195.svg)](https://explorer.solana.com/)
+[![solana](https://img.shields.io/badge/Solana-mainnet--beta-14F195.svg?logo=solana&logoColor=white)](https://explorer.solana.com/)
+[![xrp](https://img.shields.io/badge/XRP-Ledger-23292F.svg?logo=xrp&logoColor=white)](https://xrpl.org/)
 [![sdk](https://img.shields.io/npm/v/@yieldfy/sdk.svg)](https://www.npmjs.com/package/@yieldfy/sdk)
 
 [Website](https://yieldfy.ai) · [SDK](./packages/sdk) · [Docs](./docs) · [Security](./SECURITY.md) · [Contributing](./CONTRIBUTING.md)
