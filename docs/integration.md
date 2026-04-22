@@ -1,6 +1,6 @@
 # Integration guide
 
-This page explains how a tenant consumes Yieldfy — SDK, optimizer, webhooks — end to end. Some sections reference code that lands at Phase 5 (⏳ waiting for the on-chain deploy); those are flagged inline.
+This page explains how a tenant consumes Yieldfy — SDK, optimizer, webhooks — end to end. Mainnet-beta is live since 2026-04-22 under a 100 wXRP per-tx Beta-0 cap; see [`ops/DEPLOYMENTS.md`](../ops/DEPLOYMENTS.md) for the canonical program + mint addresses. Yield routing is Phase-B (wrapper-only) pending a Kamino wXRP reserve — tracked in [`ops/PHASE_C_STATUS.md`](../ops/PHASE_C_STATUS.md).
 
 ## Architecture at a glance
 
@@ -98,7 +98,7 @@ console.log(position.venue, position.principal, position.receiptSupply);
 | Var                     | Scope     | Notes                                                                 |
 | ----------------------- | --------- | --------------------------------------------------------------------- |
 | `VITE_OPTIMIZER_URL`    | dashboard | Usually `http://localhost:4000` in dev, your prod URL in prod.        |
-| `VITE_YIELDFY_PROGRAM_ID` | dashboard | Capture from `anchor deploy` output (⏳ waiting for on-chain deploy).         |
+| `VITE_YIELDFY_PROGRAM_ID` | dashboard | `3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE` (same on devnet + mainnet). |
 | `SOLANA_RPC_URL`        | optimizer | Used for `Connection.getSlot()` when attesting.                       |
 | `YIELDFY_ATTESTOR_KEY`  | optimizer | Persistent ed25519 key (JSON byte array). Whitelist its pubkey in the Anchor `Config.attestor`. |
 | `AXIOM_TOKEN`           | optimizer | Optional. Enables structured event ingestion to Axiom.                |

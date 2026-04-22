@@ -20,7 +20,7 @@ Deposit wXRP. Receive yXRP 1:1. The router selects the best venue, attests the c
 
 ---
 
-> **Status: public beta.** The on-chain program is live on devnet with capped deposits (100 wXRP per tx) and is pending external audit before mainnet-beta. Use at your own risk; see [`AUDIT.md`](./AUDIT.md) for scope and invariants, [`SECURITY.md`](./SECURITY.md) for vulnerability reporting.
+> **Status: mainnet-beta public beta.** Program `3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE` is live on Solana mainnet-beta as of 2026-04-22, authority-gated by a Squads 2-of-2 vault, Beta-0 per-tx cap of 100 wXRP, no external audit. Yield routing is currently wrapper-only — the Kamino CPI flips to live supply-and-redeem once Kamino lists wXRP as a reserve (tracked in [`ops/PHASE_C_STATUS.md`](./ops/PHASE_C_STATUS.md)). Use at your own risk; see [`AUDIT.md`](./AUDIT.md) for scope and invariants, [`SECURITY.md`](./SECURITY.md) for vulnerability reporting.
 
 ## What it is
 

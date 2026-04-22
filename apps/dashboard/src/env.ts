@@ -5,7 +5,7 @@ const schema = z.object({
     .string()
     .url()
     .optional()
-    .default("https://api.devnet.solana.com"),
+    .default("https://api.mainnet-beta.solana.com"),
   VITE_WXRP_MINT: z.string().optional(),
   VITE_YXRP_MINT: z.string().optional(),
   VITE_YIELDFY_PROGRAM_ID: z.string().optional(),
