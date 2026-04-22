@@ -34,6 +34,14 @@ Yieldfy is launching as a public beta without a paid external audit — the risk
 - Cap and staleness window are tunable live via `set_cap` — no redeploy required.
 - [`AUDIT.md`](../AUDIT.md) enumerates the 8 invariants; [`tests/invariants.spec.ts`](../tests/invariants.spec.ts) covers them under bankrun; the [Bug bounty](../SECURITY.md#bug-bounty) covers external review.
 
+**Watcher** (Beta-0):
+
+```
+npx tsx ops/scripts/watch-mainnet.ts
+```
+
+One-shot health check — verifies 8 invariants against live mainnet Config + Position + vault + yXRP mint state. Exit 0 = healthy, exit 2 = invariant breach. Intended for cron (every 5 min) during the watch window. Set `ALERT_WEBHOOK=<slack-url>` to get pinged on failure.
+
 **Ramp plan** (absolute SOL figures; adjust for wXRP price):
 
 | Phase | Cap (wXRP) | Trigger to advance | Expected duration |
