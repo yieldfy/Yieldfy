@@ -116,9 +116,9 @@ function Metrics() {
   const ref = useReveal<HTMLDivElement>();
   const stats = [
     { k: "$2.4B", v: "Tokenized treasuries on XRPL" },
-    { k: "14.2%", v: "Best-in-class Solana yield (30d avg)" },
+    { k: "2-of-2", v: "Squads multisig–governed authority" },
     { k: "<9s", v: "Average cross-chain settlement" },
-    { k: "24/7", v: "Autonomous agent rebalancing" },
+    { k: "1:1", v: "yXRP receipt, withdrawable any time" },
   ];
   return (
     <section className={`relative py-16 px-5 md:py-20 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>

@@ -1,0 +1,38 @@
+name: watch-mainnet
+
+on:
+  schedule:
+    # Every 10 minutes during Beta-0 watch window. Tune later.
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: watch-mainnet
+  cancel-in-progress: false
+
+jobs:
+  invariant-check:
+    name: mainnet invariant check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: run watch-mainnet
+        env:
+          SOLANA_RPC_URL: https://api.mainnet-beta.solana.com
+          # Optional: set WATCH_WEBHOOK as a repository secret to get Slack/Discord pings.
+          ALERT_WEBHOOK: ${{ secrets.WATCH_WEBHOOK }}
+        run: |
+          cd tests && npm install --no-save 2>/dev/null || true
+          cd ..
+          npx tsx ops/scripts/watch-mainnet.ts

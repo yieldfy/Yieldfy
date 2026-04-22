@@ -32,9 +32,9 @@ const OverviewView = () => {
           ? "Set VITE_WXRP_MINT"
           : "Spot wXRP in wallet",
     },
-    { label: "Yield Earned", value: "—", hint: "No positions yet" },
-    { label: "Current APY", value: "—", hint: "No positions yet" },
-    { label: "Active Venues", value: "0 / 4", hint: "Kamino live at MVP" },
+    { label: "Yield Earned", value: "—", hint: "Phase B — wrapper only" },
+    { label: "Current APY", value: "—", hint: "Active routing: awaiting venue wXRP listing" },
+    { label: "Active Venues", value: "0 / 4", hint: "Kamino/MarginFi/Drift/Meteora integrations pending" },
   ];
 
   return (

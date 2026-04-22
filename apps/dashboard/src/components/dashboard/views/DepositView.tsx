@@ -135,7 +135,16 @@ const DepositView = () => {
   }
 
   return (
-    <div className="max-w-lg mx-auto">
+    <div className="max-w-lg mx-auto space-y-4">
+      <div className="rounded-2xl border border-amber-400/30 bg-amber-50/80 p-4 text-xs leading-relaxed text-amber-900">
+        <div className="flex items-start gap-2">
+          <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+          <div>
+            <div className="font-semibold mb-1">Early Access · Phase B (wrapper only)</div>
+            Deposits mint yXRP 1:1 and are fully withdrawable at any time. Active yield routing to Kamino/MarginFi/Drift/Meteora unlocks once one of them lists wXRP — your wXRP earns 0% until then. Per-tx cap 100 wXRP. Use at your own risk.
+          </div>
+        </div>
+      </div>
       <div className="glass-card p-6 md:p-8">
         <StepBar step={step} />
 
