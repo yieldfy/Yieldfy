@@ -1,7 +1,7 @@
 // @yieldfy/sdk — typed client for the Yieldfy Anchor program.
 //
 // Ships with a stub IDL that matches programs/yieldfy per the engineering
-// plan (§05–§07). Once yieldfy runs `anchor build` and publishes the real
+// plan (§05–§07). Once someone runs `anchor build` and publishes the real
 // IDL, replace src/idl/yieldfy.json with the generated file — the public
 // surface of this package stays stable.
 

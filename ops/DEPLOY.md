@@ -1,6 +1,6 @@
 # Yieldfy deploy & upgrade runbook
 
-Owner: yieldfy. Covers first deploy, subsequent upgrades, multisig handoff, and attestor key rotation. Cross-references §11/§12 of the engineering plan.
+Owner: Yieldfy core team.
 
 ## Prerequisites
 

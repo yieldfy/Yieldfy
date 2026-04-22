@@ -239,7 +239,7 @@ const DepositView = () => {
                 <span>
                   <code>VITE_YIELDFY_PROGRAM_ID</code> isn't set. You can still
                   fetch a signed attestation, but signing the on-chain tx will
-                  fail until yieldfy deploys the Anchor program and you set
+                  fail until the Anchor program is deployed and you set
                   the ID.
                 </span>
               </div>

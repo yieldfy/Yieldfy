@@ -12,7 +12,7 @@ Typed client for the Yieldfy wXRP auto-router on Solana.
 ## What lands at Phase 5
 
 - `Yieldfy` class — typed wrapper around the Anchor program: `deposit()`, `withdraw()`, `readPosition()`.
-- Generated IDL types from `programs/yieldfy/target/idl/yieldfy.json` (published by yieldfy).
+- Generated IDL types from `programs/yieldfy/target/idl/yieldfy.json` (published from the program build).
 - ed25519 pre-instruction builder for `deposit_wxrp_to_kamino`.
 
 ## Install

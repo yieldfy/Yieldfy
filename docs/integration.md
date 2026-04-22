@@ -1,6 +1,6 @@
 # Integration guide
 
-This page explains how a tenant consumes Yieldfy — SDK, optimizer, webhooks — end to end. Some sections reference code that lands at Phase 5 (⏳ waiting for yieldfy's Anchor program); those are flagged inline.
+This page explains how a tenant consumes Yieldfy — SDK, optimizer, webhooks — end to end. Some sections reference code that lands at Phase 5 (⏳ waiting for the on-chain deploy); those are flagged inline.
 
 ## Architecture at a glance
 
@@ -44,7 +44,7 @@ The optimizer returns `{ venue, venueCode, slot, sigHex, pubkeyBase58 }` — the
 ## 2 · Submit a deposit ⏳ *Phase 5*
 
 ```ts
-// Lands once yieldfy publishes the IDL.
+// Lands once the IDL is published.
 import { AnchorProvider } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { Yieldfy } from "@yieldfy/sdk";
@@ -88,7 +88,7 @@ Response:
 ## 4 · Read positions ⏳ *Phase 5*
 
 ```ts
-// Lands once yieldfy publishes the IDL.
+// Lands once the IDL is published.
 const position = await client.readPosition(userPubkey);
 console.log(position.venue, position.principal, position.receiptSupply);
 ```
@@ -98,7 +98,7 @@ console.log(position.venue, position.principal, position.receiptSupply);
 | Var                     | Scope     | Notes                                                                 |
 | ----------------------- | --------- | --------------------------------------------------------------------- |
 | `VITE_OPTIMIZER_URL`    | dashboard | Usually `http://localhost:4000` in dev, your prod URL in prod.        |
-| `VITE_YIELDFY_PROGRAM_ID` | dashboard | Capture from `anchor deploy` output (⏳ waiting for yieldfy).         |
+| `VITE_YIELDFY_PROGRAM_ID` | dashboard | Capture from `anchor deploy` output (⏳ waiting for on-chain deploy).         |
 | `SOLANA_RPC_URL`        | optimizer | Used for `Connection.getSlot()` when attesting.                       |
 | `YIELDFY_ATTESTOR_KEY`  | optimizer | Persistent ed25519 key (JSON byte array). Whitelist its pubkey in the Anchor `Config.attestor`. |
 | `AXIOM_TOKEN`           | optimizer | Optional. Enables structured event ingestion to Axiom.                |

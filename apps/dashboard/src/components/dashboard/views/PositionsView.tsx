@@ -63,7 +63,7 @@ const PositionsView = () => {
       <div className="space-y-6">
         <EmptyState
           title="Program not configured"
-          description="Set VITE_YIELDFY_PROGRAM_ID in .env.local (populated once yieldfy deploys the Anchor program)."
+          description="Set VITE_YIELDFY_PROGRAM_ID in .env.local (populated once the Anchor program is deployed)."
         />
       </div>
     );
