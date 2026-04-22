@@ -21,6 +21,7 @@ on:
       - "Cargo.lock"
       - "rust-toolchain.toml"
       - ".github/workflows/anchor.yml"
+  workflow_dispatch: {}
 
 concurrency:
   group: anchor-${{ github.ref }}

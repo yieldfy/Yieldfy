@@ -49,7 +49,8 @@ Attestor key lives in the optimizer process as `YIELDFY_ATTESTOR_KEY` (JSON byte
 1. Generate a new ed25519 keypair (`solana-keygen new --no-bip39-passphrase -o new-attestor.json`).
 2. Deploy the new key to the optimizer via the secret store (HSM-wrapped per §11).
 3. Restart the optimizer. Confirm `GET /attestor/pubkey` returns the new pubkey.
-4. Call the program's `initialize` instruction is _not_ re-runnable; a dedicated `rotate_attestor` instruction is tracked as a Phase D follow-up. Until it lands, rotation means redeploying the program with a new Config account — do this via the multisig.
+4. Call `rotate_attestor(new_attestor)` on the program. The authority signer is `Config.authority` (on mainnet-beta this is the Squads vault; the call must go through a 2-of-3 Squads transaction). Emits `AttestorRotated { previous, current }`.
+5. Drain any in-flight optimizer work that was signed by the old key before step 4 — deposits signed by the previous key will fail with `BadAttestor` once the new one is in place.
 
 ## Upgrade checklist (every mainnet push)
 
@@ -57,9 +58,56 @@ Attestor key lives in the optimizer process as `YIELDFY_ATTESTOR_KEY` (JSON byte
 - [ ] bankrun 80%+ coverage on every instruction (`tests/*.spec.ts`)
 - [ ] Audit report for the new code reviewed
 - [ ] Circuit-breaker tested in staging (pause → deposit reverts → resume)
-- [ ] Rollback buffer captured (`solana program dump <program-id> rollback.so`)
+- [ ] Rollback buffer captured per [§Rollback procedure](#rollback-procedure) below
 - [ ] On-call sign-off in #yieldfy-ops
+
+## Rollback procedure
+
+Before every mainnet upgrade, capture the currently-deployed program bytes so we can revert without waiting on a rebuild.
+
+### Before the upgrade
+
+```bash
+PROGRAM_ID="<program-id>"
+STAMP=$(date -u +"%Y%m%dT%H%M%SZ")
+mkdir -p ops/artifacts/mainnet/rollback
+
+solana program dump \
+  --url mainnet-beta \
+  "$PROGRAM_ID" \
+  "ops/artifacts/mainnet/rollback/yieldfy-${STAMP}.so"
+
+shasum -a 256 "ops/artifacts/mainnet/rollback/yieldfy-${STAMP}.so" \
+  > "ops/artifacts/mainnet/rollback/yieldfy-${STAMP}.sha256"
+```
+
+Commit the `.sha256` (but **not** the `.so`, which is large and git-ignored under `ops/artifacts/`). Record the hash + tx slot in [`ops/DEPLOYMENTS.md`](./DEPLOYMENTS.md) before you push the new version.
+
+### To roll back
+
+```bash
+# 1. Publish the rollback buffer from the captured bytes.
+solana program write-buffer \
+  --url mainnet-beta \
+  "ops/artifacts/mainnet/rollback/yieldfy-<stamp>.so"
+# → prints <rollback-buffer-pubkey>
+
+# 2. Queue the upgrade through Squads (2-of-3).
+squads-cli program-upgrade \
+  --program-id "$PROGRAM_ID" \
+  --buffer <rollback-buffer-pubkey> \
+  --multisig <squads-vault>
+```
+
+Once 2 signers approve, execute. The on-chain bytes revert to the pre-upgrade version and the Config PDA is unaffected (state survives program-upgrades).
+
+If the offending upgrade also touched Config layout, the rollback alone is insufficient — escalate to `set_paused(true)` via Squads first, then coordinate a migration instruction in the next upgrade.
 
 ## Emergency pause
 
-Call `initialize`'s authority account + flip `config.paused = true` via a dedicated `set_paused` instruction (Phase D). Until that lands, an emergency pause requires a program upgrade that hardcodes `require!(false, …)` at the top of `deposit_wxrp_to_kamino::handle`.
+Call `set_paused(true)` from the `Config.authority` signer. On mainnet-beta that means a Squads 2-of-3 transaction.
+
+- Pausing halts `deposit_wxrp_to_kamino` and `rebalance` — both revert with `YieldfyError::Paused`.
+- `withdraw` is **never** blocked by the pause bit, so users can always exit.
+- Emits `PausedToggled { previous, current }` for observability. Resume with `set_paused(false)`.
+- The per-tx deposit cap and attestation staleness window can be tuned live via `set_cap(max_single_deposit, staleness_slots)` — both must be `> 0`; set `paused=true` if the intent is a full halt rather than throttling.
