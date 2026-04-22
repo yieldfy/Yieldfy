@@ -27,12 +27,14 @@ jobs:
 
       - run: npm ci
 
+      - name: install ops/scripts deps
+        working-directory: ops/scripts
+        run: npm install --no-save
+
       - name: run watch-mainnet
         env:
           SOLANA_RPC_URL: https://api.mainnet-beta.solana.com
           # Optional: set WATCH_WEBHOOK as a repository secret to get Slack/Discord pings.
           ALERT_WEBHOOK: ${{ secrets.WATCH_WEBHOOK }}
-        run: |
-          cd tests && npm install --no-save 2>/dev/null || true
-          cd ..
-          npx tsx ops/scripts/watch-mainnet.ts
+        working-directory: ops/scripts
+        run: npx tsx watch-mainnet.ts
