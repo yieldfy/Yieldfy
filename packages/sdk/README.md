@@ -4,9 +4,19 @@ Typed TypeScript client for the [Yieldfy](https://github.com/yieldfy/Yieldfy) An
 
 ## Install
 
+This package is published to **GitHub Packages**. Add this line to a `.npmrc` in your project root (or `~/.npmrc`):
+
+```
+@yieldfy:registry=https://npm.pkg.github.com
+```
+
+Then:
+
 ```bash
 npm install @yieldfy/sdk
 ```
+
+> GitHub Packages requires a personal access token with `read:packages` scope even for public packages. Generate one at <https://github.com/settings/tokens> and run `npm login --registry=https://npm.pkg.github.com` once.
 
 ## Quick start
 
