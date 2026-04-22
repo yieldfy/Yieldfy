@@ -85,7 +85,7 @@ Full walkthrough (test wXRP seeding, attestation checks, redeploy) in [docs/loca
 Full runbooks:
 
 - **On-chain program** — [ops/DEPLOY.md](./ops/DEPLOY.md): mainnet-beta deploy, Squads multisig handoff, upgrade checklist.
-- **Production services** — [ops/DEPLOY-PRODUCTION.md](./ops/DEPLOY-PRODUCTION.md): DigitalOcean App Platform (`optimizer.yieldfy.ai`, `indexer.yieldfy.ai`), Managed Redis, Vercel dashboard, DNS, pre-launch checklist.
+- **Production services** — [ops/DEPLOY-PRODUCTION.md](./ops/DEPLOY-PRODUCTION.md): the backend ships from a private repo (`yieldfy/yieldfy-api`) to DigitalOcean App Platform; dashboard on Vercel; DNS + pre-launch checklist.
 - **Live deployments** — [ops/DEPLOYMENTS.md](./ops/DEPLOYMENTS.md): append-only record of every cluster, every Config PDA, every first-deposit tx.
 
 ## Supported venues

@@ -1,16 +1,25 @@
-# Production deploy runbook · DigitalOcean + Vercel
+# Production deploy · topology & runbook
 
-Target topology:
+Two repos, three hosted surfaces:
 
 ```
-yieldfy.ai            ─► Vercel (static SPA from apps/dashboard)
-optimizer.yieldfy.ai  ─► DigitalOcean App Platform (services/optimizer)
-indexer.yieldfy.ai    ─► DigitalOcean App Platform (services/wxrp-indexer)
-                      │
-                      └─► DO Managed Redis (webhook subscription store)
+github.com/yieldfy/Yieldfy           (public — this repo)
+  └─ apps/dashboard                  ─►  Vercel  ─►  yieldfy.ai
+
+github.com/yieldfy/yieldfy-api       (private — backend source of truth)
+  └─ @yieldfy/api                    ─►  DigitalOcean App Platform
+                                           ─►  optimizer.yieldfy.ai
 ```
 
-Estimated bill at dev-tier: **$12/mo (optimizer) + $5/mo (indexer) + $15/mo (Redis)** = **~$32/mo**. Vercel stays free until traffic scales.
+| Surface | Repo | Host | Cost |
+| --- | --- | --- | --- |
+| Dashboard (`yieldfy.ai`) | `yieldfy/Yieldfy` | Vercel | $0 (Hobby) |
+| Optimizer (`optimizer.yieldfy.ai`) | `yieldfy/yieldfy-api` | DO App Platform basic-xxs | $5/mo |
+| Solana program | `yieldfy/Yieldfy` | Solana devnet | ~2.5 SOL one-time |
+
+**No managed Redis.** Webhook subscriptions fall back to the in-memory store; good enough until we need persistence.
+
+**No wXRP indexer in production yet.** Only needed when we move to mainnet for Hex Trust mint/burn reconciliation. Lives in `services/wxrp-indexer/` ready to deploy when that day comes.
 
 ---
 
@@ -18,110 +27,94 @@ Estimated bill at dev-tier: **$12/mo (optimizer) + $5/mo (indexer) + $15/mo (Red
 
 ### 1. DigitalOcean account
 
-- Create a [DigitalOcean](https://cloud.digitalocean.com) account.
-- Attach a payment method.
-- Create a [personal access token](https://cloud.digitalocean.com/account/api/tokens) with read + write scopes. Save it as `DIGITALOCEAN_ACCESS_TOKEN`.
+- Create a [DigitalOcean](https://cloud.digitalocean.com) account, attach a payment method.
+- Create a [personal access token](https://cloud.digitalocean.com/account/api/tokens) with read + write.
 
-### 2. `doctl` CLI (local)
+### 2. Connect DigitalOcean to GitHub
 
-```sh
-brew install doctl
-doctl auth init --access-token "$DIGITALOCEAN_ACCESS_TOKEN"
-doctl account get                # sanity check
-```
+In the DO dashboard → Apps → Create App → "GitHub" → authorize the `yieldfy` GitHub org for **both** `yieldfy/Yieldfy` and `yieldfy/yieldfy-api`. This is one-time OAuth; without it, DO cannot clone the private backend repo.
 
-### 3. Link GitHub to DO App Platform
-
-In the DO dashboard → Apps → Create app → Connect to GitHub → authorize the `yieldfy` org (one-time, needs GitHub admin on the org). Pick the `Yieldfy` repo. This is required before `doctl apps create --spec` will work against a GitHub source.
-
-### 4. DNS at yieldfy.ai
-
-We terminate SSL at DO and Vercel, so you just need CNAMEs:
+### 3. DNS at yieldfy.ai
 
 | Hostname | Record | Target |
 | --- | --- | --- |
-| `yieldfy.ai`, `www.yieldfy.ai` | `A` / `CNAME` | (already set for Vercel) |
-| `optimizer.yieldfy.ai` | `CNAME` | `<app-id>.ondigitalocean.app` (printed by `doctl apps create`) |
-| `indexer.yieldfy.ai` | `CNAME` | `<app-id>.ondigitalocean.app` |
+| `yieldfy.ai`, `www.yieldfy.ai` | (Vercel) | Vercel's A / CNAME (already set) |
+| `optimizer.yieldfy.ai` | `CNAME` | `<app-id>.ondigitalocean.app` — printed by `doctl apps create` |
 
 DO issues a Let's Encrypt cert automatically once DNS resolves.
 
-### 5. Secrets
+### 4. First deploy
 
-The optimizer needs two real secrets. Put them in the DO app via the UI or `doctl`:
-
-```sh
-# Attestor key (same file used for devnet — in production, issue a fresh one
-# and rotate Config.attestor on-chain via `rotate_attestor` ix)
-doctl apps update <APP-ID> --spec .do/optimizer.app.yaml \
-  --update-sources=false
-
-# Then edit the app in the UI to paste the secret values, OR use
-# doctl apps update-secret with the API once that command lands.
-```
-
-The Redis `REDIS_URL` is wired via `${redis.REDIS_URL}` interpolation — the App Platform sets it automatically once the `databases:` block provisions the cluster.
-
-### 6. First deploy
+The live App Platform spec ships inside the private repo at `yieldfy/yieldfy-api:.do/app.yaml`. Apply it:
 
 ```sh
-doctl apps create --spec .do/optimizer.app.yaml
-doctl apps create --spec .do/wxrp-indexer.app.yaml
+brew install doctl
+doctl auth init   # paste your DO access token
 
-# Capture the app IDs returned, save them:
-doctl apps list
+# Clone locally (or reference a local checkout)
+git clone https://github.com/yieldfy/yieldfy-api
+cd yieldfy-api
+
+doctl apps create --spec .do/app.yaml
+doctl apps list   # capture the app id
 ```
 
-Subsequent deploys are **driven by GitHub Actions on tag push** — see the next section.
+### 5. Set the attestor secret in DO
+
+App Platform → yieldfy-optimizer → Settings → App-Level Env Vars → `YIELDFY_ATTESTOR_KEY`:
+
+Paste the contents of `yieldfy/Yieldfy:ops/artifacts/devnet/attestor.json` — the 64-byte JSON array. Save. App redeploys automatically.
+
+Verify:
+
+```sh
+curl https://optimizer.yieldfy.ai/attestor/pubkey
+# → {"pubkey":"76XD6xfJhXoH7HhyywhTvkX5RT1etAoot3HN4AF1wHXb"}
+```
+
+That pubkey must equal `Config.attestor` on-chain, or deposits will revert.
+
+### 6. Point the dashboard at production
+
+In Vercel → Project (yieldfy) → Settings → Environment Variables → Production, paste everything from `apps/dashboard/.env.production.example`. Redeploy.
 
 ---
 
 ## Continuous deploy
 
-On every `v*` or `sdk-v*` tag push to `main`, `.github/workflows/deploy-do.yml` (ships in the same PR as this runbook) calls `doctl apps create-deployment <app-id>` for both apps. The tag must match the committed spec, so tag + commit are atomic.
+Once set up, pushing to `main` on `yieldfy/yieldfy-api` triggers a zero-downtime redeploy automatically (`deploy_on_push: true` in the spec). Pushing a tag is optional — the branch push is authoritative.
 
-Required repo secret:
-
-- `DIGITALOCEAN_ACCESS_TOKEN` — the same token as step 1.
-
-Optional repo variables (so the workflow knows which apps to redeploy):
-
-- `DO_APP_OPTIMIZER_ID` — app ID from `doctl apps list`
-- `DO_APP_INDEXER_ID`
-
-If these variables aren't set, the workflow falls back to `doctl apps list --format ID,Spec.Name` and picks by name. Slower, but zero-config.
+No GitHub Actions workflow on `yieldfy/Yieldfy` drives the deploy; the private repo owns its own release cadence.
 
 ---
 
-## Rotating the attestor key (post-launch)
+## Rotating the attestor key
 
-1. `solana-keygen new -o ops/artifacts/prod/attestor.new.json`
+1. Generate a new keypair (`solana-keygen new -o new-attestor.json`).
 2. Call `rotate_attestor(new_pubkey)` on-chain as the Config authority.
-3. Replace the `YIELDFY_ATTESTOR_KEY` env var in the DO app with the new JSON byte array. Hit save — App Platform performs a zero-downtime rolling replace.
-4. Verify `curl https://optimizer.yieldfy.ai/attestor/pubkey` matches the new key.
-
-Do not delete the old key for 24h — any in-flight attestations signed with it still need to clear the staleness window on-chain.
+3. In DO → yieldfy-optimizer → App-Level Env Vars, replace `YIELDFY_ATTESTOR_KEY` with the new JSON byte array. Save.
+4. `curl https://optimizer.yieldfy.ai/attestor/pubkey` should return the new pubkey.
+5. Keep the old key around for 24h — in-flight attestations still need to clear the staleness window.
 
 ---
 
 ## Pre-launch checklist
 
-- [ ] DNS CNAMEs resolve for `optimizer.yieldfy.ai` + `indexer.yieldfy.ai`.
+- [ ] DO GitHub integration authorized for `yieldfy/yieldfy-api` (private).
+- [ ] `optimizer.yieldfy.ai` CNAME resolves.
 - [ ] `curl https://optimizer.yieldfy.ai/health` → `{ok:true}`.
-- [ ] `curl https://optimizer.yieldfy.ai/attestor/pubkey` → matches `Config.attestor` on-chain (currently `76XD6xfJhXoH7HhyywhTvkX5RT1etAoot3HN4AF1wHXb` for devnet).
-- [ ] `curl https://indexer.yieldfy.ai/supply` → returns a snapshot.
-- [ ] Vercel env has `VITE_OPTIMIZER_URL=https://optimizer.yieldfy.ai`.
-- [ ] `CORS_ORIGIN=https://yieldfy.ai` on the optimizer; `curl -H "Origin: https://yieldfy.ai" …/attestor/pubkey -i` returns `Access-Control-Allow-Origin: https://yieldfy.ai`.
-- [ ] Rate limit on `/attest` smoke-tested (100 requests → 40 of them return 429).
-- [ ] Prometheus `/metrics` endpoint reachable (optionally scraped by Grafana Cloud).
-- [ ] A dashboard deposit from a fresh wallet lands end-to-end on devnet.
+- [ ] `/attestor/pubkey` matches `Config.attestor` on-chain.
+- [ ] `CORS_ORIGIN=https://yieldfy.ai` on the app.
+- [ ] Vercel env has `VITE_OPTIMIZER_URL=https://optimizer.yieldfy.ai` and the live devnet addresses.
+- [ ] Dashboard deposit from a fresh Phantom wallet lands on devnet.
+
+---
 
 ## Rollback
 
 ```sh
-# List deployments and roll back to the previous good one
 doctl apps list-deployments <APP-ID>
 doctl apps create-deployment <APP-ID> --rollback <DEPLOYMENT-ID>
 ```
 
-Redis state persists across rollbacks. On-chain program is unaffected by any App Platform change.
+Solana program state is unaffected by any App Platform change.
