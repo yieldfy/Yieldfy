@@ -24,6 +24,34 @@ The script runs `anchor build`, `anchor deploy`, copies the generated IDL into `
    spl-token authorize <yxrp-mint> mint <config-pda>
    ```
 
+## Staged rollout strategy (unaudited launch posture)
+
+Yieldfy is launching as a public beta without a paid external audit — the risk surface is contained by:
+
+- Low per-tx deposit cap (`max_single_deposit = 100_000_000` = 100 wXRP at 6 decimals).
+- Authority-gated pause via `set_paused(true)` callable from the Squads vault at any time.
+- Withdraw is never blocked by `paused`, so users always retain exit.
+- Cap and staleness window are tunable live via `set_cap` — no redeploy required.
+- [`AUDIT.md`](../AUDIT.md) enumerates the 8 invariants; [`tests/invariants.spec.ts`](../tests/invariants.spec.ts) covers them under bankrun; the [Bug bounty](../SECURITY.md#bug-bounty) covers external review.
+
+**Ramp plan** (absolute SOL figures; adjust for wXRP price):
+
+| Phase | Cap (wXRP) | Trigger to advance | Expected duration |
+| --- | --- | --- | --- |
+| Beta-0 (today) | 100 | Successful `circuit-breaker-dryrun.ts` + 10+ real user deposits without invariant breach | 2 weeks |
+| Beta-1 | 1,000 | No open critical/high bug-bounty findings; TVL > $50k; observability dashboards stable | 2 weeks |
+| Beta-2 | 10,000 | External audit engaged OR TVL > $250k with no invariants violated | until audit lands |
+| GA | uncapped | Audit report published + remediation merged | — |
+
+Cap bumps go through `set_cap(new_cap, staleness_slots)` from the Squads vault. Record each bump in [`DEPLOYMENTS.md`](./DEPLOYMENTS.md).
+
+**Abort conditions** — call `set_paused(true)` immediately if any of the following:
+
+- Any deposit succeeds with `amount > Config.max_single_deposit` (invariant I3 violated).
+- Any `Position.principal > Position.receipt_supply` or vice versa (invariant I5 violated).
+- Any deposit succeeds without an ed25519 pre-ix matching `Config.attestor` (invariants I1/I2).
+- Observed attestor privkey leak or any unexplained deviation in `/attestor/pubkey`.
+
 ## Mainnet-beta deploy
 
 ```

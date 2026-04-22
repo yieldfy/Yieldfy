@@ -156,7 +156,9 @@ async function main() {
     const sig = await program.methods
       .initialize({
         attestor: attestor.publicKey,
-        maxSingleDeposit: new BN(1_000_000_000),
+        // 100 wXRP at 6 decimals — tight beta cap; raise via set_cap after the
+        // first 2-week watch window if no invariant breaches surface.
+        maxSingleDeposit: new BN(100_000_000),
         stalenessSlots: new BN(150),
       })
       .accounts({

@@ -20,6 +20,8 @@ Deposit wXRP. Receive yXRP 1:1. The router selects the best venue, attests the c
 
 ---
 
+> **Status: public beta.** The on-chain program is live on devnet with capped deposits (100 wXRP per tx) and is pending external audit before mainnet-beta. Use at your own risk; see [`AUDIT.md`](./AUDIT.md) for scope and invariants, [`SECURITY.md`](./SECURITY.md) for vulnerability reporting.
+
 ## What it is
 
 Yieldfy is a non-custodial routing layer that turns wrapped XRP (LayerZero-bridged, Hex Trust custodied) into a yield-bearing Solana position. A user deposits wXRP into the program, the program mints yXRP 1:1, and the off-chain optimizer signs an attestation naming the venue the funds should route to. The program verifies the attestation via the Solana ed25519 precompile before any CPI executes.

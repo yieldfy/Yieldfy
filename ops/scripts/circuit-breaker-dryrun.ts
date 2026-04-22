@@ -63,17 +63,20 @@ async function fetchAttestation(venue: number) {
   const res = await fetch(`${OPTIMIZER_URL}/attest?profile=balanced`);
   if (!res.ok) throw new Error(`optimizer /attest ${res.status}`);
   const body = (await res.json()) as {
-    slot: number;
-    venue: string;
-    venueCode: number;
-    sigHex: string;
+    attestation: {
+      venue: string;
+      venueCode: number;
+      slot: string;
+      sigHex: string;
+    };
   };
-  if (body.venueCode !== venue) {
+  const att = body.attestation;
+  if (att.venueCode !== venue) {
     throw new Error(
-      `optimizer returned venueCode=${body.venueCode}, expected ${venue}`,
+      `optimizer returned venueCode=${att.venueCode}, expected ${venue}`,
     );
   }
-  return body;
+  return { slot: Number(att.slot), venueCode: att.venueCode, sigHex: att.sigHex };
 }
 
 async function main() {
