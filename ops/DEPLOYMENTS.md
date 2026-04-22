@@ -96,3 +96,20 @@ Attestor secret key + mint secret keys live under `ops/artifacts/devnet/` (git-i
 | Config `staleness_slots` | `150` |
 
 Attestor secret key lives under `ops/artifacts/mainnet/` (git-ignored). Do not commit.
+
+### First deposit (2026-04-22)
+
+Smoke test validated end-to-end on mainnet via [`ops/scripts/smoke-test-mainnet.ts`](./scripts/smoke-test-mainnet.ts) — the script signs the ed25519 attestation locally with the mainnet attestor keypair, bypassing the optimizer HTTP hop.
+
+| Field | Value |
+| --- | --- |
+| User | `AzZutCoBEZVTVspNcGtmWbET1sei6srRJurCSNuNDxLH` (deployer hot wallet) |
+| Position PDA | [`BTcsQEra85QtDo4c2KWCwq1jewEHkySFTeNx3ZQriaa9`](https://explorer.solana.com/address/BTcsQEra85QtDo4c2KWCwq1jewEHkySFTeNx3ZQriaa9) |
+| Amount | `1_000_000` base units (1 wXRP) |
+| Venue | `0` (kamino — Phase B, wXRP parked in vault pending Phase C real CPI) |
+| Attestation slot | `415007191` |
+| Deposit tx | [`26bE79B2YzRZrWosRrzZGbafmhfWTnvtU7wFxTcXJ31PJeRL4Co2Xa5mMF1ErMRP1qNgzvuT9bhWru4iwowxJdf5`](https://explorer.solana.com/tx/26bE79B2YzRZrWosRrzZGbafmhfWTnvtU7wFxTcXJ31PJeRL4Co2Xa5mMF1ErMRP1qNgzvuT9bhWru4iwowxJdf5) |
+| Principal | `1_000_000` |
+| Receipt supply | `1_000_000` (1 yXRP minted 1:1) |
+
+Invariants I1 (attestation freshness), I2 (venue binding), I3 (cap honored), I5 (1:1 receipt), and I7 (Position PDA accumulation) confirmed on-chain.
