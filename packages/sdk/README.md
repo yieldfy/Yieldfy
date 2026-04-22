@@ -1,19 +1,6 @@
 # @yieldfy/sdk
 
-> **Status:** scaffold. The full client lands once the Anchor IDL is published (Phase 5 of the Yieldfy engineering plan).
-
-Typed client for the Yieldfy wXRP auto-router on Solana.
-
-## What works today
-
-- `fetchAttestation(optimizerUrl, profile?)` — calls the optimizer's `/attest` endpoint and returns the signed attestation payload.
-- `Attestation` / `VenueKey` / `DepositParams` — shared types used by both the dashboard and the on-chain program.
-
-## What lands at Phase 5
-
-- `Yieldfy` class — typed wrapper around the Anchor program: `deposit()`, `withdraw()`, `readPosition()`.
-- Generated IDL types from `programs/yieldfy/target/idl/yieldfy.json` (published from the program build).
-- ed25519 pre-instruction builder for `deposit_wxrp_to_kamino`.
+Typed TypeScript client for the [Yieldfy](https://github.com/yieldfy/Yieldfy) Anchor program — wXRP auto-router on Solana.
 
 ## Install
 
@@ -21,17 +8,35 @@ Typed client for the Yieldfy wXRP auto-router on Solana.
 npm install @yieldfy/sdk
 ```
 
-## Usage (Phase 5 preview)
+## Quick start
 
 ```ts
 import { AnchorProvider } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { Yieldfy, fetchAttestation } from "@yieldfy/sdk";
+import { Yieldfy, fetchAttestation, VENUE_CODE } from "@yieldfy/sdk";
+
+const PROGRAM_ID = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"; // devnet
+const OPTIMIZER_URL = "https://optimizer.yieldfy.ai";
 
 const client = new Yieldfy(provider, new PublicKey(PROGRAM_ID));
-const att = await fetchAttestation(OPTIMIZER_URL, "balanced");
-const sig = await client.deposit({ amount: 1_000_000n }, att);
+const attestation = await fetchAttestation(OPTIMIZER_URL);
+const sig = await client.deposit(
+  { amount: 10_000_000n, expectedVenue: VENUE_CODE.kamino },
+  attestation,
+);
 ```
+
+## Surface
+
+- **`Yieldfy`** — typed wrapper around the Anchor program: `deposit()`, `withdraw()`, `readPosition()`, `fetchConfig()`.
+- **`fetchAttestation(optimizerUrl, profile?)`** — calls the optimizer's `/attest` endpoint and returns the signed attestation payload.
+- **PDA helpers** — `findConfigPda`, `findPositionPda`, `findVaultPda`.
+- **Types** — `Attestation`, `VenueKey`, `DepositParams`, `ConfigAccount`, `PositionAccount`, `RiskProfile`.
+- **ed25519 pre-instruction builder** — `buildAttestationPreIx(attestation)` assembles the ed25519 verify instruction the program expects directly before `deposit`.
+
+## Frontend template
+
+A minimal React example lives at [`template/DepositFlow.tsx`](https://github.com/yieldfy/Yieldfy/blob/main/template/DepositFlow.tsx) in the main repo.
 
 ## Publish pipeline
 

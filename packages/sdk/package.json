@@ -1,7 +1,7 @@
 {
   "name": "@yieldfy/sdk",
-  "version": "0.0.1",
-  "description": "Typed client for the Yieldfy Anchor program. Currently a scaffold — full client lands once the IDL is published.",
+  "version": "0.1.0",
+  "description": "Typed client for the Yieldfy Anchor program — wXRP auto-router on Solana.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -46,7 +46,7 @@
     "wxrp",
     "defi"
   ],
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yieldfy/yieldfy.git",
