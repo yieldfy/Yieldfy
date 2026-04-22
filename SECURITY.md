@@ -2,6 +2,8 @@
 
 Yieldfy handles real value on Solana mainnet-beta. We take security reports seriously and respond on business hours within one working day.
 
+Auditors engaging on the on-chain program should start with [`AUDIT.md`](./AUDIT.md) — scope, trust model, invariants, and threat vectors in one place.
+
 ## Supported versions
 
 | Component | Version | Supported |

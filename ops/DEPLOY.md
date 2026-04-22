@@ -56,8 +56,8 @@ Attestor key lives in the optimizer process as `YIELDFY_ATTESTOR_KEY` (JSON byte
 
 - [ ] `anchor test` passes green on CI
 - [ ] bankrun 80%+ coverage on every instruction (`tests/*.spec.ts`)
-- [ ] Audit report for the new code reviewed
-- [ ] Circuit-breaker tested in staging (pause → deposit reverts → resume)
+- [ ] Audit report for the new code reviewed — scope + invariants tracked in [`AUDIT.md`](../AUDIT.md)
+- [ ] Circuit-breaker validated on devnet: `DRY_RUN=0 npx tsx ops/scripts/circuit-breaker-dryrun.ts`
 - [ ] Rollback buffer captured per [§Rollback procedure](#rollback-procedure) below
 - [ ] On-call sign-off in #yieldfy-ops
 
