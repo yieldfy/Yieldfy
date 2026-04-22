@@ -59,4 +59,40 @@ Attestor secret key + mint secret keys live under `ops/artifacts/devnet/` (git-i
 
 ## mainnet-beta
 
-Pending. Requires audit remediation + multisig handoff — see [`DEPLOY.md`](./DEPLOY.md) for the runbook.
+| Field | Value |
+| --- | --- |
+| Program ID | [`3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE`](https://explorer.solana.com/address/3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE) |
+| ProgramData | `6bTJy9V486umZCW4MsJBkjQXC7E9WqX2BcMKnwwPduRU` |
+| Upgrade authority | [`48uosZFYVqLr5XEKsuohtrwfnsYkcqP9PVX838rGZXKD`](https://v4.squads.so/) (Squads 2-of-2 vault) |
+| First deploy tx | [`5ch5QCpELPY7ymeqFsWsBoMNimum7i138Ss5pYsBNHjKroyXKyGKmVCwBNQ2LJuEi8dJ3QMG553hhCnaou1GbwUH`](https://explorer.solana.com/tx/5ch5QCpELPY7ymeqFsWsBoMNimum7i138Ss5pYsBNHjKroyXKyGKmVCwBNQ2LJuEi8dJ3QMG553hhCnaou1GbwUH) |
+| First deploy slot | `415002209` |
+| First deploy date | 2026-04-22 |
+| Code version | `v1.20.0` + `rotate_authority` patch |
+| Program size | 360,328 bytes |
+| Deployer rent + fees spent | ~2.621 SOL |
+| Launch posture | public beta (no external audit; caps per `DEPLOY.md` §Staged rollout) |
+
+### Post-deploy checklist
+
+- [x] Program account visible on Solana Explorer.
+- [x] Upgrade authority transferred to Squads vault — verified via `solana program show`.
+- [x] `initialize()` called with mainnet attestor pubkey, cap `100_000_000` (100 wXRP), staleness `150` slots.
+- [x] `rotate_authority(squads_vault)` — `Config.authority` now = `48uos…ZXKD`.
+- [x] yXRP mint authority handed to Config PDA — verified via `spl-token display`.
+
+### Initialized state
+
+| Account | Address |
+| --- | --- |
+| Config PDA | [`AhSmxEXYsAhkH1hZgJwvcJyAAXSi8giPs7fgZJhR7pvu`](https://explorer.solana.com/address/AhSmxEXYsAhkH1hZgJwvcJyAAXSi8giPs7fgZJhR7pvu) |
+| Vault PDA (wXRP) | [`5CZnKQH1r42KuiHfW4DHDdf3x8o4KyG2oq9Eb6wbkgWR`](https://explorer.solana.com/address/5CZnKQH1r42KuiHfW4DHDdf3x8o4KyG2oq9Eb6wbkgWR) |
+| wXRP mint (LayerZero-bridged) | [`6UpQcMAb5xMzxc7ZfPaVMgx3KqsvKZdT5U718BzD5We2`](https://explorer.solana.com/address/6UpQcMAb5xMzxc7ZfPaVMgx3KqsvKZdT5U718BzD5We2) |
+| yXRP mint | [`4GPZvtLVqKryEuUQbk4Ap7JiHQ1u4RdLc9UfYweCbnp5`](https://explorer.solana.com/address/4GPZvtLVqKryEuUQbk4Ap7JiHQ1u4RdLc9UfYweCbnp5) |
+| Attestor pubkey | `E86gTzWPwnFPtscwGn3NYQhkWt1S2RXN5Csj1mTBDMgo` |
+| Initialize tx | [`3ALq5scAv6LhxdhyTQ1viRzTwPXcWeVG1TEfhrvMJaeGLXB5zZp7k9q36EdGTqCcDR4yzvZaHarj76EcEnTWCfd4`](https://explorer.solana.com/tx/3ALq5scAv6LhxdhyTQ1viRzTwPXcWeVG1TEfhrvMJaeGLXB5zZp7k9q36EdGTqCcDR4yzvZaHarj76EcEnTWCfd4) |
+| rotate_authority tx | [`3Ynh8b13PwYBtNzyW6hkaTFJ5c5k8QTCAPkxSkfqdfVRuqb3ZyRrrGei69n3XY2E98xGA8Vu3BhLLjygvZn9E5dn`](https://explorer.solana.com/tx/3Ynh8b13PwYBtNzyW6hkaTFJ5c5k8QTCAPkxSkfqdfVRuqb3ZyRrrGei69n3XY2E98xGA8Vu3BhLLjygvZn9E5dn) |
+| yXRP SetAuthority tx | [`95vyPS51SeUqFDSSTyjYZMxTxGxQ2AdT9D3gj9yoVjBpVtXPZAisZxzeetkyKaSiwxJ4iAx1KDRyLjZoayZKga1`](https://explorer.solana.com/tx/95vyPS51SeUqFDSSTyjYZMxTxGxQ2AdT9D3gj9yoVjBpVtXPZAisZxzeetkyKaSiwxJ4iAx1KDRyLjZoayZKga1) |
+| Config `max_single_deposit` | `100_000_000` (100 wXRP at 6 decimals, Beta-0 cap) |
+| Config `staleness_slots` | `150` |
+
+Attestor secret key lives under `ops/artifacts/mainnet/` (git-ignored). Do not commit.

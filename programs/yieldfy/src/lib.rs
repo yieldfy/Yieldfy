@@ -72,6 +72,14 @@ pub mod yieldfy {
         admin::handle_rotate_attestor(ctx, new_attestor)
     }
 
+    /// Authority-only. Transfers `Config.authority` to `new_authority`. Used
+    /// at launch to hand control from the hot deployer keypair to a
+    /// multisig, and thereafter to rotate the multisig itself if members
+    /// change. The caller must sign as the *current* authority.
+    pub fn rotate_authority(ctx: Context<AdminOnly>, new_authority: Pubkey) -> Result<()> {
+        admin::handle_rotate_authority(ctx, new_authority)
+    }
+
     /// Authority-only. Updates the per-tx deposit cap and the attestation
     /// staleness window. Both must be > 0 — use `set_paused(true)` if the
     /// intent is to halt activity.

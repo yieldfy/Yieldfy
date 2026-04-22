@@ -355,6 +355,59 @@
       ]
     },
     {
+      "name": "rotate_authority",
+      "docs": [
+        "Authority-only. Transfers `Config.authority` to `new_authority`. Used",
+        "at launch to hand control from the hot deployer keypair to a",
+        "multisig, and thereafter to rotate the multisig itself if members",
+        "change. The caller must sign as the *current* authority."
+      ],
+      "discriminator": [
+        248,
+        225,
+        151,
+        35,
+        28,
+        15,
+        85,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "set_cap",
       "docs": [
         "Authority-only. Updates the per-tx deposit cap and the attestation",
@@ -614,6 +667,19 @@
       ]
     },
     {
+      "name": "AuthorityRotated",
+      "discriminator": [
+        89,
+        124,
+        120,
+        223,
+        3,
+        19,
+        185,
+        230
+      ]
+    },
+    {
       "name": "CapsUpdated",
       "discriminator": [
         147,
@@ -713,6 +779,22 @@
             "name": "authority",
             "type": "pubkey"
           },
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "current",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityRotated",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "previous",
             "type": "pubkey"

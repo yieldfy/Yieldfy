@@ -63,6 +63,24 @@ pub fn handle_rotate_attestor(ctx: Context<AdminOnly>, new_attestor: Pubkey) -> 
     Ok(())
 }
 
+/// Authority-only. Transfers `Config.authority` to `new_authority`. Used at
+/// launch to hand admin control from the hot deployer keypair to a
+/// multisig vault, and thereafter to rotate the multisig itself if members
+/// ever change. The caller must sign as the *current* authority.
+pub fn handle_rotate_authority(
+    ctx: Context<AdminOnly>,
+    new_authority: Pubkey,
+) -> Result<()> {
+    let c = &mut ctx.accounts.config;
+    let prev = c.authority;
+    c.authority = new_authority;
+    emit!(AuthorityRotated {
+        previous: prev,
+        current: new_authority,
+    });
+    Ok(())
+}
+
 #[event]
 pub struct PausedToggled {
     pub authority: Pubkey,
@@ -73,6 +91,12 @@ pub struct PausedToggled {
 #[event]
 pub struct AttestorRotated {
     pub authority: Pubkey,
+    pub previous: Pubkey,
+    pub current: Pubkey,
+}
+
+#[event]
+pub struct AuthorityRotated {
     pub previous: Pubkey,
     pub current: Pubkey,
 }
