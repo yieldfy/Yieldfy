@@ -1,0 +1,7 @@
+target/
+node_modules/
+tests/node_modules/
+programs/yieldfy/target/
+ops/artifacts/
+**/.anchor/
+**/.solana/
