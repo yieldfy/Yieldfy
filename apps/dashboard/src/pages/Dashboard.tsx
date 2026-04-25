@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardLayout, { ViewKey } from "@/components/dashboard/DashboardLayout";
+import WalletConnectGate from "@/components/dashboard/WalletConnectGate";
 import OverviewView from "@/components/dashboard/views/OverviewView";
 import DepositView from "@/components/dashboard/views/DepositView";
 import PositionsView from "@/components/dashboard/views/PositionsView";
@@ -22,9 +23,11 @@ const Dashboard = () => {
   };
 
   return (
-    <DashboardLayout current={view} onChange={setView} onDepositClick={() => setView("deposit")}>
-      {render()}
-    </DashboardLayout>
+    <WalletConnectGate>
+      <DashboardLayout current={view} onChange={setView} onDepositClick={() => setView("deposit")}>
+        {render()}
+      </DashboardLayout>
+    </WalletConnectGate>
   );
 };
 
