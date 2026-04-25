@@ -1,15 +1,10 @@
 import { ReactNode, useState } from "react";
-import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Menu, ExternalLink } from "lucide-react";
+import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Menu, ExternalLink, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
-import { useWallet } from "@solana/wallet-adapter-react";
 import WalletMenu from "@/components/dashboard/WalletMenu";
 import NotificationsBell from "@/components/dashboard/NotificationsBell";
 import NetworkSwitcher from "@/components/dashboard/NetworkSwitcher";
-import { useNetwork } from "@/providers/NetworkProvider";
-
-const truncate = (addr: string, head = 14, tail = 14) =>
-  addr.length <= head + tail + 1 ? addr : `${addr.slice(0, head)}…${addr.slice(-tail)}`;
 
 export type ViewKey = "overview" | "deposit" | "positions" | "venues" | "history" | "settings";
 
@@ -56,8 +51,6 @@ const NavItem = ({ item, active, onClick }: { item: typeof NAV[number]; active: 
 
 const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { publicKey } = useWallet();
-  const { solscanUrl } = useNetwork();
 
   const Sidebar = (
     <aside
@@ -93,36 +86,23 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
         ))}
       </nav>
       <div className="border-t border-[#0F1923]/06 p-4">
-        {publicKey ? (
-          <a
-            href={solscanUrl("account", publicKey.toBase58())}
-            target="_blank"
-            rel="noreferrer"
-            className="group flex flex-col gap-1.5 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur transition-colors hover:bg-white/70"
-            title="View on Solscan"
-          >
-            <div className="flex items-center gap-3">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full opacity-50 animate-ping bg-[#2EC4B6]" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#2EC4B6]" />
-              </span>
-              <span className="font-mono text-xs text-[#0F1923]/80 group-hover:text-[#0F1923]">
-                {truncate(publicKey.toBase58())}
-              </span>
+        <a
+          href="https://t.me/Yieldfy"
+          target="_blank"
+          rel="noreferrer"
+          className="group flex flex-col gap-1 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur transition-colors hover:bg-white/70"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0F1923]/[0.04] text-[#0F1923]/70 group-hover:bg-[#0F1923]/[0.08] group-hover:text-[#0F1923] transition-colors">
+              <MessageCircle size={14} />
+            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="text-xs font-medium text-[#0F1923]">Need help?</span>
+              <span className="text-[10px] text-[#0F1923]/55">Join our Telegram</span>
             </div>
-            <span className="ml-5 inline-flex items-center gap-1 text-[10px] uppercase tracking-wider text-[#0F1923]/45 group-hover:text-[#0F1923]/70">
-              View on Solscan
-              <ExternalLink size={10} className="opacity-70 transition-transform group-hover:translate-x-0.5" />
-            </span>
-          </a>
-        ) : (
-          <div className="flex items-center gap-3 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur">
-            <span className="relative flex h-2 w-2">
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0F1923]/40" />
-            </span>
-            <span className="font-mono text-xs text-[#0F1923]/70">Not connected</span>
+            <ExternalLink size={11} className="ml-auto text-[#0F1923]/40 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0F1923]/70" />
           </div>
-        )}
+        </a>
       </div>
     </aside>
   );
