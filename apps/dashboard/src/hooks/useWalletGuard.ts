@@ -88,20 +88,25 @@ export function useWalletGuard(): { handleDisconnect: () => Promise<void> } {
     [disconnect],
   );
 
-  // 1. Track the address from wallet-adapter directly.
+  // 1. Track the address from wallet-adapter directly. The snapshot persists
+  //    for the lifetime of this mount — even across transient `connected`
+  //    flips — because Phantom's account-switch can show up to wallet-adapter
+  //    as disconnect→reconnect with a new pubkey, and resetting the snapshot
+  //    on disconnect would let the new pubkey re-seat as "initial" with no
+  //    drift detected. Intentional disconnect via `useDisconnectWallet` does
+  //    a hard navigation, which unmounts the guard and clears the ref naturally.
   useEffect(() => {
-    if (connected && publicKey) {
-      const address = publicKey.toBase58();
-      if (!initialAddressRef.current) {
-        initialAddressRef.current = address;
-        handledRef.current = false;
-      } else if (initialAddressRef.current !== address) {
-        clearAndRedirect(
-          "You switched to a different wallet. Please reconnect to continue.",
-        );
-      }
-    } else if (!connected) {
-      initialAddressRef.current = null;
+    if (!connected || !publicKey) return;
+    const address = publicKey.toBase58();
+    if (initialAddressRef.current === null) {
+      initialAddressRef.current = address;
+      handledRef.current = false;
+      return;
+    }
+    if (initialAddressRef.current !== address) {
+      clearAndRedirect(
+        "You switched to a different wallet. Please reconnect to continue.",
+      );
     }
   }, [connected, publicKey, clearAndRedirect]);
 
