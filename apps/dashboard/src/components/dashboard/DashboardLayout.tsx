@@ -8,8 +8,8 @@ import NotificationsBell from "@/components/dashboard/NotificationsBell";
 import NetworkSwitcher from "@/components/dashboard/NetworkSwitcher";
 import { useNetwork } from "@/providers/NetworkProvider";
 
-const truncate = (addr: string, head = 6, tail = 6) =>
-  `${addr.slice(0, head)}…${addr.slice(-tail)}`;
+const truncate = (addr: string, head = 14, tail = 14) =>
+  addr.length <= head + tail + 1 ? addr : `${addr.slice(0, head)}…${addr.slice(-tail)}`;
 
 export type ViewKey = "overview" | "deposit" | "positions" | "venues" | "history" | "settings";
 
