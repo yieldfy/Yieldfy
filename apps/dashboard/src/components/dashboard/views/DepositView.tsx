@@ -24,6 +24,9 @@ const RISKS: { key: RiskProfile; label: string; desc: string }[] = [
 
 const OPTIMIZER_URL = env.VITE_OPTIMIZER_URL;
 
+// Hard ceiling on a single deposit input regardless of wallet balance.
+const MAX_DEPOSIT_WXRP = 1_000_000;
+
 const parseAmount = (raw: string): bigint | null => {
   const stripped = raw.replace(/[,\s]/g, "");
   if (!stripped) return null;
@@ -35,6 +38,36 @@ const parseAmount = (raw: string): bigint | null => {
   } catch {
     return null;
   }
+};
+
+// Sanitize keystrokes from the amount input: drop signs, non-numeric junk,
+// extra dots, and clamp the integer part so we never accept > MAX_DEPOSIT_WXRP.
+const sanitizeAmountInput = (raw: string): string => {
+  // Drop everything except digits and the first dot.
+  const cleaned = raw.replace(/[^\d.]/g, "");
+  const firstDot = cleaned.indexOf(".");
+  const oneDot =
+    firstDot === -1
+      ? cleaned
+      : cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, "");
+
+  // Cap fractional precision at 6 decimals (wXRP has 6).
+  const [whole = "", frac = ""] = oneDot.split(".");
+  const truncFrac = frac.slice(0, 6);
+
+  // Cap the whole part at MAX_DEPOSIT_WXRP. Compare numerically (safe — 1M
+  // fits in Number), strip leading zeros for display.
+  const wholeNum = whole === "" ? 0 : Number(whole);
+  if (!Number.isFinite(wholeNum)) return "";
+  const cappedWhole = Math.min(wholeNum, MAX_DEPOSIT_WXRP).toString();
+
+  // If the user explicitly typed digits but we capped, drop the fraction —
+  // 1,000,000 exactly is the ceiling.
+  if (wholeNum >= MAX_DEPOSIT_WXRP) return MAX_DEPOSIT_WXRP.toString();
+
+  // Preserve a trailing dot so the user can keep typing decimals.
+  if (firstDot !== -1) return `${cappedWhole}.${truncFrac}`;
+  return cappedWhole;
 };
 
 const DepositView = () => {
@@ -60,10 +93,11 @@ const DepositView = () => {
   );
 
   const amountLamports = parseAmount(amount);
+  const amountWxrp = amountLamports === null ? 0 : Number(amountLamports) / 1e6;
+  const overBalance = balance !== undefined && amountWxrp > balance;
+  const overCap = amountWxrp > MAX_DEPOSIT_WXRP;
   const amountValid =
-    amountLamports !== null &&
-    amountLamports > 0n &&
-    (!balance || Number(amountLamports) / 1e6 <= balance);
+    amountLamports !== null && amountLamports > 0n && !overBalance && !overCap;
 
   const reset = useCallback(() => {
     setStep(1);
@@ -163,7 +197,7 @@ const DepositView = () => {
                 inputMode="decimal"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={(e) => setAmount(sanitizeAmountInput(e.target.value))}
                 style={{ caretColor: "#0F1923" }}
                 className="w-full bg-transparent text-center font-instrument italic text-5xl gradient-text outline-none border-b-2 border-transparent focus:border-[#0F1923]/15 transition-colors"
               />
@@ -177,13 +211,24 @@ const DepositView = () => {
               </span>
               {balance !== undefined && balance > 0 && (
                 <button
-                  onClick={() => setAmount(String(balance))}
+                  onClick={() =>
+                    setAmount(sanitizeAmountInput(String(Math.min(balance, MAX_DEPOSIT_WXRP))))
+                  }
                   className="px-2 py-0.5 rounded-full bg-white/60 hover:bg-white/90 text-[#0F1923] font-medium transition-colors"
                 >
                   MAX
                 </button>
               )}
             </div>
+            {(overBalance || overCap) && (
+              <div className="-mt-3 mb-4 text-center text-xs text-[#E84855]">
+                {overCap
+                  ? `Single deposit is capped at ${MAX_DEPOSIT_WXRP.toLocaleString("en-US")} wXRP.`
+                  : `Amount exceeds your balance of ${(balance ?? 0).toLocaleString("en-US", {
+                      maximumFractionDigits: 4,
+                    })} wXRP.`}
+              </div>
+            )}
 
             {!WXRP_MINT && (
               <div className="mb-6 rounded-xl border border-amber-300/60 bg-amber-50/60 p-3 text-xs text-amber-900 flex items-start gap-2">
