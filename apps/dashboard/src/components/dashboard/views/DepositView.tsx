@@ -164,7 +164,8 @@ const DepositView = () => {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-full bg-transparent text-center font-instrument italic text-5xl gradient-text outline-none"
+                style={{ caretColor: "#0F1923" }}
+                className="w-full bg-transparent text-center font-instrument italic text-5xl gradient-text outline-none border-b-2 border-transparent focus:border-[#0F1923]/15 transition-colors"
               />
             </div>
             <div className="flex items-center justify-center gap-3 mb-6 text-xs text-[#0F1923]/60">
