@@ -1,5 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Instrument+Serif:ital@1&display=swap');
 
+html {
+  /* Make in-page anchor jumps from header/footer nav glide instead of teleport. */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
