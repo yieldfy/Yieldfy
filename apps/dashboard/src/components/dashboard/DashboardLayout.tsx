@@ -1,13 +1,15 @@
 import { ReactNode, useState } from "react";
-import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Bell, Menu, X } from "lucide-react";
+import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
 import { useWallet } from "@solana/wallet-adapter-react";
 import WalletMenu from "@/components/dashboard/WalletMenu";
+import NotificationsBell from "@/components/dashboard/NotificationsBell";
+import NetworkSwitcher from "@/components/dashboard/NetworkSwitcher";
+import { useNetwork } from "@/providers/NetworkProvider";
 
 const truncate = (addr: string, head = 6, tail = 6) =>
   `${addr.slice(0, head)}…${addr.slice(-tail)}`;
-const solscanUrl = (addr: string) => `https://solscan.io/account/${addr}`;
 
 export type ViewKey = "overview" | "deposit" | "positions" | "venues" | "history" | "settings";
 
@@ -53,9 +55,9 @@ const NavItem = ({ item, active, onClick }: { item: typeof NAV[number]; active: 
 };
 
 const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props) => {
-  const [mobileNetwork, setMobileNetwork] = useState<"Mainnet" | "Devnet">("Mainnet");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { publicKey, connected } = useWallet();
+  const { publicKey } = useWallet();
+  const { solscanUrl } = useNetwork();
 
   const Sidebar = (
     <aside
@@ -93,7 +95,7 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
       <div className="border-t border-[#0F1923]/06 p-4">
         {publicKey ? (
           <a
-            href={solscanUrl(publicKey.toBase58())}
+            href={solscanUrl("account", publicKey.toBase58())}
             target="_blank"
             rel="noreferrer"
             className="group flex items-center gap-3 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur transition-colors hover:bg-white/70"
@@ -154,24 +156,8 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
             <h1 className="font-barlow text-lg md:text-xl font-medium text-[#0F1923] truncate">{TITLES[current]}</h1>
           </div>
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="hidden sm:flex glass-pill">
-              <div className="glass-pill-inner !py-1 !px-1 flex items-center gap-1">
-                {(["Mainnet", "Devnet"] as const).map((n) => (
-                  <button
-                    key={n}
-                    onClick={() => setMobileNetwork(n)}
-                    className={`px-3 py-1 rounded-full text-xs transition-all ${
-                      mobileNetwork === n ? "gradient-bg text-white" : "text-[#0F1923]/60 hover:text-[#0F1923]"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <button className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[#0F1923]/70 hover:bg-white/50 transition-colors">
-              <Bell size={18} />
-            </button>
+            <NetworkSwitcher />
+            <NotificationsBell />
             <WalletMenu />
             <button onClick={onDepositClick} className="btn-primary !py-2 !px-4 md:!px-5 text-xs md:text-sm">
               Deposit

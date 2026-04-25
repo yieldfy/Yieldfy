@@ -11,6 +11,7 @@ import {
 import { useWxrpBalance, WXRP_MINT } from "@/hooks/useWxrpBalance";
 import { useYieldfyClient } from "@/hooks/useYieldfyClient";
 import { useRiskProfile } from "@/hooks/useRiskProfile";
+import { useNetwork } from "@/providers/NetworkProvider";
 import { env } from "@/env";
 
 type Stage = "idle" | "attesting" | "signing" | "confirming" | "done" | "error";
@@ -319,6 +320,7 @@ const Processing = ({
   onReset,
   onRetry,
 }: ProcessingProps) => {
+  const { solscanUrl } = useNetwork();
   const steps: { key: Stage; label: string }[] = [
     { key: "attesting", label: "Fetch signed attestation" },
     { key: "signing", label: "Sign transaction in wallet" },
@@ -346,7 +348,7 @@ const Processing = ({
         )}
         {txSig && (
           <a
-            href={`https://solscan.io/tx/${txSig}?cluster=devnet`}
+            href={solscanUrl("tx", txSig)}
             target="_blank"
             rel="noreferrer"
             className="mt-3 inline-flex items-center gap-1 text-xs text-[#0F1923]/70 hover:text-[#0F1923]"

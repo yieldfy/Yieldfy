@@ -14,14 +14,14 @@ import { useEffect, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { Copy, ExternalLink, LogOut, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { useNetwork } from "@/providers/NetworkProvider";
 
 const truncate = (addr: string, head = 4, tail = 4) =>
   `${addr.slice(0, head)}…${addr.slice(-tail)}`;
 
-const solscanUrl = (addr: string) => `https://solscan.io/account/${addr}`;
-
 const WalletMenu = () => {
   const { publicKey, wallet, disconnect } = useWallet();
+  const { solscanUrl } = useNetwork();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +97,7 @@ const WalletMenu = () => {
         >
           <MenuItem icon={<Copy size={14} />} label="Copy address" onClick={onCopy} />
           <a
-            href={solscanUrl(addr)}
+            href={solscanUrl("account", addr)}
             target="_blank"
             rel="noreferrer"
             role="menuitem"

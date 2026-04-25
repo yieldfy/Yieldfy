@@ -6,6 +6,12 @@ const schema = z.object({
     .url()
     .optional()
     .default("https://api.mainnet-beta.solana.com"),
+  VITE_SOLANA_RPC_URL_MAINNET: z.string().url().optional(),
+  VITE_SOLANA_RPC_URL_DEVNET: z
+    .string()
+    .url()
+    .optional()
+    .default("https://api.devnet.solana.com"),
   VITE_WXRP_MINT: z.string().optional(),
   VITE_YXRP_MINT: z.string().optional(),
   VITE_YIELDFY_PROGRAM_ID: z.string().optional(),
@@ -17,6 +23,8 @@ export type Env = z.infer<typeof schema>;
 function validate(): Env {
   const parsed = schema.safeParse({
     VITE_SOLANA_RPC_URL: import.meta.env.VITE_SOLANA_RPC_URL,
+    VITE_SOLANA_RPC_URL_MAINNET: import.meta.env.VITE_SOLANA_RPC_URL_MAINNET,
+    VITE_SOLANA_RPC_URL_DEVNET: import.meta.env.VITE_SOLANA_RPC_URL_DEVNET,
     VITE_WXRP_MINT: import.meta.env.VITE_WXRP_MINT,
     VITE_YXRP_MINT: import.meta.env.VITE_YXRP_MINT,
     VITE_YIELDFY_PROGRAM_ID: import.meta.env.VITE_YIELDFY_PROGRAM_ID,
@@ -35,3 +43,8 @@ function validate(): Env {
 }
 
 export const env = validate();
+
+export const RPC_ENDPOINTS = {
+  mainnet: env.VITE_SOLANA_RPC_URL_MAINNET ?? env.VITE_SOLANA_RPC_URL,
+  devnet: env.VITE_SOLANA_RPC_URL_DEVNET,
+} as const;
