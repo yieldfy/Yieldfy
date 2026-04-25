@@ -1,5 +1,17 @@
-import { ReactNode, useState } from "react";
-import { LayoutGrid, ArrowDownCircle, Layers, BarChart3, Clock, Settings, Menu, ExternalLink, MessageCircle } from "lucide-react";
+import { ReactNode, useEffect, useState } from "react";
+import {
+  LayoutGrid,
+  ArrowDownCircle,
+  Layers,
+  BarChart3,
+  Clock,
+  Settings,
+  Menu,
+  ExternalLink,
+  MessageCircle,
+  ChevronsLeft,
+  ChevronsRight,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import yieldfyLogo from "@/assets/yieldfy-logo.png";
 import WalletMenu from "@/components/dashboard/WalletMenu";
@@ -26,6 +38,8 @@ const TITLES: Record<ViewKey, string> = {
   settings: "Settings",
 };
 
+const COLLAPSE_KEY = "yieldfy:sidebar-collapsed";
+
 interface Props {
   current: ViewKey;
   onChange: (v: ViewKey) => void;
@@ -33,28 +47,56 @@ interface Props {
   children: ReactNode;
 }
 
-const NavItem = ({ item, active, onClick }: { item: typeof NAV[number]; active: boolean; onClick: () => void }) => {
+const NavItem = ({
+  item,
+  active,
+  collapsed,
+  onClick,
+}: {
+  item: typeof NAV[number];
+  active: boolean;
+  collapsed: boolean;
+  onClick: () => void;
+}) => {
   const Icon = item.icon;
   return (
     <button
       onClick={onClick}
-      className={`group relative flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-300 ${
-        active ? "text-[#0F1923]" : "text-[#0F1923]/50 hover:text-[#0F1923]/80 hover:bg-white/40"
-      }`}
+      title={collapsed ? item.label : undefined}
+      aria-label={item.label}
+      className={`group relative flex w-full items-center rounded-xl py-3 text-sm font-medium transition-all duration-300 ${
+        collapsed ? "justify-center px-0" : "gap-3 px-4"
+      } ${active ? "text-[#0F1923]" : "text-[#0F1923]/50 hover:text-[#0F1923]/80 hover:bg-white/40"}`}
     >
       {active && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-[3px] rounded-full gradient-bg" />}
       <Icon size={18} />
-      <span className="font-barlow">{item.label}</span>
+      {!collapsed && <span className="font-barlow">{item.label}</span>}
     </button>
   );
 };
 
 const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem(COLLAPSE_KEY) === "1";
+  });
 
-  const Sidebar = (
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(COLLAPSE_KEY, collapsed ? "1" : "0");
+    } catch {
+      // ignore
+    }
+  }, [collapsed]);
+
+  // The mobile drawer always shows the full sidebar; only the desktop rail
+  // honors the collapsed flag. `effectiveCollapsed` lets us share the JSX.
+  const renderSidebar = (effectiveCollapsed: boolean, showToggle: boolean) => (
     <aside
-      className="flex h-full w-[280px] flex-col border-r"
+      className={`flex h-full flex-col border-r transition-[width] duration-300 ease-out ${
+        effectiveCollapsed ? "w-[76px]" : "w-[280px]"
+      }`}
       style={{
         background: "rgba(255,255,255,0.5)",
         backdropFilter: "blur(40px) saturate(1.4)",
@@ -62,22 +104,41 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
         borderColor: "rgba(15,25,35,0.06)",
       }}
     >
-      <Link
-        to="/"
-        aria-label="Back to landing"
-        className="flex items-center gap-2 px-6 py-5 transition-opacity hover:opacity-70"
+      <div
+        className={`flex items-center py-5 ${
+          effectiveCollapsed ? "flex-col gap-3 px-3" : "justify-between gap-2 px-6"
+        }`}
       >
-        <img src={yieldfyLogo} alt="Yieldfy" className="h-7 w-auto" />
-        <span className="font-barlow text-xl font-light text-[#0F1923]">
-          yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
-        </span>
-      </Link>
+        <Link
+          to="/"
+          aria-label="Back to landing"
+          className="flex items-center gap-2 transition-opacity hover:opacity-70"
+        >
+          <img src={yieldfyLogo} alt="Yieldfy" className="h-7 w-auto" />
+          {!effectiveCollapsed && (
+            <span className="font-barlow text-xl font-light text-[#0F1923]">
+              yieldfy<span style={{ color: "#2EC4B6" }}>.</span>
+            </span>
+          )}
+        </Link>
+        {showToggle && (
+          <button
+            onClick={() => setCollapsed((c) => !c)}
+            aria-label={effectiveCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={effectiveCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-[#0F1923]/50 hover:bg-white/40 hover:text-[#0F1923]/80 transition-colors"
+          >
+            {effectiveCollapsed ? <ChevronsRight size={14} /> : <ChevronsLeft size={14} />}
+          </button>
+        )}
+      </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
         {NAV.map((item) => (
           <NavItem
             key={item.key}
             item={item}
             active={current === item.key}
+            collapsed={effectiveCollapsed}
             onClick={() => {
               onChange(item.key);
               setDrawerOpen(false);
@@ -90,18 +151,25 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
           href="https://t.me/Yieldfy"
           target="_blank"
           rel="noreferrer"
-          className="group flex flex-col gap-1 rounded-xl bg-white/50 px-3 py-2.5 backdrop-blur transition-colors hover:bg-white/70"
+          title={effectiveCollapsed ? "Need help? Join our Telegram" : undefined}
+          className={`group flex rounded-xl bg-white/50 backdrop-blur transition-colors hover:bg-white/70 ${
+            effectiveCollapsed ? "h-10 w-10 mx-auto items-center justify-center" : "px-3 py-2.5"
+          }`}
         >
-          <div className="flex items-center gap-2.5">
-            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0F1923]/[0.04] text-[#0F1923]/70 group-hover:bg-[#0F1923]/[0.08] group-hover:text-[#0F1923] transition-colors">
-              <MessageCircle size={14} />
-            </span>
-            <div className="flex flex-col leading-tight">
-              <span className="text-xs font-medium text-[#0F1923]">Need help?</span>
-              <span className="text-[10px] text-[#0F1923]/55">Join our Telegram</span>
+          {effectiveCollapsed ? (
+            <MessageCircle size={16} className="text-[#0F1923]/70 group-hover:text-[#0F1923]" />
+          ) : (
+            <div className="flex items-center gap-2.5 w-full">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#0F1923]/[0.04] text-[#0F1923]/70 group-hover:bg-[#0F1923]/[0.08] group-hover:text-[#0F1923] transition-colors">
+                <MessageCircle size={14} />
+              </span>
+              <div className="flex flex-col leading-tight">
+                <span className="text-xs font-medium text-[#0F1923]">Need help?</span>
+                <span className="text-[10px] text-[#0F1923]/55">Join our Telegram</span>
+              </div>
+              <ExternalLink size={11} className="ml-auto text-[#0F1923]/40 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0F1923]/70" />
             </div>
-            <ExternalLink size={11} className="ml-auto text-[#0F1923]/40 transition-transform group-hover:translate-x-0.5 group-hover:text-[#0F1923]/70" />
-          </div>
+          )}
         </a>
       </div>
     </aside>
@@ -114,12 +182,12 @@ const DashboardLayout = ({ current, onChange, onDepositClick, children }: Props)
       <div className="blob absolute -right-[150px] bottom-[10%] h-[600px] w-[600px] opacity-[0.10] pointer-events-none" style={{ animationDirection: "reverse" }} />
 
       {/* Desktop sidebar */}
-      <div className="hidden md:block relative z-10">{Sidebar}</div>
+      <div className="hidden md:block relative z-10">{renderSidebar(collapsed, true)}</div>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer — always full, no toggle */}
       {drawerOpen && (
         <div className="md:hidden fixed inset-0 z-50 flex">
-          <div className="relative z-10 h-full">{Sidebar}</div>
+          <div className="relative z-10 h-full">{renderSidebar(false, false)}</div>
           <div className="flex-1 bg-[#0F1923]/40 backdrop-blur-sm" onClick={() => setDrawerOpen(false)} />
         </div>
       )}
