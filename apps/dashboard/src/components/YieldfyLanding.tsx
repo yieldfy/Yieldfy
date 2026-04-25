@@ -692,6 +692,21 @@ function FooterSection() {
             <p className={`${TEXT_60} max-w-sm text-sm leading-relaxed`}>
               An autonomous routing agent bridging XRPL tokenized treasuries to the best Solana yield venues.
             </p>
+            <a
+              href="https://x.com/Yieldfy"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Yieldfy on X (Twitter)"
+              className={`mt-5 inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#0F1923]/15 ${TEXT_70} hover:border-[#0F1923]/40 hover:text-[#0F1923] transition-colors`}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                className="h-4 w-4 fill-current"
+              >
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
           </div>
           <div>
             <div className={`text-xs tracking-wider uppercase ${TEXT_50} mb-4`}>Product</div>
