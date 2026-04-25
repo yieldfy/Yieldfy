@@ -124,11 +124,6 @@ const HeroSection = () => {
                 <span className="font-barlow tracking-wide">XRP × Solana</span>
               </div>
             </div>
-            <div className="glass-pill glass-pill-dark">
-              <div className="glass-pill-inner !text-[10px] md:!text-xs">
-                <span className="font-barlow tracking-wide text-amber-300">● Early Access · Phase B</span>
-              </div>
-            </div>
           </div>
 
           {/* Headline with corner accents */}
@@ -151,9 +146,6 @@ const HeroSection = () => {
           <p className="mt-6 max-w-lg text-center font-barlow text-base md:text-lg text-white/75 px-2">
             An autonomous routing agent that bridges tokenized treasuries to the best Solana
             yield venues — institutional, non-custodial, fully auditable.
-          </p>
-          <p className="mt-3 max-w-lg text-center font-barlow text-xs md:text-sm text-amber-300/90 px-2">
-            Live on mainnet-beta. Deposit &amp; attestation layer is active; active yield routing unlocks once our first venue lists wXRP (100 wXRP per-tx cap during early access).
           </p>
 
           <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto max-w-xs sm:max-w-none">
