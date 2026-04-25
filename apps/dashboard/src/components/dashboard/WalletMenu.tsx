@@ -15,13 +15,15 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { Copy, ExternalLink, LogOut, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { useNetwork } from "@/providers/NetworkProvider";
+import { useDisconnectWallet } from "@/hooks/useWalletGuard";
 
 const truncate = (addr: string, head = 4, tail = 4) =>
   `${addr.slice(0, head)}…${addr.slice(-tail)}`;
 
 const WalletMenu = () => {
-  const { publicKey, wallet, disconnect } = useWallet();
+  const { publicKey, wallet } = useWallet();
   const { solscanUrl } = useNetwork();
+  const disconnectWallet = useDisconnectWallet();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -57,11 +59,7 @@ const WalletMenu = () => {
 
   const onDisconnect = async () => {
     setOpen(false);
-    try {
-      await disconnect();
-    } catch (err) {
-      console.error("[WalletMenu] disconnect error:", err);
-    }
+    await disconnectWallet("You have been disconnected.");
   };
 
   return (

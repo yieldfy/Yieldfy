@@ -15,9 +15,23 @@
  * Pattern adapted from sorrowzzz/quiverterminal's useWalletGuard.
  */
 import { useCallback, useEffect, useRef } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, type WalletContextState } from "@solana/wallet-adapter-react";
 
 const DISCONNECT_MESSAGE_KEY = "yieldfy_disconnect_message";
+
+// wallet-adapter-react persists the active wallet under this key. Removing it
+// is the only way to keep `autoConnect` from immediately re-attaching after
+// the user explicitly disconnects.
+const WALLET_NAME_STORAGE_KEY = "walletName";
+
+const clearAdapterAutoConnect = () => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(WALLET_NAME_STORAGE_KEY);
+  } catch {
+    // ignore (private mode, locked storage, etc.)
+  }
+};
 
 type ProviderLike = {
   isConnected?: boolean;
@@ -57,6 +71,9 @@ export function useWalletGuard(): { handleDisconnect: () => Promise<void> } {
       if (typeof window !== "undefined") {
         sessionStorage.setItem(DISCONNECT_MESSAGE_KEY, message);
       }
+      // Strip the wallet-adapter persistence first so even if `disconnect()`
+      // throws, autoConnect won't reattach on the next mount.
+      clearAdapterAutoConnect();
       try {
         await disconnect();
       } catch (err) {
@@ -64,8 +81,8 @@ export function useWalletGuard(): { handleDisconnect: () => Promise<void> } {
       }
       // Hard navigation so React state, react-query cache, and any
       // in-flight tx UI is fully reset.
-      if (typeof window !== "undefined" && window.location.pathname !== "/") {
-        window.location.href = "/";
+      if (typeof window !== "undefined") {
+        window.location.assign("/");
       }
     },
     [disconnect],
@@ -174,6 +191,34 @@ export function useWalletGuard(): { handleDisconnect: () => Promise<void> } {
   }, [disconnect, clearAndRedirect]);
 
   return { handleDisconnect };
+}
+
+/**
+ * useDisconnectWallet — call this from UI buttons (e.g. WalletMenu) that
+ * need to fully disconnect the user without mounting the guard's listener
+ * stack. It strips the wallet-adapter autoConnect key, calls the provider's
+ * disconnect, leaves a one-shot toast message, and hard-navigates to /.
+ */
+export function useDisconnectWallet(): (message?: string) => Promise<void> {
+  const { disconnect }: WalletContextState = useWallet();
+
+  return useCallback(
+    async (message: string = "You have been disconnected.") => {
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem(DISCONNECT_MESSAGE_KEY, message);
+      }
+      clearAdapterAutoConnect();
+      try {
+        await disconnect();
+      } catch (err) {
+        console.error("[useDisconnectWallet] disconnect error:", err);
+      }
+      if (typeof window !== "undefined") {
+        window.location.assign("/");
+      }
+    },
+    [disconnect],
+  );
 }
 
 /**
