@@ -1,6 +1,5 @@
 import { AnchorProvider, BN, Program, type Idl } from "@coral-xyz/anchor";
 import {
-  ComputeBudgetProgram,
   PublicKey,
   SystemProgram,
   type Connection,
@@ -144,14 +143,13 @@ export class Yieldfy {
 
     const edIx: TransactionInstruction = buildAttestationPreIx(att);
 
-    // attest::verify hardcodes ix index 0 for the ed25519 precompile. Phantom
-    // auto-prepends ComputeBudget priority-fee ixs at signing time when the
-    // tx contains none, which would shift ed25519 off index 0. Including our
-    // own setComputeUnitLimit + setComputeUnitPrice (after edIx) suppresses
-    // Phantom's injection while keeping ed25519 at index 0.
-    const cbLimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 200_000 });
-    const cbPriceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
-
+    // attest::verify hardcodes ix index 0 for the ed25519 precompile. Empirically,
+    // current Phantom versions REORDER any ComputeBudget ixs to the front of the
+    // tx — even when we provide our own — which displaces ed25519 and triggers
+    // BadAttestIx (6003) on-chain. We deliberately omit ComputeBudget here so
+    // Phantom has nothing to reorder. If a future Phantom auto-injects despite
+    // none being present, the on-chain attestor scan will need to move from
+    // index 0 → first-ed25519-found.
     const methods = this.program.methods as unknown as {
       depositWxrpToKamino(args: {
         amount: BN;
@@ -187,7 +185,7 @@ export class Yieldfy {
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .preInstructions([edIx, cbLimitIx, cbPriceIx, ataIx])
+      .preInstructions([edIx, ataIx])
       .transaction();
 
     const { connection } = this.provider;
