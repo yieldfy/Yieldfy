@@ -10,13 +10,18 @@ use crate::state::YieldfyError;
 /// Anchor/Solana combo.
 const ED25519_PROGRAM_ID: Pubkey = pubkey!("Ed25519SigVerify111111111111111111111111111");
 
-/// Verify that the preceding ed25519 instruction (index 0 in the current
-/// transaction) is a valid Yieldfy attestation:
+/// Verify that an ed25519 precompile instruction in the current transaction
+/// is a valid Yieldfy attestation:
 ///
 ///   signer   = `attestor` stored in Config
 ///   message  = [venue_u8, slot_u64_le]   (9 bytes)
 ///
 /// Also enforces a staleness bound: `current_slot <= slot + staleness_slots`.
+///
+/// Scans all ixs in the tx for the first ed25519 precompile rather than
+/// pinning index 0. Phantom auto-injects ComputeBudget ixs at the front of
+/// the tx (and reorders user-supplied ones forward), which would always
+/// displace ed25519 if we hardcoded its position.
 pub fn verify(
     ix_sysvar: &AccountInfo,
     attestor: Pubkey,
@@ -26,10 +31,22 @@ pub fn verify(
 ) -> Result<()> {
     require_keys_eq!(*ix_sysvar.key, IX_SYSVAR_ID, YieldfyError::BadAttestIx);
 
-    // ed25519 precompile must be at index 0; the current Yieldfy ix is at 1+.
-    let ix = load_instruction_at_checked(0, ix_sysvar)
-        .map_err(|_| YieldfyError::BadAttestIx)?;
-    require!(ix.program_id == ED25519_PROGRAM_ID, YieldfyError::BadAttestIx);
+    // Find the first ed25519 precompile ix anywhere in the tx. Cap the scan
+    // at 16 ixs — Solana's per-tx ix limit is higher, but Yieldfy txs never
+    // approach that.
+    let mut ed_ix = None;
+    let mut i: u16 = 0;
+    while i < 16 {
+        match load_instruction_at_checked(i as usize, ix_sysvar) {
+            Ok(ix) if ix.program_id == ED25519_PROGRAM_ID => {
+                ed_ix = Some(ix);
+                break;
+            }
+            Ok(_) => i += 1,
+            Err(_) => break, // out of ixs
+        }
+    }
+    let ix = ed_ix.ok_or(YieldfyError::BadAttestIx)?;
 
     // ed25519 single-signature instruction data layout:
     //   [0..2]    num_signatures (u16 LE) — must be 1
