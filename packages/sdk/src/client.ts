@@ -6,6 +6,7 @@ import {
 } from "@solana/web3.js";
 import {
   getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountIdempotentInstruction,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import IDL from "./idl/yieldfy.json";
@@ -107,6 +108,16 @@ export class Yieldfy {
     const userWxrp = getAssociatedTokenAddressSync(cfg.wxrpMint, user);
     const userYxrp = getAssociatedTokenAddressSync(cfg.yxrpMint, user);
 
+    // First-time depositors don't yet have a yXRP token account. The on-chain
+    // deposit IX expects `user_yxrp` to be initialized, so create it
+    // idempotently (no-op when it already exists) as a pre-instruction.
+    const ataIx = createAssociatedTokenAccountIdempotentInstruction(
+      user,
+      userYxrp,
+      user,
+      cfg.yxrpMint,
+    );
+
     const edIx: TransactionInstruction = buildAttestationPreIx(att);
 
     const methods = this.program.methods as unknown as {
@@ -142,7 +153,7 @@ export class Yieldfy {
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .preInstructions([edIx])
+      .preInstructions([ataIx, edIx])
       .rpc();
   }
 
