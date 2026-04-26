@@ -71,7 +71,7 @@ const sanitizeAmountInput = (raw: string): string => {
 };
 
 const DepositView = () => {
-  const { connected } = useWallet();
+  const { connected, sendTransaction } = useWallet();
   const { data: balance, refetch: refetchBalance } = useWxrpBalance();
   const clientState = useYieldfyClient();
 
@@ -127,7 +127,11 @@ const DepositView = () => {
       }
 
       setStage("signing");
-      const sig = await clientState.client.deposit({ amount: amountLamports }, att);
+      const sig = await clientState.client.deposit(
+        { amount: amountLamports },
+        att,
+        (tx, conn, opts) => sendTransaction(tx, conn, opts),
+      );
       if (cancelled.current) return;
 
       setStage("confirming");
@@ -142,7 +146,7 @@ const DepositView = () => {
       setStage("error");
       toast.error("Deposit failed", { description: msg });
     }
-  }, [amountLamports, amountValid, profile, clientState, refetchBalance]);
+  }, [amountLamports, amountValid, profile, clientState, refetchBalance, sendTransaction]);
 
   const connectCard = useMemo(
     () => (

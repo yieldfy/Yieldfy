@@ -3,8 +3,24 @@ import {
   ComputeBudgetProgram,
   PublicKey,
   SystemProgram,
+  type Connection,
+  type SendOptions,
+  type Transaction,
   type TransactionInstruction,
 } from "@solana/web3.js";
+
+/**
+ * Caller-supplied transaction sender. The dashboard passes `sendTransaction`
+ * from `@solana/wallet-adapter-react`'s `useWallet()`, which routes Phantom
+ * through its native `signAndSendTransaction` API. The two-step pattern
+ * (`signTransaction` then `sendRawTransaction`) trips Phantom's
+ * "this dApp could be malicious" heuristic.
+ */
+export type SendTransactionFn = (
+  tx: Transaction,
+  connection: Connection,
+  options?: SendOptions,
+) => Promise<string>;
 import {
   getAssociatedTokenAddressSync,
   createAssociatedTokenAccountIdempotentInstruction,
@@ -98,10 +114,17 @@ export class Yieldfy {
   }
 
   /**
-   * Deposit wXRP, routed via the optimizer's signed attestation. Returns the tx
-   * signature. Requires the wallet on `provider` to sign.
+   * Deposit wXRP, routed via the optimizer's signed attestation. Returns the
+   * tx signature once confirmed. `sendTransaction` must come from the
+   * wallet-adapter (or call `phantom.signAndSendTransaction` directly) so
+   * Phantom doesn't flag the dApp as malicious for using the legacy
+   * sign-then-send pattern.
    */
-  async deposit(p: DepositParams, att: Attestation): Promise<string> {
+  async deposit(
+    p: DepositParams,
+    att: Attestation,
+    sendTransaction: SendTransactionFn,
+  ): Promise<string> {
     const user = this.provider.wallet.publicKey;
     const cfg = await this.fetchConfig();
     const [positionPda] = this.findPositionPda(user);
@@ -137,12 +160,14 @@ export class Yieldfy {
         expectedVenue: number;
       }): {
         accounts(a: Record<string, PublicKey>): {
-          preInstructions(ix: TransactionInstruction[]): { rpc(): Promise<string> };
+          preInstructions(ix: TransactionInstruction[]): {
+            transaction(): Promise<Transaction>;
+          };
         };
       };
     };
 
-    return methods
+    const tx = await methods
       .depositWxrpToKamino({
         amount: new BN(p.amount.toString()),
         attestationSlot: new BN(att.slot),
@@ -163,7 +188,16 @@ export class Yieldfy {
         systemProgram: SystemProgram.programId,
       })
       .preInstructions([edIx, cbLimitIx, cbPriceIx, ataIx])
-      .rpc();
+      .transaction();
+
+    const { connection } = this.provider;
+    const sig = await sendTransaction(tx, connection);
+    const latest = await connection.getLatestBlockhash();
+    await connection.confirmTransaction(
+      { signature: sig, ...latest },
+      "confirmed",
+    );
+    return sig;
   }
 
   /** Withdraw wXRP. No attestation required (users can always exit — §07). */
