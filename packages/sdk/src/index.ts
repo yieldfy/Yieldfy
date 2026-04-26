@@ -34,3 +34,13 @@ export {
   type RiskProfile,
   type VenueKey,
 } from "./types.js";
+
+export {
+  DEFAULT_REWARD_PARAMS,
+  computeScore,
+  distributeEpoch,
+  epochSolPool,
+  type ParticipantInput,
+  type ParticipantScore,
+  type RewardParams,
+} from "./rewards.js";

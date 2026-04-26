@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWxrpBalance, WXRP_MINT } from "@/hooks/useWxrpBalance";
 import EmptyState from "../EmptyState";
@@ -39,6 +39,49 @@ const OverviewView = () => {
 
   return (
     <div className="space-y-6">
+      {/* Launch Rewards preview — activates at $YIELDFY launch */}
+      <div className="relative overflow-hidden glass-card p-5 md:p-6 border border-[#0F1923]/8">
+        <div className="absolute -right-12 -top-12 h-40 w-40 rounded-full gradient-bg opacity-20 blur-2xl pointer-events-none" />
+        <div className="relative flex items-start gap-4">
+          <div className="shrink-0 h-10 w-10 rounded-full gradient-bg flex items-center justify-center">
+            <Sparkles size={18} className="text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h3 className="font-barlow text-lg md:text-xl font-medium text-[#0F1923]">
+                SOL yield activates at $YIELDFY launch
+              </h3>
+              <span className="text-[10px] tracking-[0.18em] uppercase px-2 py-0.5 rounded-full gradient-bg text-[#0F1923] font-semibold">
+                Phase 2
+              </span>
+            </div>
+            <p className="text-sm text-[#0F1923]/65 leading-relaxed">
+              Hold $YIELDFY <span className="text-[#0F1923]">and</span> keep wXRP in the vault — both required —
+              to earn weekly SOL distributions sized as a fraction of $YIELDFY market cap. More token + more vault
+              + higher MC = larger share. Bootstrapped from protocol treasury until lending venues list wXRP.
+            </p>
+            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+              <div>
+                <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Cadence</div>
+                <div className="text-[#0F1923] font-medium">Weekly</div>
+              </div>
+              <div>
+                <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Pool size</div>
+                <div className="text-[#0F1923] font-medium">0.1% of MC</div>
+              </div>
+              <div>
+                <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Eligibility</div>
+                <div className="text-[#0F1923] font-medium">Both required</div>
+              </div>
+              <div>
+                <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Distributed in</div>
+                <div className="text-[#0F1923] font-medium">SOL</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {metrics.map((m) => (
