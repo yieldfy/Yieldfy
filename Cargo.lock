@@ -2930,6 +2930,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "yieldfy_distributor"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "solana-keccak-hasher",
+]
+
+[[package]]
 name = "zerocopy"
 version = "0.8.48"
 source = "registry+https://github.com/rust-lang/crates.io-index"

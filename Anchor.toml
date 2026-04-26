@@ -7,9 +7,15 @@ skip-lint = false
 
 [programs.localnet]
 yieldfy = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"
+yieldfy_distributor = "9jXLmjPtUSZ2P1D22mXYSmjmHPty2AExeU1cXoEwnEqa"
 
 [programs.devnet]
 yieldfy = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"
+yieldfy_distributor = "9jXLmjPtUSZ2P1D22mXYSmjmHPty2AExeU1cXoEwnEqa"
+
+[programs.mainnet]
+yieldfy = "3PY2nY7UVQR327WeSdJFrsrcrqhD4wE2CHg4ZcDarGDE"
+yieldfy_distributor = "9jXLmjPtUSZ2P1D22mXYSmjmHPty2AExeU1cXoEwnEqa"
 
 [registry]
 url = "https://api.apr.dev"

@@ -1,0 +1,520 @@
+{
+  "address": "9jXLmjPtUSZ2P1D22mXYSmjmHPty2AExeU1cXoEwnEqa",
+  "metadata": {
+    "name": "yieldfy_distributor",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Yieldfy SOL rewards merkle distributor — claim Phase 2 SOL yields against the indexer-published root"
+  },
+  "instructions": [
+    {
+      "name": "claim",
+      "docs": [
+        "Submit a merkle proof to claim this epoch's SOL allocation. The",
+        "`ClaimStatus` PDA prevents double-claims for (distributor, epoch, index)."
+      ],
+      "discriminator": [
+        62,
+        198,
+        214,
+        193,
+        213,
+        159,
+        108,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claim_status",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  108,
+                  97,
+                  105,
+                  109
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              },
+              {
+                "kind": "arg",
+                "path": "epoch_id"
+              },
+              {
+                "kind": "arg",
+                "path": "index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "claimant",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_id",
+          "type": "u64"
+        },
+        {
+          "name": "index",
+          "type": "u32"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "proof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize",
+      "docs": [
+        "One-time setup. Creates the Distributor account + the SOL treasury PDA.",
+        "`admin` becomes the only key that can publish new epoch roots and",
+        "withdraw stuck treasury funds. Squads vault is the expected admin in",
+        "production."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  105,
+                  115,
+                  116,
+                  114,
+                  105,
+                  98,
+                  117,
+                  116,
+                  111,
+                  114
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "args.distributor_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "publish_epoch",
+      "docs": [
+        "Admin-only. Posts the merkle root for a new epoch. The root commits to",
+        "the full set of (wallet, lamports) leaves the indexer published.",
+        "`epoch_lamports_total` is the sum of all leaf amounts — used as a",
+        "sanity bound: total claimed for the epoch can never exceed this."
+      ],
+      "discriminator": [
+        222,
+        6,
+        136,
+        82,
+        54,
+        246,
+        245,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "distributor"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "epoch_id",
+          "type": "u64"
+        },
+        {
+          "name": "merkle_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "epoch_lamports_total",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_paused",
+      "docs": [
+        "Admin-only circuit breaker. While paused, publish + claim revert."
+      ],
+      "discriminator": [
+        91,
+        60,
+        125,
+        192,
+        176,
+        225,
+        166,
+        218
+      ],
+      "accounts": [
+        {
+          "name": "distributor",
+          "writable": true
+        },
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "distributor"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    },
+    {
+      "name": "top_up",
+      "docs": [
+        "Anyone can call this — it tops up the treasury PDA from the payer.",
+        "In practice the admin (Squads vault) calls it, but funding from any",
+        "wallet is fine since SOL has no spend authority once it lands."
+      ],
+      "discriminator": [
+        236,
+        225,
+        96,
+        9,
+        60,
+        106,
+        77,
+        208
+      ],
+      "accounts": [
+        {
+          "name": "distributor"
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "distributor"
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "ClaimStatus",
+      "discriminator": [
+        22,
+        183,
+        249,
+        157,
+        247,
+        95,
+        150,
+        96
+      ]
+    },
+    {
+      "name": "Distributor",
+      "discriminator": [
+        90,
+        90,
+        217,
+        147,
+        6,
+        32,
+        135,
+        4
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Paused",
+      "msg": "Distributor is paused"
+    },
+    {
+      "code": 6001,
+      "name": "EpochNotMonotonic",
+      "msg": "Epoch id must be strictly greater than the current epoch"
+    },
+    {
+      "code": 6002,
+      "name": "WrongEpoch",
+      "msg": "Claim references an epoch that's not currently active"
+    },
+    {
+      "code": 6003,
+      "name": "BadProof",
+      "msg": "Merkle proof did not verify against the published root"
+    },
+    {
+      "code": 6004,
+      "name": "EpochExhausted",
+      "msg": "Cumulative claims would exceed the epoch's published total"
+    },
+    {
+      "code": 6005,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    },
+    {
+      "code": 6006,
+      "name": "TreasuryUnderflow",
+      "msg": "Treasury balance is below the requested payout"
+    }
+  ],
+  "types": [
+    {
+      "name": "ClaimStatus",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor",
+            "type": "pubkey"
+          },
+          {
+            "name": "epoch_id",
+            "type": "u64"
+          },
+          {
+            "name": "index",
+            "type": "u32"
+          },
+          {
+            "name": "claimant",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Distributor",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury_bump",
+            "type": "u8"
+          },
+          {
+            "name": "distributor_bump",
+            "type": "u8"
+          },
+          {
+            "name": "distributor_id",
+            "type": "u64"
+          },
+          {
+            "name": "current_epoch_id",
+            "type": "u64"
+          },
+          {
+            "name": "current_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "epoch_lamports_total",
+            "type": "u64"
+          },
+          {
+            "name": "epoch_lamports_claimed",
+            "type": "u64"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "distributor_id",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
