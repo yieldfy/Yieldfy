@@ -483,6 +483,155 @@ function AgentLogic() {
   );
 }
 
+function Roadmap() {
+  const ref = useReveal<HTMLDivElement>();
+  const phases = [
+    {
+      n: "01",
+      status: "live",
+      title: "Vault & Receipt",
+      window: "Live · Mainnet",
+      body: "wXRP deposits route through a Squads-controlled program PDA and mint yXRP receipts 1:1. Withdrawals are always-on; user funds remain provably exitable.",
+      bullets: [
+        "On-chain deposit + 1:1 yXRP redemption",
+        "Squads 2-of-2 program upgrade authority",
+        "Open-source program + SDK (npm: @yieldfy/sdk)",
+        "Optimizer signs ed25519 attestations every routing call",
+      ],
+    },
+    {
+      n: "02",
+      status: "active",
+      title: "$YIELDFY Launch",
+      window: "May 2026",
+      body: "Native token activates the first real reward layer. Stake wXRP and hold $YIELDFY to earn Solana yield from the protocol's bootstrap treasury, distributed weekly.",
+      bullets: [
+        "Yieldfy Points snapshot → claimable $YIELDFY allocation",
+        "SOL yield distributions gated on dual participation (vault + token)",
+        "yXRP/USDC liquidity market with $YIELDFY emissions",
+        "Genesis Depositor commemorative NFT",
+        "Public Day-7 governance vote on Phase 3 venue priority",
+      ],
+    },
+    {
+      n: "03",
+      status: "next",
+      title: "Yield Activation",
+      window: "On first wXRP listing",
+      body: "Routing flips from theatre to live as soon as a major Solana lending venue lists wXRP. Multi-venue scoring activates against the same attestation framework already shipping today.",
+      bullets: [
+        "Real CPI routing into Kamino, MarginFi, Save, or Drift Spot",
+        "Multi-venue scoring with Conservative / Balanced / Opportunistic profiles",
+        "Auto-rebalance ix triggered by attested venue rotation",
+        "Live wXRP APY surfaced on dashboard",
+      ],
+    },
+    {
+      n: "04",
+      status: "planned",
+      title: "Treasury Grade",
+      window: "Q4 2026",
+      body: "Yieldfy graduates into the institutional surface its architecture has been built for: audited, multi-asset, and embedded directly into the XRPL→Solana corridor.",
+      bullets: [
+        "Independent audit of program + optimizer attestation flow",
+        "Multi-asset support beyond wXRP — USDC, USDY, other XRPL-bridged RWAs",
+        "Embedded XRP → wXRP bridge in-app",
+        "Whitelist mode + sub-vault accounts for treasury clients",
+        "Attestation export for compliance / accounting",
+      ],
+    },
+  ];
+
+  const statusStyle = (s: string) => {
+    switch (s) {
+      case "live":
+        return "bg-emerald-500/15 text-emerald-700 border-emerald-500/30";
+      case "active":
+        return "gradient-bg text-[#0F1923]";
+      case "next":
+        return "bg-[#0F1923]/8 text-[#0F1923]/70 border-[#0F1923]/15";
+      default:
+        return "bg-transparent text-[#0F1923]/40 border-[#0F1923]/15";
+    }
+  };
+  const statusLabel = (s: string) => {
+    switch (s) {
+      case "live":
+        return "Live";
+      case "active":
+        return "Active build";
+      case "next":
+        return "Next";
+      default:
+        return "Planned";
+    }
+  };
+
+  return (
+    <section id="roadmap" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
+      <Blobs />
+      <div className="relative max-w-6xl mx-auto">
+        <SectionLabel number="05" label="Roadmap" />
+        <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-4 max-w-3xl ${TEXT} reveal`}>
+          From custody-grade rails to{" "}
+          <span className="font-instrument italic font-normal gradient-text">institutional yield routing.</span>
+        </h2>
+        <p className={`text-sm md:text-base ${TEXT_60} max-w-2xl mb-12 md:mb-16 reveal`}>
+          The pitch above is a destination, not a snapshot. Below is what's shipped today, what's activating at $YIELDFY launch, and what gates the rest. We update it every milestone.
+        </p>
+
+        <div className="relative">
+          <div
+            aria-hidden="true"
+            className="hidden md:block absolute left-[19px] top-2 bottom-2 w-px bg-gradient-to-b from-[#0F1923]/30 via-[#0F1923]/15 to-transparent"
+          />
+          <div className="space-y-6 md:space-y-8">
+            {phases.map((p, i) => (
+              <div
+                key={p.n}
+                className="relative md:pl-[60px] reveal"
+                style={{ transitionDelay: `${i * 80}ms` }}
+              >
+                <div className="hidden md:flex absolute left-0 top-6 w-10 h-10 rounded-full bg-white border border-[#0F1923]/15 items-center justify-center font-mono text-xs text-[#0F1923]/70">
+                  {p.n}
+                </div>
+                <div className="glass-card glass-card-hover p-6 md:p-8">
+                  <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
+                    <div className="min-w-0">
+                      <div className={`text-[10px] tracking-[0.2em] uppercase mb-2 md:hidden ${TEXT_50}`}>
+                        Phase {p.n}
+                      </div>
+                      <h3 className={`text-2xl md:text-3xl font-light ${TEXT}`}>{p.title}</h3>
+                      <div className={`text-xs tracking-wider uppercase mt-1 ${TEXT_50}`}>{p.window}</div>
+                    </div>
+                    <span
+                      className={`inline-flex items-center gap-2 text-[10px] tracking-[0.18em] uppercase px-3 py-1 rounded-full border whitespace-nowrap ${statusStyle(p.status)}`}
+                    >
+                      {p.status === "live" && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      )}
+                      {statusLabel(p.status)}
+                    </span>
+                  </div>
+                  <p className={`${TEXT_70} leading-relaxed text-sm mb-5`}>{p.body}</p>
+                  <ul className="space-y-2">
+                    {p.bullets.map((b) => (
+                      <li key={b} className={`flex items-start gap-3 text-sm ${TEXT_70}`}>
+                        <GradientDot className="mt-1.5" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Security() {
   const ref = useReveal<HTMLDivElement>();
   const items = [
@@ -495,7 +644,7 @@ function Security() {
     <section id="security" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
-        <SectionLabel number="05" label="Security" />
+        <SectionLabel number="06" label="Security" />
         <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Built for capital that{" "}
           <span className="font-instrument italic font-normal gradient-text">cannot afford to be wrong.</span>
@@ -529,7 +678,7 @@ function Pricing() {
     <section id="pricing" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_CREAM}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-6xl mx-auto">
-        <SectionLabel number="06" label="Pricing" />
+        <SectionLabel number="07" label="Pricing" />
         <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 max-w-3xl ${TEXT} reveal`}>
           Aligned with your yield —{" "}
           <span className="font-instrument italic font-normal gradient-text">not your TVL.</span>
@@ -595,7 +744,7 @@ function FAQ() {
     <section id="faq" className={`relative py-20 px-5 md:py-32 md:px-8 overflow-hidden ${BG_SAND}`} ref={ref}>
       <Blobs />
       <div className="relative max-w-4xl mx-auto">
-        <SectionLabel number="07" label="Questions" />
+        <SectionLabel number="08" label="Questions" />
         <h2 className={`text-[28px] md:text-[36px] lg:text-[44px] leading-[1.1] font-light mb-12 md:mb-16 ${TEXT} reveal`}>
           Frequently{" "}
           <span className="font-instrument italic font-normal gradient-text">asked.</span>
@@ -775,6 +924,7 @@ function ScrolledNav() {
     { label: "How it works", href: "#how-it-works" },
     { label: "Architecture", href: "#architecture" },
     { label: "Venues", href: "#venues" },
+    { label: "Roadmap", href: "#roadmap" },
     { label: "Pricing", href: "#pricing" },
     { label: "FAQ", href: "#faq" },
   ];
@@ -817,6 +967,7 @@ export default function YieldfyLanding() {
       <Architecture />
       <Venues />
       <AgentLogic />
+      <Roadmap />
       <Security />
       <Pricing />
       <FAQ />
