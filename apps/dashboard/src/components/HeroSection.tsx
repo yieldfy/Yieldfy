@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Architecture", href: "#architecture" },
   { label: "Venues", href: "#venues" },
+  { label: "Roadmap", href: "#roadmap" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ];

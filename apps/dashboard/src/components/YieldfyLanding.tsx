@@ -895,6 +895,7 @@ function FooterSection() {
               {[
                 { label: "Architecture", href: "#architecture" },
                 { label: "Agent logic", href: "#agent" },
+                { label: "Roadmap", href: "#roadmap" },
                 { label: "Security", href: "#security" },
               ].map((item) => (
                 <li key={item.label}>
