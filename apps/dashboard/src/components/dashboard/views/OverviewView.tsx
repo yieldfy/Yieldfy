@@ -67,7 +67,7 @@ const OverviewView = () => {
               </div>
               <div>
                 <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Pool size</div>
-                <div className="text-[#0F1923] font-medium">0.1% of MC</div>
+                <div className="text-[#0F1923] font-medium">0.0675% of MC</div>
               </div>
               <div>
                 <div className="text-[#0F1923]/40 uppercase tracking-wider mb-1">Eligibility</div>

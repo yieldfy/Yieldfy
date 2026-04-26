@@ -15,7 +15,11 @@ export interface RewardParams {
   alpha: number;
   /** Exponent applied to USD value of wXRP in vault. */
   beta: number;
-  /** Fraction of $YIELDFY market cap distributed each epoch (e.g. 0.001 = 0.1% / week). */
+  /**
+   * Fraction of $YIELDFY market cap distributed each epoch.
+   * Default 0.000675 (0.0675% / week) — conservative launch rate. The protocol
+   * raises this as TVL and MC scale.
+   */
   distributionRatePerEpoch: number;
   /** Minimum $YIELDFY balance to be eligible for any reward. Anti-dust. */
   minYieldfy: number;
@@ -26,7 +30,7 @@ export interface RewardParams {
 export const DEFAULT_REWARD_PARAMS: RewardParams = {
   alpha: 0.6, // token holding weighted slightly more
   beta: 0.4,
-  distributionRatePerEpoch: 0.001, // 0.1% of MC per week
+  distributionRatePerEpoch: 0.000675, // 0.0675% of MC per week — launch rate, scales up later
   minYieldfy: 1_000,
   minVaultUsd: 0.1,
 };
