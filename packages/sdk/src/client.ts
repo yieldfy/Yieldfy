@@ -131,9 +131,17 @@ export class Yieldfy {
     const userWxrp = getAssociatedTokenAddressSync(cfg.wxrpMint, user);
     const userYxrp = getAssociatedTokenAddressSync(cfg.yxrpMint, user);
 
-    // First-time depositors don't yet have a yXRP token account. The on-chain
-    // deposit IX expects `user_yxrp` to be initialized, so create it
-    // idempotently (no-op when it already exists) as a pre-instruction.
+    // ATA-creation only on first deposit. createAssociatedTokenAccountIdempotent
+    // is a no-op when the ATA exists, so we *could* always include it — but
+    // dropping it on repeat deposits keeps the tx as [ed25519, deposit] (2 ixs)
+    // instead of [ed25519, createATA, deposit] (3 ixs). Phantom's
+    // "this dApp could be malicious" heuristic flags ed25519-at-index-0 paired
+    // with multiple subsequent ixs (the signature-spoof attack pattern); the
+    // shorter tx slips under that threshold for returning depositors.
+    const { connection } = this.provider;
+    const userYxrpAccount = await connection.getAccountInfo(userYxrp);
+    const needsAtaInit = userYxrpAccount === null;
+
     const ataIx = createAssociatedTokenAccountIdempotentInstruction(
       user,
       userYxrp,
@@ -143,13 +151,12 @@ export class Yieldfy {
 
     const edIx: TransactionInstruction = buildAttestationPreIx(att);
 
-    // attest::verify hardcodes ix index 0 for the ed25519 precompile. Empirically,
-    // current Phantom versions REORDER any ComputeBudget ixs to the front of the
-    // tx — even when we provide our own — which displaces ed25519 and triggers
-    // BadAttestIx (6003) on-chain. We deliberately omit ComputeBudget here so
-    // Phantom has nothing to reorder. If a future Phantom auto-injects despite
-    // none being present, the on-chain attestor scan will need to move from
-    // index 0 → first-ed25519-found.
+    // attest::verify hardcodes ix index 0 for the ed25519 precompile. Current
+    // Phantom REORDERS any ComputeBudget ixs to the front, displacing ed25519
+    // and triggering BadAttestIx (6003) on-chain — so we deliberately omit
+    // ComputeBudget. The ed25519-first shape can trip Phantom's malicious
+    // heuristic (see ATA comment above); minimizing post-ed25519 ixs is the
+    // remaining knob until the on-chain program scans for ed25519 at any index.
     const methods = this.program.methods as unknown as {
       depositWxrpToKamino(args: {
         amount: BN;
@@ -185,10 +192,9 @@ export class Yieldfy {
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .preInstructions([edIx, ataIx])
+      .preInstructions(needsAtaInit ? [edIx, ataIx] : [edIx])
       .transaction();
 
-    const { connection } = this.provider;
     const sig = await sendTransaction(tx, connection);
     const latest = await connection.getLatestBlockhash();
     await connection.confirmTransaction(
