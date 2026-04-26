@@ -11,6 +11,7 @@
  */
 
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { register, Counter, Gauge } from "prom-client";
 import { env } from "./env.js";
@@ -57,6 +58,21 @@ async function loadPublisherConfig(): Promise<PublisherConfig | null> {
 
 async function main() {
   const fastify = Fastify({ logger: true });
+  // Allow the dashboard (production + previews + local dev) to read claim
+  // proofs cross-origin. Same-origin server-to-server callers (no Origin
+  // header — curl, indexer cron, etc.) are passed through.
+  await fastify.register(cors, {
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const ok =
+        origin === "https://www.yieldfy.ai" ||
+        origin === "https://yieldfy.ai" ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        /^https:\/\/yieldfypriv-[a-z0-9-]+\.vercel\.app$/.test(origin);
+      cb(null, ok);
+    },
+    methods: ["GET", "POST"],
+  });
   const conn = new Connection(env.SOLANA_RPC_URL, "confirmed");
   const storage = new EpochStorage(env.STORAGE_DIR);
   await storage.ensureDir();
