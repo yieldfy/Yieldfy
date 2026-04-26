@@ -1,5 +1,6 @@
 import { AnchorProvider, BN, Program, type Idl } from "@coral-xyz/anchor";
 import {
+  ComputeBudgetProgram,
   PublicKey,
   SystemProgram,
   type TransactionInstruction,
@@ -120,6 +121,14 @@ export class Yieldfy {
 
     const edIx: TransactionInstruction = buildAttestationPreIx(att);
 
+    // attest::verify hardcodes ix index 0 for the ed25519 precompile. Phantom
+    // auto-prepends ComputeBudget priority-fee ixs at signing time when the
+    // tx contains none, which would shift ed25519 off index 0. Including our
+    // own setComputeUnitLimit + setComputeUnitPrice (after edIx) suppresses
+    // Phantom's injection while keeping ed25519 at index 0.
+    const cbLimitIx = ComputeBudgetProgram.setComputeUnitLimit({ units: 200_000 });
+    const cbPriceIx = ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 1 });
+
     const methods = this.program.methods as unknown as {
       depositWxrpToKamino(args: {
         amount: BN;
@@ -153,7 +162,7 @@ export class Yieldfy {
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .preInstructions([ataIx, edIx])
+      .preInstructions([edIx, cbLimitIx, cbPriceIx, ataIx])
       .rpc();
   }
 
