@@ -31,6 +31,14 @@ export interface EpochResult {
       proof: string[];
     }
   >;
+  /** Sum of all claim.lamports as bigint string. Used to fund the Saber distributor. "0" for empty-pool epochs. */
+  totalLamports: string;
+  /** Saber distributor PDA base58, populated by the publisher after the Squads tx confirms. Null while pending or for empty-pool epochs. */
+  saberDistributor: string | null;
+  /** Base keypair pubkey used to derive the Saber distributor PDA. Same null semantics as saberDistributor. */
+  saberDistributorBase: string | null;
+  /** Wall-clock ms when the publisher confirmed the Squads tx. Null until then. */
+  saberPublishedAt: number | null;
 }
 
 export class EpochStorage {

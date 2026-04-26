@@ -1,12 +1,10 @@
 /**
  * Merkle tree builder for per-wallet SOL claim proofs.
  *
- * Leaf format: keccak256(<index:u32 LE> || <wallet:32-byte pubkey> || <lamports:u64 LE>).
- * The index field locks the order so the on-chain distributor can index
- * claim bitmap entries deterministically (Saber-style).
- *
- * NOTE: when we ship the on-chain distributor program, the leaf layout MUST
- * match this exactly. If you change the layout here, change the program too.
+ * Leaf format: keccak256(<index:u64 LE> || <wallet:32-byte pubkey> || <lamports:u64 LE>).
+ * Matches Saber merkle-distributor (program MRKGLMizK9XSTaD1d1jbVkdHZbQVCSnPpYiTw9aKQv8)
+ * — sorted-pair concat, keccak256 — so the root we publish here is directly
+ * usable in Saber's `new_distributor` call.
  */
 
 import { PublicKey } from "@solana/web3.js";
@@ -20,8 +18,8 @@ export interface ClaimLeaf {
 }
 
 function leafBuffer(leaf: ClaimLeaf): Buffer {
-  const idx = Buffer.alloc(4);
-  idx.writeUInt32LE(leaf.index, 0);
+  const idx = Buffer.alloc(8);
+  idx.writeBigUInt64LE(BigInt(leaf.index), 0);
   const pk = new PublicKey(leaf.wallet).toBuffer();
   const lp = Buffer.alloc(8);
   lp.writeBigUInt64LE(leaf.lamports, 0);

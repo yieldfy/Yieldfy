@@ -74,12 +74,14 @@ export async function runEpoch(args: RunEpochArgs): Promise<EpochResult> {
   );
 
   const claims: EpochResult["claims"] = {};
+  let totalLamports = 0n;
   for (const { leaf, proof } of tree.leaves) {
     claims[leaf.wallet] = {
       index: leaf.index,
       lamports: leaf.lamports.toString(),
       proof,
     };
+    totalLamports += leaf.lamports;
   }
 
   const epochId = await nextEpochId(args.storage);
@@ -97,6 +99,10 @@ export async function runEpoch(args: RunEpochArgs): Promise<EpochResult> {
     participants: participants.length,
     scores,
     claims,
+    totalLamports: totalLamports.toString(),
+    saberDistributor: null,
+    saberDistributorBase: null,
+    saberPublishedAt: null,
   };
   await args.storage.write(result);
   return result;

@@ -16,6 +16,7 @@
   "dependencies": {
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.0",
+    "@sqds/multisig": "^2.1.4",
     "@yieldfy/sdk": "*",
     "fastify": "^4.28.1",
     "keccak256": "^1.0.6",

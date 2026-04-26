@@ -46,10 +46,15 @@ export {
 } from "./rewards.js";
 
 export {
-  YieldfyDistributor,
-  CLAIM_SEED,
-  DISTRIBUTOR_SEED,
-  TREASURY_SEED,
-  fetchClaimProof,
-  type ClaimProof,
-} from "./distributor.js";
+  SABER_DISTRIBUTOR_PROGRAM_ID,
+  SABER_DISTRIBUTOR_SEED,
+  SABER_CLAIM_STATUS_SEED,
+  findSaberDistributorPda,
+  findSaberClaimStatusPda,
+  buildSaberNewDistributorIx,
+  buildSaberClaimIx,
+  type NewDistributorAccounts,
+  type NewDistributorArgs,
+  type ClaimAccounts,
+  type ClaimArgs,
+} from "./saber-distributor.js";

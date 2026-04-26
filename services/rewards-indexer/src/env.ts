@@ -29,6 +29,24 @@ const schema = z.object({
   ALPHA: z.coerce.number().positive().optional(),
   BETA: z.coerce.number().positive().optional(),
   DISTRIBUTION_RATE: z.coerce.number().positive().optional(),
+
+  /**
+   * Squads V4 multisig PDA. Required to publish epochs on-chain via the Saber
+   * distributor — without it, /admin/publish-epoch returns a 503 and the
+   * indexer is read-only. Pre-launch (empty pools) the indexer doesn't need
+   * this; set it before the $YIELDFY token mints.
+   */
+  SQUADS_MULTISIG_PDA: z.string().optional(),
+  /** Vault index inside the multisig (Squads' "authority index"). Default 0. */
+  SQUADS_VAULT_INDEX: z.coerce.number().int().nonnegative().default(0),
+  /**
+   * Proposer keypair — needs at least Initiate permission on the multisig.
+   * Either provide a path to a JSON keypair file, OR the inline JSON content
+   * (a 64-element byte array). The proposer never holds vote/execute power in
+   * the recommended setup; member 1 + member 2 approve via Squads UI.
+   */
+  SQUADS_PROPOSER_KEYPAIR_PATH: z.string().optional(),
+  SQUADS_PROPOSER_KEYPAIR_JSON: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

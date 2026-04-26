@@ -17,8 +17,6 @@ const schema = z.object({
   VITE_YIELDFY_PROGRAM_ID: z.string().optional(),
   VITE_OPTIMIZER_URL: z.string().url().optional().default("http://localhost:4000"),
   VITE_REWARDS_INDEXER_URL: z.string().url().optional(),
-  VITE_DISTRIBUTOR_PROGRAM_ID: z.string().optional(),
-  VITE_DISTRIBUTOR_ID: z.coerce.bigint().optional().default(0n),
 });
 
 export type Env = z.infer<typeof schema>;
@@ -33,8 +31,6 @@ function validate(): Env {
     VITE_YIELDFY_PROGRAM_ID: import.meta.env.VITE_YIELDFY_PROGRAM_ID,
     VITE_OPTIMIZER_URL: import.meta.env.VITE_OPTIMIZER_URL,
     VITE_REWARDS_INDEXER_URL: import.meta.env.VITE_REWARDS_INDEXER_URL,
-    VITE_DISTRIBUTOR_PROGRAM_ID: import.meta.env.VITE_DISTRIBUTOR_PROGRAM_ID,
-    VITE_DISTRIBUTOR_ID: import.meta.env.VITE_DISTRIBUTOR_ID,
   });
   if (!parsed.success) {
     const issues = parsed.error.issues

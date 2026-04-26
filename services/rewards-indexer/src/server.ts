@@ -11,10 +11,15 @@
  */
 
 import Fastify from "fastify";
-import { Connection } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { register, Counter, Gauge } from "prom-client";
 import { env } from "./env.js";
 import { runEpoch } from "./epoch.js";
+import {
+  loadProposerKeypair,
+  publishEpochToSaber,
+  type PublisherConfig,
+} from "./saber-publisher.js";
 import { EpochStorage } from "./storage.js";
 
 const epochCount = new Counter({
@@ -29,12 +34,38 @@ const lastEpochParticipants = new Gauge({
   name: "yieldfy_rewards_last_participants",
   help: "Wallet count in the most recent snapshot.",
 });
+const publishCount = new Counter({
+  name: "yieldfy_rewards_publish_proposed_total",
+  help: "Squads vault transaction proposals successfully created.",
+});
+
+async function loadPublisherConfig(): Promise<PublisherConfig | null> {
+  if (!env.SQUADS_MULTISIG_PDA) return null;
+  if (!env.SQUADS_PROPOSER_KEYPAIR_PATH && !env.SQUADS_PROPOSER_KEYPAIR_JSON) {
+    return null;
+  }
+  const proposer: Keypair = await loadProposerKeypair({
+    path: env.SQUADS_PROPOSER_KEYPAIR_PATH,
+    inlineJson: env.SQUADS_PROPOSER_KEYPAIR_JSON,
+  });
+  return {
+    multisigPda: new PublicKey(env.SQUADS_MULTISIG_PDA),
+    vaultIndex: env.SQUADS_VAULT_INDEX,
+    proposer,
+  };
+}
 
 async function main() {
   const fastify = Fastify({ logger: true });
   const conn = new Connection(env.SOLANA_RPC_URL, "confirmed");
   const storage = new EpochStorage(env.STORAGE_DIR);
   await storage.ensureDir();
+  const publisherConfig = await loadPublisherConfig();
+  fastify.log.info(
+    publisherConfig
+      ? `[publisher] Squads configured · multisig=${publisherConfig.multisigPda.toBase58()} vault=${publisherConfig.vaultIndex}`
+      : "[publisher] Squads not configured — /admin/publish-epoch disabled",
+  );
 
   fastify.get("/health", async () => ({ ok: true }));
 
@@ -65,6 +96,7 @@ async function main() {
     return {
       epochId: result.epochId,
       merkleRoot: result.merkleRoot,
+      saberDistributor: result.saberDistributor,
       wallet: req.params.wallet,
       ...claim,
     };
@@ -85,6 +117,32 @@ async function main() {
         wallet: req.params.wallet,
         ...claim,
       };
+    },
+  );
+
+  fastify.post<{ Params: { id?: string } }>(
+    "/admin/publish-epoch/:id?",
+    async (req, reply) => {
+      if (!publisherConfig) {
+        return reply.status(503).send({
+          error:
+            "publisher not configured — set SQUADS_MULTISIG_PDA + SQUADS_PROPOSER_KEYPAIR_(PATH|JSON)",
+        });
+      }
+      const epoch =
+        req.params.id !== undefined
+          ? await storage.read(Number(req.params.id))
+          : await storage.readLatest();
+      if (!epoch) return reply.status(404).send({ error: "no such epoch" });
+
+      const result = await publishEpochToSaber({
+        conn,
+        epoch,
+        storage,
+        config: publisherConfig,
+      });
+      if (result.status === "proposed") publishCount.inc();
+      return result;
     },
   );
 
